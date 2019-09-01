@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset='utf-8' />
+	<title>www.layabox.com</title>
+	<meta name='viewport' content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no'
+	/>
+	<meta name="renderer" content="webkit"/>
+	<meta name='apple-mobile-web-app-capable' content='yes' />
+	<meta name='full-screen' content='true' />
+	<meta name='x5-fullscreen' content='true' />
+	<meta name='360-fullscreen' content='true' />
+	<meta name="laya" screenorientation ="landscape"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+	<meta http-equiv='expires' content='0' />
+	<meta http-equiv="Cache-Control" content="no-siteapp"/>
+</head>
+
+<body bgColor="#0">
+	<!--以下引用了常用类库，如果不使用，可以删除-->
+	
+    <!--核心包，封装了显示对象渲染，事件，时间管理，时间轴动画，缓动，消息交互,socket，本地存储，鼠标触摸，声音，加载，颜色滤镜，位图字体等-->
+	<script type="text/javascript" src="libs/laya.core.js"></script>
+	<!--封装了webgl渲染管线，如果使用webgl渲染，可以在初始化时调用Laya.init(1000,800,laya.webgl.WebGL);-->
+    <script type="text/javascript" src="libs/laya.webgl.js"></script>
+	<!--提供了制作UI的各种组件实现-->
+    <script type="text/javascript" src="libs/laya.ui.js"></script>
+	<!-- 物理引擎matter.js -->
+	<!--用户自定义顺序文件添加到这里-->
+	<!--jsfile--Custom-->
+	<!--jsfile--Custom-->
+
+	<!--自定义的js(src文件夹下)文件自动添加到下面jsfile模块标签里面里-->
+	<!--删除标签，ide不会自动添加js文件，请谨慎操作-->
+	<!--jsfile--startTag-->
+	<script src="js/World2DInitClass.js"></script>
+	<script src="js/world2d/physics/Physics.js"></script>
+	<script src="js/world2d/interfaces/physics/IRigidbody2D.js"></script>
+	<script src="js/world2d/interfaces/IWorld2D.js"></script>
+	<script src="js/world2d/interfaces/ITransform2D.js"></script>
+	<script src="js/world2d/interfaces/geometry/IPolygon2D.js"></script>
+	<script src="js/world2d/interfaces/collision/ICollisionDetector.js"></script>
+	<script src="js/world2d/interfaces/collision/CollisionType.js"></script>
+	<script src="js/world2d/interfaces/collision/CollisionShapEnum2D.js"></script>
+	<script src="js/world2d/interfaces/collision/CollisionLayerEnum.js"></script>
+	<script src="js/world2d/interfaces/collider/ColliderShapEnum2D.js"></script>
+	<script src="js/world2d/Helper2D.js"></script>
+	<script src="js/world2d/drawapi/DrawAPI2D.js"></script>
+	<script src="js/world2d/collision/CollisionResolutionBox2D.js"></script>
+	<script src="js/world2d/collision/CollisionResolution2D.js"></script>
+	<script src="js/Global.js"></script>
+	<script src="js/ui/layaUI.max.all.js"></script>
+	<script src="js/view/TestWorld2dShap.js"></script>
+	<script src="js/view/TestWorld2dCircle.js"></script>
+	<script src="js/view/TestWorld2dPolygon.js"></script>
+	<script src="js/view/TestWorld2dPolygon2.js"></script>
+	<script src="js/view/TestWorld2dPolygonRectangle.js"></script>
+	<script src="js/view/TestWorld2dPolygonRectangle2.js"></script>
+	<script src="js/view/TestWorld2dRectangle.js"></script>
+	<script src="js/view/TestWorld2dRectangle2.js"></script>
+	<script src="js/view/TestWorld2dRightTriangle.js"></script>
+	<script src="js/view/TestWorld2dRightTriangle2.js"></script>
+	<script src="js/view/TestWorld2dStableCircle.js"></script>
+	<script src="js/view/TestWorld2dStableRectangle.js"></script>
+	<script src="js/view/TestWorld2dTriangle.js"></script>
+	<script src="js/view/TestWorld2dTriangle2.js"></script>
+	<script src="js/world2d/interfaces/geometry/IPoint2D.js"></script>
+	<script src="js/world2d/interfaces/collider/ICollider2D.js"></script>
+	<script src="js/world2d/collider/Collider2D.js"></script>
+	<script src="js/world2d/interfaces/collider/IColliderCircle2D.js"></script>
+	<script src="js/world2d/collider/ColliderCircle2D.js"></script>
+	<script src="js/world2d/interfaces/collider/IColliderPolygon2D.js"></script>
+	<script src="js/world2d/collider/ColliderPolygon2D.js"></script>
+	<script src="js/world2d/interfaces/collision/ICollision2D.js"></script>
+	<script src="js/world2d/collision/Collision2D.js"></script>
+	<script src="js/world2d/interfaces/collision/ICollisionCircle2D.js"></script>
+	<script src="js/world2d/collision/CollisionCircle2D.js"></script>
+	<script src="js/world2d/interfaces/collision/ICollisionContact2D.js"></script>
+	<script src="js/world2d/collision/CollisionContact2D.js"></script>
+	<script src="js/world2d/interfaces/collision/ICollisionPolygon2D.js"></script>
+	<script src="js/world2d/collision/CollisionPolygon2D.js"></script>
+	<script src="js/world2d/interfaces/collision/ICollisionRectangle2D.js"></script>
+	<script src="js/world2d/collision/CollisionRectangle2D.js"></script>
+	<script src="js/world2d/interfaces/geometry/IBounds.js"></script>
+	<script src="js/world2d/geometry/Bounds.js"></script>
+	<script src="js/world2d/interfaces/geometry/ISegment2D.js"></script>
+	<script src="js/world2d/geometry/Segment2D.js"></script>
+	<script src="js/world2d/interfaces/geometry/IVector2D.js"></script>
+	<script src="js/world2d/geometry/Vector2D.js"></script>
+	<script src="js/world2d/interfaces/geometry/ICircle2D.js"></script>
+	<script src="js/world2d/physics/Rigidbody2D.js"></script>
+	<script src="js/world2d/Transform2D.js"></script>
+	<script src="js/world2d/World2D.js"></script>
+	<!--jsfile--endTag-->
+
+	<!--启动类添加到这里-->
+	<!--jsfile--Main-->
+	<script src="js/Main.js"></script>
+	<!--jsfile--Main-->
+</body>
+
+</html>
