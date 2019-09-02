@@ -8,6 +8,11 @@ module world2d {
     export class World2D implements IWorld2D {
 
         /**
+         * 调试模式
+         */
+        static DEBUG: boolean = true;
+
+        /**
          * 单例对象
          */
         static inst: IWorld2D;
@@ -51,7 +56,7 @@ module world2d {
                 this.$contacts[i].test();
             }
             // 绘制世界
-            DrawAPI2D.draw(this.$transforms);
+            World2D.DEBUG == true && DrawAPI2D.draw(this.$transforms);
         }
 
         /**
