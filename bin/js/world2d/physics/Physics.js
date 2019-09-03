@@ -20,7 +20,7 @@ var world2d;
             // 参与检测的对象列表
             var array = (layers & world2d.CollisionLayerEnum.ALL) ? null : [];
             // 默认检测所有对象
-            if (array == null) {
+            if (array === null) {
                 array = transforms.concat();
             }
             // 获取与射线包围盒发生碰撞的对象
@@ -28,11 +28,11 @@ var world2d;
                 for (var i = 0; i < transforms.length; i++) {
                     var transform = transforms[i];
                     // 不在指定的层级之中
-                    if ((transform.layer & layers) == 0) {
+                    if ((transform.layer & layers) === 0) {
                         continue;
                     }
                     // 未与射线的包围盒发生碰撞
-                    if (world2d.CollisionResolution2D.bounds2Bounds(bounds, transform.bounds) == false) {
+                    if (world2d.CollisionResolution2D.bounds2Bounds(bounds, transform.bounds) === false) {
                         continue;
                     }
                     array.push(transform);

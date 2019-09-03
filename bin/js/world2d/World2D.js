@@ -40,7 +40,7 @@ var world2d;
                 this.$contacts[i].test();
             }
             // 绘制世界
-            world2d.DrawAPI2D.draw(this.$transforms);
+            World2D.DEBUG == true && world2d.DrawAPI2D.draw(this.$transforms);
         };
         /**
          * 添加对象
@@ -50,7 +50,7 @@ var world2d;
             transform.layer = layer;
             for (var i = 0; i < this.$transforms.length; i++) {
                 var transform2 = this.$transforms[i];
-                if (this.$shouldCollide(transform.layer, transform2.layer) == true) {
+                if (this.$shouldCollide(transform.layer, transform2.layer) === true) {
                     var contact = new world2d.CollisionContact2D(transform, transform2);
                     this.$contacts.push(contact);
                 }
@@ -68,8 +68,8 @@ var world2d;
             this.$transforms.splice(index, 1);
             for (var i = this.$contacts.length - 1; i > -1; i--) {
                 var contact = this.$contacts[i];
-                if (contact.a == transform || contact.b == transform) {
-                    if (contact.touching) {
+                if (contact.a === transform || contact.b === transform) {
+                    if (contact.touching === true) {
                         contact.doCollide(world2d.CollisionType.COLLISION_EXIT);
                     }
                     this.$contacts.splice(i, 1);
@@ -85,7 +85,7 @@ var world2d;
                 a = b;
                 b = t;
             }
-            if (this.$detectors[a] == void 0) {
+            if (this.$detectors[a] === void 0) {
                 this.$detectors[a] = [];
             }
             this.$detectors[a][b] = true;
@@ -99,7 +99,7 @@ var world2d;
                 a = b;
                 b = t;
             }
-            if (this.$detectors[a] && this.$detectors[a][b]) {
+            if (this.$detectors[a] !== void 0 && this.$detectors[a][b] === true) {
                 return true;
             }
             return false;
@@ -114,6 +114,10 @@ var world2d;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 调试模式
+         */
+        World2D.DEBUG = true;
         return World2D;
     }());
     world2d.World2D = World2D;

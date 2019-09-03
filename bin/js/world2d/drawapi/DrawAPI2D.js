@@ -19,11 +19,11 @@ var world2d;
             // 绘制所有对撞机
             for (var i = 0; i < transforms.length; i++) {
                 var transform = transforms[i];
-                if (transform.collider.shap == world2d.ColliderShapEnum2D.CIRCLE) {
+                if (transform.collider.shap === world2d.ColliderShapEnum2D.CIRCLE) {
                     var collider = transform.collider;
                     DrawAPI2D.drawCircle(collider.x, collider.y, collider.radius, "#FF0000");
                 }
-                else if (transform.collider.shap == world2d.ColliderShapEnum2D.POLYGON) {
+                else if (transform.collider.shap === world2d.ColliderShapEnum2D.POLYGON) {
                     var collider = transform.collider;
                     DrawAPI2D.drawPolygon(collider.x, collider.y, collider.vertexs, "#FF0000");
                 }
@@ -32,11 +32,11 @@ var world2d;
             for (var i = 0; i < transforms.length; i++) {
                 var transform = transforms[i];
                 var lineColor = transform.hitNum == 0 ? "#0000FF" : "#00FF00";
-                if (transform.collision.shap == world2d.CollisionShapEnum2D.CIRCLE) {
+                if (transform.collision.shap === world2d.CollisionShapEnum2D.CIRCLE) {
                     var collision = transform.collision;
                     DrawAPI2D.drawCircle(collision.x, collision.y, collision.radius, lineColor);
                 }
-                else if (transform.collision.shap == world2d.CollisionShapEnum2D.RECTANGLE) {
+                else if (transform.collision.shap === world2d.CollisionShapEnum2D.RECTANGLE) {
                     var collision = transform.collision;
                     DrawAPI2D.drawRect(collision.left, collision.top, collision.right - collision.left, collision.bottom - collision.top, lineColor);
                 }

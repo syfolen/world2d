@@ -6,7 +6,7 @@ var world2d;
              * 是否使用box2d的碰撞算法
              * NOTE: box2d中的碰撞算法效率很高，但并不精确
              */
-            this.useBox2d = false;
+            this.useBox2d = true;
             /**
              * 是否检测包围盒
              */
@@ -15,28 +15,28 @@ var world2d;
              * 相撞标记
              */
             this.$touching = false;
-            if (a.collision.shap == world2d.CollisionShapEnum2D.CIRCLE) {
+            if (a.collision.shap === world2d.CollisionShapEnum2D.CIRCLE) {
                 this.$a = a;
                 this.$b = b;
-                if (b.collision.shap == world2d.CollisionShapEnum2D.CIRCLE) {
+                if (b.collision.shap === world2d.CollisionShapEnum2D.CIRCLE) {
                     this.$testFunc = this.$c2c;
                     // 圆对圆不需要检测包围盒
                     this.$testAABB = false;
                 }
-                else if (b.collision.shap == world2d.CollisionShapEnum2D.RECTANGLE) {
+                else if (b.collision.shap === world2d.CollisionShapEnum2D.RECTANGLE) {
                     this.$testFunc = this.$c2r;
                 }
                 else {
                     this.$testFunc = this.$c2p;
                 }
             }
-            else if (a.collision.shap == world2d.CollisionShapEnum2D.RECTANGLE) {
-                if (b.collision.shap == world2d.CollisionShapEnum2D.CIRCLE) {
+            else if (a.collision.shap === world2d.CollisionShapEnum2D.RECTANGLE) {
+                if (b.collision.shap === world2d.CollisionShapEnum2D.CIRCLE) {
                     this.$a = b;
                     this.$b = a;
                     this.$testFunc = this.$c2r;
                 }
-                else if (b.collision.shap == world2d.CollisionShapEnum2D.RECTANGLE) {
+                else if (b.collision.shap === world2d.CollisionShapEnum2D.RECTANGLE) {
                     this.$a = a;
                     this.$b = b;
                     this.$testFunc = this.$r2r;
@@ -52,10 +52,10 @@ var world2d;
             else {
                 this.$a = b;
                 this.$b = a;
-                if (b.collision.shap == world2d.CollisionShapEnum2D.CIRCLE) {
+                if (b.collision.shap === world2d.CollisionShapEnum2D.CIRCLE) {
                     this.$testFunc = this.$c2p;
                 }
-                else if (b.collision.shap == world2d.CollisionShapEnum2D.RECTANGLE) {
+                else if (b.collision.shap === world2d.CollisionShapEnum2D.RECTANGLE) {
                     this.$testFunc = this.$r2p;
                 }
                 else {
@@ -71,11 +71,11 @@ var world2d;
             var b = this.$b;
             var collide = this.$testAABB == false ? true : world2d.CollisionResolution2D.bounds2Bounds(a.bounds, b.bounds);
             // 若包围盒发生碰撞，则继续检测
-            if (collide == true) {
+            if (collide === true) {
                 collide = this.$testFunc.call(this, a.collision, b.collision);
             }
-            if (collide == true) {
-                if (this.$touching == false) {
+            if (collide === true) {
+                if (this.$touching === false) {
                     this.$touching = true;
                     a.hitNum++;
                     b.hitNum++;
@@ -85,7 +85,7 @@ var world2d;
                     this.doCollide(world2d.CollisionType.COLLISION_STAY);
                 }
             }
-            else if (this.$touching == true) {
+            else if (this.$touching === true) {
                 this.$touching = false;
                 a.hitNum--;
                 b.hitNum--;
@@ -95,11 +95,11 @@ var world2d;
         CollisionContact2D.prototype.doCollide = function (type) {
             var a = this.$a;
             var b = this.$b;
-            if (type == world2d.CollisionType.COLLISION_ENTER) {
+            if (type === world2d.CollisionType.COLLISION_ENTER) {
                 a.onCollisionEnter(b);
                 b.onCollisionEnter(a);
             }
-            else if (type == world2d.CollisionType.COLLISION_EXIT) {
+            else if (type === world2d.CollisionType.COLLISION_EXIT) {
                 a.onCollisionExit(b);
                 b.onCollisionExit(a);
             }
@@ -118,7 +118,7 @@ var world2d;
          * 矩型与圆
          */
         CollisionContact2D.prototype.$c2r = function (c, r) {
-            if (this.useBox2d) {
+            if (this.useBox2d === true) {
                 return world2d.CollisionResolutionBox2D.circle2Polygon(new world2d.Vector2D(c.x, c.y), c.radius, r.vertexs);
             }
             return world2d.CollisionResolution2D.circle2Polygin(c, r);
@@ -127,7 +127,7 @@ var world2d;
          * 多边型与圆
          */
         CollisionContact2D.prototype.$c2p = function (c, p) {
-            if (this.useBox2d) {
+            if (this.useBox2d === true) {
                 return world2d.CollisionResolutionBox2D.circle2Polygon(new world2d.Vector2D(c.x, c.y), c.radius, p.vertexs);
             }
             return world2d.CollisionResolution2D.circle2Polygin(c, p);
@@ -143,7 +143,7 @@ var world2d;
          * 矩型与多边型
          */
         CollisionContact2D.prototype.$r2p = function (r, p) {
-            if (this.useBox2d) {
+            if (this.useBox2d === true) {
                 return world2d.CollisionResolutionBox2D.polygon2Polygon(r.vertexs, p.vertexs);
             }
             return world2d.CollisionResolution2D.polygon2Vertexs(p, r.vertexs);
@@ -152,7 +152,7 @@ var world2d;
          * 多边形与多边形
          */
         CollisionContact2D.prototype.$p2p = function (p1, p2) {
-            if (this.useBox2d) {
+            if (this.useBox2d === true) {
                 return world2d.CollisionResolutionBox2D.polygon2Polygon(p1.vertexs, p2.vertexs);
             }
             return world2d.CollisionResolution2D.polygon2Vertexs(p1, p2.vertexs) && world2d.CollisionResolution2D.polygon2Vertexs(p2, p1.vertexs);
