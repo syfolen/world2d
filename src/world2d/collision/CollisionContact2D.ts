@@ -34,28 +34,28 @@ module world2d {
         private $touching: boolean = false;
 
         constructor(a: ITransform2D, b: ITransform2D) {
-            if (a.collision.shap == CollisionShapEnum2D.CIRCLE) {
+            if (a.collision.shap === CollisionShapEnum2D.CIRCLE) {
                 this.$a = a;
                 this.$b = b;
-                if (b.collision.shap == CollisionShapEnum2D.CIRCLE) {
+                if (b.collision.shap === CollisionShapEnum2D.CIRCLE) {
                     this.$testFunc = this.$c2c;
                     // 圆对圆不需要检测包围盒
                     this.$testAABB = false;
                 }
-                else if (b.collision.shap == CollisionShapEnum2D.RECTANGLE) {
+                else if (b.collision.shap === CollisionShapEnum2D.RECTANGLE) {
                     this.$testFunc = this.$c2r;
                 }
                 else {
                     this.$testFunc = this.$c2p;
                 }
             }
-            else if (a.collision.shap == CollisionShapEnum2D.RECTANGLE) {
-                if (b.collision.shap == CollisionShapEnum2D.CIRCLE) {
+            else if (a.collision.shap === CollisionShapEnum2D.RECTANGLE) {
+                if (b.collision.shap === CollisionShapEnum2D.CIRCLE) {
                     this.$a = b;
                     this.$b = a;
                     this.$testFunc = this.$c2r;
                 }
-                else if (b.collision.shap == CollisionShapEnum2D.RECTANGLE) {
+                else if (b.collision.shap === CollisionShapEnum2D.RECTANGLE) {
                     this.$a = a;
                     this.$b = b;
                     this.$testFunc = this.$r2r;
@@ -71,10 +71,10 @@ module world2d {
             else {
                 this.$a = b;
                 this.$b = a;
-                if (b.collision.shap == CollisionShapEnum2D.CIRCLE) {
+                if (b.collision.shap === CollisionShapEnum2D.CIRCLE) {
                     this.$testFunc = this.$c2p;
                 }
-                else if (b.collision.shap == CollisionShapEnum2D.RECTANGLE) {
+                else if (b.collision.shap === CollisionShapEnum2D.RECTANGLE) {
                     this.$testFunc = this.$r2p;
                 }
                 else {
@@ -93,12 +93,12 @@ module world2d {
             let collide: boolean = this.$testAABB == false ? true : CollisionResolution2D.bounds2Bounds(a.bounds, b.bounds);
 
             // 若包围盒发生碰撞，则继续检测
-            if (collide == true) {
+            if (collide === true) {
                 collide = this.$testFunc.call(this, a.collision, b.collision);
             }
 
-            if (collide == true) {
-                if (this.$touching == false) {
+            if (collide === true) {
+                if (this.$touching === false) {
                     this.$touching = true;
                     a.hitNum++;
                     b.hitNum++;
@@ -108,7 +108,7 @@ module world2d {
                     this.doCollide(CollisionType.COLLISION_STAY);
                 }
             }
-            else if (this.$touching == true) {
+            else if (this.$touching === true) {
                 this.$touching = false;
                 a.hitNum--;
                 b.hitNum--;
@@ -120,11 +120,11 @@ module world2d {
             const a: ITransform2D = this.$a;
             const b: ITransform2D = this.$b;
 
-            if (type == CollisionType.COLLISION_ENTER) {
+            if (type === CollisionType.COLLISION_ENTER) {
                 a.onCollisionEnter(b);
                 b.onCollisionEnter(a);
             }
-            else if (type == CollisionType.COLLISION_EXIT) {
+            else if (type === CollisionType.COLLISION_EXIT) {
                 a.onCollisionExit(b);
                 b.onCollisionExit(a);
             }
@@ -145,7 +145,7 @@ module world2d {
          * 矩型与圆
          */
         private $c2r(c: ICollisionCircle2D, r: ICollisionRectangle2D): boolean {
-            if (this.useBox2d) {
+            if (this.useBox2d === true) {
                 return CollisionResolutionBox2D.circle2Polygon(new Vector2D(c.x, c.y), c.radius, r.vertexs);
             }
             return CollisionResolution2D.circle2Polygin(c, r);
@@ -155,7 +155,7 @@ module world2d {
          * 多边型与圆
          */
         private $c2p(c: ICollisionCircle2D, p: ICollisionPolygon2D): boolean {
-            if (this.useBox2d) {
+            if (this.useBox2d === true) {
                 return CollisionResolutionBox2D.circle2Polygon(new Vector2D(c.x, c.y), c.radius, p.vertexs);
             }
             return CollisionResolution2D.circle2Polygin(c, p);
@@ -173,7 +173,7 @@ module world2d {
          * 矩型与多边型
          */
         private $r2p(r: ICollisionRectangle2D, p: ICollisionPolygon2D): boolean {
-            if (this.useBox2d) {
+            if (this.useBox2d === true) {
                 return CollisionResolutionBox2D.polygon2Polygon(r.vertexs, p.vertexs);
             }
             return CollisionResolution2D.polygon2Vertexs(p, r.vertexs);
@@ -183,7 +183,7 @@ module world2d {
          * 多边形与多边形
          */
         private $p2p(p1: ICollisionPolygon2D, p2: ICollisionPolygon2D): boolean {
-            if (this.useBox2d) {
+            if (this.useBox2d === true) {
                 return CollisionResolutionBox2D.polygon2Polygon(p1.vertexs, p2.vertexs);
             }
             return CollisionResolution2D.polygon2Vertexs(p1, p2.vertexs) && CollisionResolution2D.polygon2Vertexs(p2, p1.vertexs);

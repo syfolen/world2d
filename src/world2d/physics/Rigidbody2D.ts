@@ -30,12 +30,12 @@ module world2d {
          */
         update(delta: number): void {
             // 若速率为0，则直接返回
-            if (this.velocity == null || this.velocity.length() == 0) {
+            if (this.velocity === null || this.velocity.length() === 0) {
                 return;
             }
 
             // 若扭矩为180，则进行简单的移动
-            if (this.$torque == 180) {
+            if (this.$torque === 180) {
                 this.transform.moveBy(this.velocity.x * delta, this.velocity.y * delta);
             }
             else {
@@ -77,7 +77,7 @@ module world2d {
                 // 计算实时速率
                 this.$velocity.assign(this.velocity.x, this.velocity.y);
                 // 修正当前速率的角度
-                if (abs != 0) {
+                if (abs !== 0) {
                     this.$velocity.rotate(rotation - angle);
                 }
                 // 移动

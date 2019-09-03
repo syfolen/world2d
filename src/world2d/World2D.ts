@@ -66,7 +66,7 @@ module world2d {
             transform.layer = layer;
             for (let i: number = 0; i < this.$transforms.length; i++) {
                 const transform2: ITransform2D = this.$transforms[i];
-                if (this.$shouldCollide(transform.layer, transform2.layer) == true) {
+                if (this.$shouldCollide(transform.layer, transform2.layer) === true) {
                     const contact: ICollisionContact2D = new CollisionContact2D(transform, transform2);
                     this.$contacts.push(contact);
                 }
@@ -85,8 +85,8 @@ module world2d {
             this.$transforms.splice(index, 1);
             for (let i: number = this.$contacts.length - 1; i > -1; i--) {
                 const contact: ICollisionContact2D = this.$contacts[i];
-                if (contact.a == transform || contact.b == transform) {
-                    if (contact.touching) {
+                if (contact.a === transform || contact.b === transform) {
+                    if (contact.touching === true) {
                         contact.doCollide(CollisionType.COLLISION_EXIT);
                     }
                     this.$contacts.splice(i, 1);
@@ -103,7 +103,7 @@ module world2d {
                 a = b;
                 b = t;
             }
-            if (this.$detectors[a] == void 0) {
+            if (this.$detectors[a] === void 0) {
                 this.$detectors[a] = [];
             }
             this.$detectors[a][b] = true;
@@ -118,7 +118,7 @@ module world2d {
                 a = b;
                 b = t;
             }
-            if (this.$detectors[a] && this.$detectors[a][b]) {
+            if (this.$detectors[a] !== void 0 && this.$detectors[a][b] === true) {
                 return true;
             }
             return false;

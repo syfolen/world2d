@@ -64,7 +64,7 @@ module world2d {
             }
 
             // 若顶点与圆心的距离小于半径，则碰撞
-            if (distanceLessOrEqualThanRadius == true) {
+            if (distanceLessOrEqualThanRadius === true) {
                 return true;
             }
 
@@ -79,7 +79,7 @@ module world2d {
             const p: IVector2D = ab.copy().normalize().mul(c.radius).add(a);
             // DrawAPI2D.drawLine(a, p, "#FF0000");
             // 若p与多边形顶点的顶影不重合，则不相交
-            if (CollisionResolution2D.$vertex2VertexInDirection([p], vertexs, normal) == false) {
+            if (CollisionResolution2D.$vertex2VertexInDirection([p], vertexs, normal) === false) {
                 return false;
             }
 
@@ -89,7 +89,7 @@ module world2d {
             // 检测圆与多边形顶点在多边形每条边的方向上的投影是否重合
             for (let i: number = 0; i < segments.length; i++) {
                 const segment: IVector2D = segments[i];
-                if (segment.length() == 0) {
+                if (segment.length() === 0) {
                     continue;
                 }
                 // 获取这条边的法向量，并且以半径的倍数放大
@@ -100,7 +100,7 @@ module world2d {
                 // DrawAPI2D.drawLine(c, a, "#FF0000");
                 // DrawAPI2D.drawLine(c, b, "#FF0000");
                 // 判断多边型顶点与圆顶点的投影是否相交
-                if (CollisionResolution2D.$vertex2VertexInDirection(array, vertexs, segment) == false) {
+                if (CollisionResolution2D.$vertex2VertexInDirection(array, vertexs, segment) === false) {
                     return false;
                 }
             }
@@ -156,7 +156,7 @@ module world2d {
                         y++;
                     }
                     // 若（max1 < min2 || min1 > max2）成立，则投影未相交，若己相交，则产生碰撞
-                    if ((max1 < min2 || min1 > max2) == false) {
+                    if ((max1 < min2 || min1 > max2) === false) {
                         collide = true;
                         break;
                     }
@@ -189,7 +189,7 @@ module world2d {
                         y++;
                     }
                     // 若（max1 < min2 || min1 > max2）成立，则投影未相交，若己相交，则产生碰撞
-                    if ((max1 < min2 || min1 > max2) == false) {
+                    if ((max1 < min2 || min1 > max2) === false) {
                         collide = true;
                         break;
                     }
@@ -209,11 +209,11 @@ module world2d {
 
             for (let i: number = 0; i < segments.length; i++) {
                 const segment: IVector2D = segments[i];
-                if (segment.length() == 0) {
+                if (segment.length() === 0) {
                     continue;
                 }
                 // 若未碰撞，则直接返回
-                if (CollisionResolution2D.$vertex2VertexInDirection(array, vertexs, segments[i]) == false) {
+                if (CollisionResolution2D.$vertex2VertexInDirection(array, vertexs, segments[i]) === false) {
                     return false;
                 }
             }
@@ -240,14 +240,14 @@ module world2d {
          */
         static isLineBetweenPoints(a: IVector2D, ab: IVector2D, p1: IVector2D, p2: IVector2D): boolean {
             // 若向量ab的x为0，则说明ab垂直于x轴，此时点的投影线必定与y轴平行，故可直接比较三个点的x值
-            if (ab.x == 0) {
+            if (ab.x === 0) {
                 // DrawAPI2D.drawLine(new Vector2D(a.x, 0), a, cc.Color.YELLOW);
                 // DrawAPI2D.drawLine(new Vector2D(p1.x, 0), p1, cc.Color.YELLOW);
                 // DrawAPI2D.drawLine(new Vector2D(p2.x, 0), p2, cc.Color.YELLOW);
                 return CollisionResolution2D.isXbetweenAandB(a.x, p1.x, p2.x);
             }
             // 若向量ab的y为0，则说明ab垂直于y轴，此时点的投影线必定与x轴平行，故可直接比较三个点的y值
-            else if (ab.y == 0) {
+            else if (ab.y === 0) {
                 // DrawAPI2D.drawLine(new Vector2D(0, a.y), a, cc.Color.YELLOW);
                 // DrawAPI2D.drawLine(new Vector2D(0, p1.y), p1, cc.Color.YELLOW);
                 // DrawAPI2D.drawLine(new Vector2D(0, p2.y), p2, cc.Color.YELLOW);

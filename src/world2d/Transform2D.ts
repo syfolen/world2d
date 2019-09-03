@@ -18,7 +18,7 @@ module world2d {
         /**
          * 刚体
          */
-        private $rigidbody: IRigidbody2D;
+        private $rigidbody: IRigidbody2D = null;
 
         /**
          * 矩型包围盒
@@ -66,7 +66,7 @@ module world2d {
             // 碰撞区域
             this.$collision = collision;
             // 为刚体指定实体对象
-            if (rigidbody) {
+            if (rigidbody !== null) {
                 rigidbody.transform = this;
             }
             // 创建包围盒
@@ -74,7 +74,7 @@ module world2d {
             // 更新包围盒数据
             this.$updateBounds();
             // 更新碰撞区域
-            if (collision) {
+            if (collision !== null) {
                 this.$updateCollision();
             }
         }
@@ -84,11 +84,11 @@ module world2d {
          */
         transform(delta: number): void {
             // 物理模拟计算
-            if (this.$rigidbody) {
+            if (this.$rigidbody !== null) {
                 this.$rigidbody.update(delta);
             }
             // 若数据未发生变化，则直接返回
-            if (this.$modified == false) {
+            if (this.$modified === false) {
                 return;
             }
             // 标记数据未变化
@@ -224,7 +224,7 @@ module world2d {
             const y: number = this.$collider.y;
 
             // 更新碰撞边界
-            if (this.$collider.shap == ColliderShapEnum2D.CIRCLE) {
+            if (this.$collider.shap === ColliderShapEnum2D.CIRCLE) {
                 const collider: IColliderCircle2D = this.$collider as IColliderCircle2D;
 
                 const x: number = collider.x;
@@ -272,13 +272,13 @@ module world2d {
          */
         private $updateCollision(): void {
             // 圆形需要更新坐标和半径
-            if (this.$collision.shap == CollisionShapEnum2D.CIRCLE) {
+            if (this.$collision.shap === CollisionShapEnum2D.CIRCLE) {
                 const collider: IColliderCircle2D = this.$collider as IColliderCircle2D;
                 const collision: ICollisionCircle2D = this.$collision as ICollisionCircle2D;
                 collision.updateBounds(collider.x, collider.y, collider.radius);
             }
             // 矩形直接以包围盒数据作为更新
-            else if (this.$collision.shap == CollisionShapEnum2D.RECTANGLE) {
+            else if (this.$collision.shap === CollisionShapEnum2D.RECTANGLE) {
                 const collision: ICollisionRectangle2D = this.$collision as ICollisionRectangle2D;
                 collision.updateBounds(this.$bounds.left, this.$bounds.right, this.$bounds.top, this.$bounds.bottom);
                 // 矩形还需要准备顶点数据

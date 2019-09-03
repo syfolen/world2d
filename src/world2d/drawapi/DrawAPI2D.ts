@@ -24,11 +24,11 @@ module world2d {
             // 绘制所有对撞机
             for (let i: number = 0; i < transforms.length; i++) {
                 const transform: ITransform2D = transforms[i];
-                if (transform.collider.shap == ColliderShapEnum2D.CIRCLE) {
+                if (transform.collider.shap === ColliderShapEnum2D.CIRCLE) {
                     const collider: IColliderCircle2D = transform.collider as IColliderCircle2D;
                     DrawAPI2D.drawCircle(collider.x, collider.y, collider.radius, "#FF0000");
                 }
-                else if (transform.collider.shap == ColliderShapEnum2D.POLYGON) {
+                else if (transform.collider.shap === ColliderShapEnum2D.POLYGON) {
                     const collider: IColliderPolygon2D = transform.collider as IColliderPolygon2D;
                     DrawAPI2D.drawPolygon(collider.x, collider.y, collider.vertexs, "#FF0000");
                 }
@@ -38,11 +38,11 @@ module world2d {
             for (let i: number = 0; i < transforms.length; i++) {
                 const transform: ITransform2D = transforms[i];
                 const lineColor: string = transform.hitNum == 0 ? "#0000FF" : "#00FF00";
-                if (transform.collision.shap == CollisionShapEnum2D.CIRCLE) {
+                if (transform.collision.shap === CollisionShapEnum2D.CIRCLE) {
                     const collision: ICollisionCircle2D = transform.collision as ICollisionCircle2D;
                     DrawAPI2D.drawCircle(collision.x, collision.y, collision.radius, lineColor);
                 }
-                else if (transform.collision.shap == CollisionShapEnum2D.RECTANGLE) {
+                else if (transform.collision.shap === CollisionShapEnum2D.RECTANGLE) {
                     const collision: ICollisionRectangle2D = transform.collision as ICollisionRectangle2D;
                     DrawAPI2D.drawRect(collision.left, collision.top, collision.right - collision.left, collision.bottom - collision.top, lineColor);
                 }

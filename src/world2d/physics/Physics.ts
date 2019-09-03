@@ -29,7 +29,7 @@ module world2d {
             let array: Array<ITransform2D> = (layers & CollisionLayerEnum.ALL) ? null : [];
 
             // 默认检测所有对象
-            if (array == null) {
+            if (array === null) {
                 array = transforms.concat();
             }
             // 获取与射线包围盒发生碰撞的对象
@@ -37,11 +37,11 @@ module world2d {
                 for (let i: number = 0; i < transforms.length; i++) {
                     const transform: ITransform2D = transforms[i];
                     // 不在指定的层级之中
-                    if ((transform.layer & layers) == 0) {
+                    if ((transform.layer & layers) === 0) {
                         continue;
                     }
                     // 未与射线的包围盒发生碰撞
-                    if (CollisionResolution2D.bounds2Bounds(bounds, transform.bounds) == false) {
+                    if (CollisionResolution2D.bounds2Bounds(bounds, transform.bounds) === false) {
                         continue;
                     }
                     array.push(transform);
