@@ -4,11 +4,11 @@ module world2d {
     /**
      * 刚体接口
      */
-    export interface IRigidbody2D {
+    export interface IRigidbody2D<T extends IEntity<any>> {
         /**
          * 物理对象
          */
-        transform: ITransform2D;
+        transform: ITransform2D<T>;
 
         /**
          * 速率

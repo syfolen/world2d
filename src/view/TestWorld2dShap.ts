@@ -1,15 +1,11 @@
 
 module world2d {
 
-    export abstract class TestWorld2dShap {
+    export abstract class TestWorld2dShap implements world2d.IEntity<TestWorld2dShap> {
 
         protected $collider: ICollider2D;
         protected $collision: ICollision2D;
-        protected $transform: ITransform2D;
-
-        get transform(): ITransform2D {
-            return this.$transform;
-        }
+        protected $transform: ITransform2D<TestWorld2dShap>;
 
         protected $posX: number = Math.random() * Global.WIDTH;
         protected $posY: number = Math.random() * Global.HEIGHT;
@@ -30,12 +26,12 @@ module world2d {
             this.$collider = this.$createCollider();
             this.$collision = this.$createCollision();
 
-            const rigidbody: IRigidbody2D = new Rigidbody2D();
+            const rigidbody: IRigidbody2D<TestWorld2dShap> = new Rigidbody2D<TestWorld2dShap>();
             rigidbody.velocity = new Vector2D(this.$speedX, this.$speedY);
 
-            this.$transform = new Transform2D(this.$collider, rigidbody, this.$collision);
+            this.$transform = new Transform2D<TestWorld2dShap>(this, this.$collider, rigidbody, this.$collision);
 
-            const world: IWorld2D = Global.world2d;
+            const world: IWorld2D<TestWorld2dShap> = Global.world2d;
             world.addTransform(this.$transform, world2d.CollisionLayerEnum.DEFAULT);
 
             Laya.timer.frameLoop(1, this, this.$onEnterFrame);
@@ -66,6 +62,34 @@ module world2d {
             // else if (this.$transform.scale < 1 && this.$scale < 0) {
             //     this.$scale = 0.01;
             // }
+        }
+
+        /**
+         * 碰撞产生
+         */
+        onCollisionEnter(other: IEntity<TestWorld2dShap>): void {
+
+        }
+
+        /**
+         * 碰撞产生后，结束前，每次计算碰撞结果后调用
+         */
+        onCollisionStay(other: IEntity<TestWorld2dShap>): void {
+
+        }
+
+        /**
+         * 碰撞结束
+         */
+        onCollisionExit(other: IEntity<TestWorld2dShap>): void {
+
+        }
+
+        /**
+         * 物理数据转换器
+         */
+        get transform(): ITransform2D<TestWorld2dShap> {
+            return this.$transform;
         }
     }
 }

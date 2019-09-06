@@ -4,7 +4,12 @@ module world2d {
     /**
      * 物理数据转化对象
      */
-    export class Transform2D implements ITransform2D {
+    export class Transform2D<T extends IEntity<any>> implements ITransform2D<T> {
+        /**
+         * 实体对象
+         */
+        private $entity: T = null;
+
         /**
          * 对撞机
          */
@@ -18,7 +23,7 @@ module world2d {
         /**
          * 刚体
          */
-        private $rigidbody: IRigidbody2D = null;
+        private $rigidbody: IRigidbody2D<T> = null;
 
         /**
          * 矩型包围盒
@@ -58,7 +63,9 @@ module world2d {
         /**
          * @vertexs: 原始顶点数据
          */
-        constructor(collider: ICollider2D, rigidbody: IRigidbody2D, collision: ICollision2D) {
+        constructor(entity: T, collider: ICollider2D, rigidbody: IRigidbody2D<T>, collision: ICollision2D) {
+            // 实体对象
+            this.$entity = entity;
             // 碰撞体
             this.$collider = collider;
             // 刚体对象
@@ -97,34 +104,6 @@ module world2d {
             this.$updateBounds();
             // 更新碰撞区域
             this.$updateCollision();
-        }
-
-        /**
-         * 注册碰撞回调
-         */
-        registerCollideHandler(type: CollisionType, method: Function, caller: Object): void {
-
-        }
-
-        /**
-         * 碰撞产生
-         */
-        onCollisionEnter(other: ITransform2D): void {
-
-        }
-
-        /**
-         * 碰撞产生后，结束前，每次计算碰撞结果后调用
-         */
-        onCollisionStay(other: ITransform2D): void {
-
-        }
-
-        /**
-         * 碰撞结束
-         */
-        onCollisionExit(other: ITransform2D): void {
-
         }
 
         /**
@@ -329,6 +308,13 @@ module world2d {
         }
 
         /**
+         * 获取实体对象
+         */
+        get entity(): T {
+            return this.$entity;
+        }
+
+        /**
          * 获取碰撞体
          */
         get collider(): ICollider2D {
@@ -345,7 +331,7 @@ module world2d {
         /**
          * 获取刚体
          */
-        get rigidbody(): IRigidbody2D {
+        get rigidbody(): IRigidbody2D<T> {
             return this.$rigidbody;
         }
     }

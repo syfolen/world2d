@@ -28,7 +28,7 @@ module world2d {
         /**
          * 相加
          */
-        add(vec2: IVector2D): IVector2D {
+        add(vec2: IPoint2D): IVector2D {
             this.x += vec2.x;
             this.y += vec2.y;
             return this;
@@ -37,7 +37,7 @@ module world2d {
         /**
          * 相减
          */
-        sub(vec2: IVector2D): IVector2D {
+        sub(vec2: IPoint2D): IVector2D {
             this.x -= vec2.x;
             this.y -= vec2.y;
             return this;
@@ -50,6 +50,20 @@ module world2d {
             this.x *= value;
             this.y *= value;
             return this;
+        }
+
+        /**
+         * 点积
+         */
+        dot(a: IPoint2D): number {
+            return this.x * a.x + this.y * a.y;
+        }
+
+        /**
+         * 叉积
+         */
+        cross(a: IPoint2D): number {
+            return this.x * a.y - this.y * a.x;
         }
 
         /**
@@ -165,22 +179,36 @@ module world2d {
         /**
          * 两向量相加
          */
-        static add(a: IVector2D, b: IVector2D): IVector2D {
+        static add(a: IPoint2D, b: IPoint2D): IVector2D {
             return new Vector2D(a.x + b.x, a.y + b.y);
         }
 
         /**
          * 两向量相减
          */
-        static sub(a: IVector2D, b: IVector2D): IVector2D {
+        static sub(a: IPoint2D, b: IPoint2D): IVector2D {
             return new Vector2D(b.x - a.x, b.y - a.y);
         }
 
         /**
          * 法向量
          */
-        static normal(a: IVector2D, b: IVector2D): IVector2D {
+        static normal(a: IPoint2D, b: IPoint2D): IVector2D {
             return new Vector2D(b.y - a.y, a.x - b.x);
+        }
+
+        /**
+         * 计算两个向量之间的夹角
+         */
+        static angle(a: IVector2D, b: IVector2D): number {
+            const m: number = a.length();
+            const n: number = b.length();
+
+            if (m <= 1e-9 || n < 1e-9) {
+                return 0;
+            }
+
+            return Math.acos(a.dot(b) / (m * n));
         }
     }
 }

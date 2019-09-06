@@ -1,7 +1,7 @@
 
 module world2d {
 
-    export class CollisionContact2D implements ICollisionContact2D {
+    export class CollisionContact2D<T extends IEntity<any>> implements ICollisionContact2D<T> {
         /**
          * 是否使用box2d的碰撞算法
          * NOTE: box2d中的碰撞算法效率很高，但并不精确
@@ -21,19 +21,19 @@ module world2d {
         /**
          * 对象 a
          */
-        private $a: ITransform2D;
+        private $a: ITransform2D<T>;
 
         /**
          * 对象 b
          */
-        private $b: ITransform2D;
+        private $b: ITransform2D<T>;
 
         /**
          * 相撞标记
          */
         private $touching: boolean = false;
 
-        constructor(a: ITransform2D, b: ITransform2D) {
+        constructor(a: ITransform2D<T>, b: ITransform2D<T>) {
             if (a.collision.shap === CollisionShapEnum2D.CIRCLE) {
                 this.$a = a;
                 this.$b = b;
@@ -87,8 +87,8 @@ module world2d {
          * 检测是否相撞
          */
         test(): void {
-            const a: ITransform2D = this.$a;
-            const b: ITransform2D = this.$b;
+            const a: ITransform2D<T> = this.$a;
+            const b: ITransform2D<T> = this.$b;
 
             let collide: boolean = this.$testAABB == false ? true : CollisionResolution2D.bounds2Bounds(a.bounds, b.bounds);
 
@@ -117,20 +117,20 @@ module world2d {
         }
 
         doCollide(type: CollisionType): void {
-            const a: ITransform2D = this.$a;
-            const b: ITransform2D = this.$b;
+            const a: ITransform2D<T> = this.$a;
+            const b: ITransform2D<T> = this.$b;
 
             if (type === CollisionType.COLLISION_ENTER) {
-                a.onCollisionEnter(b);
-                b.onCollisionEnter(a);
+                a.entity.onCollisionEnter(b.entity);
+                b.entity.onCollisionEnter(a.entity);
             }
             else if (type === CollisionType.COLLISION_EXIT) {
-                a.onCollisionExit(b);
-                b.onCollisionExit(a);
+                a.entity.onCollisionExit(b.entity);
+                b.entity.onCollisionExit(a.entity);
             }
             else {
-                a.onCollisionStay(b);
-                b.onCollisionStay(a);
+                a.entity.onCollisionStay(b.entity);
+                b.entity.onCollisionStay(a.entity);
             }
         }
 
@@ -189,11 +189,11 @@ module world2d {
             return CollisionResolution2D.polygon2Vertexs(p1, p2.vertexs) && CollisionResolution2D.polygon2Vertexs(p2, p1.vertexs);
         }
 
-        get a(): ITransform2D {
+        get a(): ITransform2D<T> {
             return this.$a;
         }
 
-        get b(): ITransform2D {
+        get b(): ITransform2D<T> {
             return this.$b;
         }
 

@@ -41,6 +41,18 @@ var world2d;
             return this;
         };
         /**
+         * 点积
+         */
+        Vector2D.prototype.dot = function (a) {
+            return this.x * a.x + this.y * a.y;
+        };
+        /**
+         * 叉积
+         */
+        Vector2D.prototype.cross = function (a) {
+            return this.x * a.y - this.y * a.x;
+        };
+        /**
          * 相反
          */
         Vector2D.prototype.negate = function () {
@@ -155,6 +167,17 @@ var world2d;
          */
         Vector2D.normal = function (a, b) {
             return new Vector2D(b.y - a.y, a.x - b.x);
+        };
+        /**
+         * 计算两个向量之间的夹角
+         */
+        Vector2D.angle = function (a, b) {
+            var m = a.length();
+            var n = b.length();
+            if (m <= 1e-9 || n < 1e-9) {
+                return 0;
+            }
+            return Math.acos(a.dot(b) / (m * n));
         };
         return Vector2D;
     }());

@@ -6,7 +6,7 @@ var world2d;
              * 是否使用box2d的碰撞算法
              * NOTE: box2d中的碰撞算法效率很高，但并不精确
              */
-            this.useBox2d = true;
+            this.useBox2d = false;
             /**
              * 是否检测包围盒
              */
@@ -96,16 +96,16 @@ var world2d;
             var a = this.$a;
             var b = this.$b;
             if (type === world2d.CollisionType.COLLISION_ENTER) {
-                a.onCollisionEnter(b);
-                b.onCollisionEnter(a);
+                a.entity.onCollisionEnter(b.entity);
+                b.entity.onCollisionEnter(a.entity);
             }
             else if (type === world2d.CollisionType.COLLISION_EXIT) {
-                a.onCollisionExit(b);
-                b.onCollisionExit(a);
+                a.entity.onCollisionExit(b.entity);
+                b.entity.onCollisionExit(a.entity);
             }
             else {
-                a.onCollisionStay(b);
-                b.onCollisionStay(a);
+                a.entity.onCollisionStay(b.entity);
+                b.entity.onCollisionStay(a.entity);
             }
         };
         /**

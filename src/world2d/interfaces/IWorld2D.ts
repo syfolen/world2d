@@ -9,7 +9,7 @@ module world2d {
      * 需求来自：
      * 1. 捕鱼达人
      */
-    export interface IWorld2D {
+    export interface IWorld2D<T extends IEntity<any>> {
 
         /**
          * 更新物理
@@ -19,12 +19,12 @@ module world2d {
         /**
          * 添加对象
          */
-        addTransform(transform: ITransform2D, layer?: CollisionLayerEnum): void;
+        addTransform(transform: ITransform2D<T>, layer?: CollisionLayerEnum): void;
 
         /**
          * 移除对象
          */
-        removeTransform(transform: ITransform2D): void;
+        removeTransform(transform: ITransform2D<T>): void;
 
         /**
          * 指定碰撞层级
@@ -34,6 +34,6 @@ module world2d {
         /**
          * 对象集合
          */
-        readonly transforms: Array<ITransform2D>;
+        readonly transforms: Array<ITransform2D<T>>;
     }
 }

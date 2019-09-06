@@ -26,6 +26,16 @@ module world2d {
         mul(value: number): IVector2D;
 
         /**
+         * 点积
+         */
+        dot(a: IVector2D): number;
+
+        /**
+         * 叉积
+         */
+        cross(a: IVector2D): number;
+
+        /**
          * 归零
          */
         zero(): IVector2D;

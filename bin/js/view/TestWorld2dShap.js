@@ -15,18 +15,11 @@ var world2d;
             this.$collision = this.$createCollision();
             var rigidbody = new world2d.Rigidbody2D();
             rigidbody.velocity = new world2d.Vector2D(this.$speedX, this.$speedY);
-            this.$transform = new world2d.Transform2D(this.$collider, rigidbody, this.$collision);
+            this.$transform = new world2d.Transform2D(this, this.$collider, rigidbody, this.$collision);
             var world = Global.world2d;
             world.addTransform(this.$transform, world2d.CollisionLayerEnum.DEFAULT);
             Laya.timer.frameLoop(1, this, this.$onEnterFrame);
         }
-        Object.defineProperty(TestWorld2dShap.prototype, "transform", {
-            get: function () {
-                return this.$transform;
-            },
-            enumerable: true,
-            configurable: true
-        });
         TestWorld2dShap.prototype.$onEnterFrame = function () {
             if (this.$transform.x < 0) {
                 this.$transform.rigidbody.velocity.x = Math.abs(this.$transform.rigidbody.velocity.x);
@@ -48,6 +41,31 @@ var world2d;
             //     this.$scale = 0.01;
             // }
         };
+        /**
+         * 碰撞产生
+         */
+        TestWorld2dShap.prototype.onCollisionEnter = function (other) {
+        };
+        /**
+         * 碰撞产生后，结束前，每次计算碰撞结果后调用
+         */
+        TestWorld2dShap.prototype.onCollisionStay = function (other) {
+        };
+        /**
+         * 碰撞结束
+         */
+        TestWorld2dShap.prototype.onCollisionExit = function (other) {
+        };
+        Object.defineProperty(TestWorld2dShap.prototype, "transform", {
+            /**
+             * 物理数据转换器
+             */
+            get: function () {
+                return this.$transform;
+            },
+            enumerable: true,
+            configurable: true
+        });
         return TestWorld2dShap;
     }());
     world2d.TestWorld2dShap = TestWorld2dShap;

@@ -7,7 +7,11 @@ var world2d;
         /**
          * @vertexs: 原始顶点数据
          */
-        function Transform2D(collider, rigidbody, collision) {
+        function Transform2D(entity, collider, rigidbody, collision) {
+            /**
+             * 实体对象
+             */
+            this.$entity = null;
             /**
              * 刚体
              */
@@ -32,6 +36,8 @@ var world2d;
              * 碰撞次数，大于0说明对象发生了碰撞
              */
             this.hitNum = 0;
+            // 实体对象
+            this.$entity = entity;
             // 碰撞体
             this.$collider = collider;
             // 刚体对象
@@ -69,26 +75,6 @@ var world2d;
             this.$updateBounds();
             // 更新碰撞区域
             this.$updateCollision();
-        };
-        /**
-         * 注册碰撞回调
-         */
-        Transform2D.prototype.registerCollideHandler = function (type, method, caller) {
-        };
-        /**
-         * 碰撞产生
-         */
-        Transform2D.prototype.onCollisionEnter = function (other) {
-        };
-        /**
-         * 碰撞产生后，结束前，每次计算碰撞结果后调用
-         */
-        Transform2D.prototype.onCollisionStay = function (other) {
-        };
-        /**
-         * 碰撞结束
-         */
-        Transform2D.prototype.onCollisionExit = function (other) {
         };
         /**
          * 移动
@@ -284,6 +270,16 @@ var world2d;
              */
             get: function () {
                 return this.$bounds;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Transform2D.prototype, "entity", {
+            /**
+             * 获取实体对象
+             */
+            get: function () {
+                return this.$entity;
             },
             enumerable: true,
             configurable: true

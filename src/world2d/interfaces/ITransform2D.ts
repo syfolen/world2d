@@ -4,7 +4,7 @@ module world2d {
     /**
      * 物理数据转化对象接口
      */
-    export interface ITransform2D {
+    export interface ITransform2D<T extends IEntity<any>> {
         /**
          * 层级
          */
@@ -19,21 +19,6 @@ module world2d {
          * 2D世界通过调用此方法完成对象的数据转换与碰撞
          */
         transform(delta: number): void;
-
-        /**
-         * 碰撞产生
-         */
-        onCollisionEnter(other: ITransform2D): void;
-
-        /**
-         * 碰撞产生后，结束前，每次计算碰撞结果后调用
-         */
-        onCollisionStay(other: ITransform2D): void;
-
-        /**
-         * 碰撞结束
-         */
-        onCollisionExit(other: ITransform2D): void;
 
         /**
          * 移动
@@ -97,6 +82,11 @@ module world2d {
         readonly bounds: IBounds;
 
         /**
+         * 实体对象
+         */
+        readonly entity: T;
+
+        /**
          * 碰撞体
          */
         readonly collider: ICollider2D;
@@ -109,6 +99,6 @@ module world2d {
         /**
          * 刚体
          */
-        readonly rigidbody: IRigidbody2D;
+        readonly rigidbody: IRigidbody2D<T>;
     }
 }

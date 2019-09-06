@@ -4,7 +4,7 @@ module world2d {
     /**
      * 刚体
      */
-    export class Rigidbody2D implements IRigidbody2D {
+    export class Rigidbody2D<T extends IEntity<any>> implements IRigidbody2D<T> {
         /**
          * 当前速率，此为临时变量
          */
@@ -18,7 +18,7 @@ module world2d {
         /**
          * 物理对象
          */
-        transform: ITransform2D;
+        transform: ITransform2D<T>;
 
         /**
          * 速率
