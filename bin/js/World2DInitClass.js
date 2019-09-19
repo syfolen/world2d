@@ -10,10 +10,10 @@ var world2d;
             // const a: TestWorld2dStableCircle = new TestWorld2dStableCircle();
             // const b: TestWorld2dStableRectangle = new TestWorld2dStableRectangle();
             for (var i = 0; i < count; i++) {
-                var item = new world2d.TestWorld2dCircle();
+                new world2d.TestWorld2dCircle();
             }
             for (var i = 0; i < count; i++) {
-                var item = new world2d.TestWorld2dRectangle();
+                new world2d.TestWorld2dRectangle();
             }
             for (var i = 0; i < count; i++) {
                 new world2d.TestWorld2dRectangle2();

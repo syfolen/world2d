@@ -126,16 +126,44 @@ declare module world2d {
     }
 
     /**
-     * 碰撞区域接口
+     * 对撞机接口，仅用来保存对撞机的模型数据，如圆形对撞机的半径、多边形对撞机的顶点等，坐标、缩放、旋转等数据不在此模型中
      */
-    export interface ICollision2D {
+    export interface ICollider2D {
+
+        /**
+         * 克隆
+         */
+        clone(): ICollider2D;
+
         /**
          * 形状
          */
-        readonly shap: CollisionShapEnum2D;
+        readonly shap: ColliderShapEnum2D;
     }
 
-    export interface ICollisionContact2D {
+    /**
+     * 圆形对撞机接口
+     */
+    export interface IColliderCircle2D extends ICollider2D {
+
+        /**
+         * 半径
+         */
+        radius: number;
+    }
+
+    /**
+     * 多边形对撞机接口
+     */
+    export interface IColliderPolygon2D extends ICollider2D {
+
+        /**
+         * 顶点数据
+         */
+        vertexs: Array<IVector2D>;
+    }
+
+    export interface ICollisionContact2D<T extends IEntity<any>> {
 
         /**
          * 检测是否相撞
@@ -150,12 +178,12 @@ declare module world2d {
         /**
          * 碰撞对象
          */
-        readonly a: ITransform2D;
+        readonly a: ITransform2D<T>;
 
         /**
          * 碰撞对象
          */
-        readonly b: ITransform2D;
+        readonly b: ITransform2D<T>;
 
         /**
          * 相撞标记
@@ -173,6 +201,32 @@ declare module world2d {
          * 层级b
          */
         b: CollisionLayerEnum;
+    }
+
+    /**
+     * 实体对象接口
+     */
+    export interface IEntity<T> {
+
+        /**
+         * 碰撞产生
+         */
+        onCollisionEnter(other: IEntity<any>): void;
+
+        /**
+         * 碰撞产生后，结束前，每次计算碰撞结果后调用
+         */
+        onCollisionStay(other: IEntity<any>): void;
+
+        /**
+         * 碰撞结束
+         */
+        onCollisionExit(other: IEntity<any>): void;
+
+        /**
+         * 物理数据转换器
+         */
+        readonly transform: ITransform2D<IEntity<T>>;
     }
 
     /**
@@ -204,11 +258,11 @@ declare module world2d {
     /**
      * 刚体接口
      */
-    export interface IRigidbody2D {
+    export interface IRigidbody2D<T extends IEntity<any>> {
         /**
          * 物理对象
          */
-        transform: ITransform2D;
+        transform: ITransform2D<T>;
 
         /**
          * 速率
@@ -247,9 +301,9 @@ declare module world2d {
     }
 
     /**
-     * 物理数据转化对象接口
+     * 转换器接口，用来保存对撞机数据模型在世界空间中旋转和缩放值，并提供变换的接口
      */
-    export interface ITransform2D {
+    export interface ITransform2D<T extends IEntity<any>> {
         /**
          * 层级
          */
@@ -264,21 +318,6 @@ declare module world2d {
          * 2D世界通过调用此方法完成对象的数据转换与碰撞
          */
         transform(delta: number): void;
-
-        /**
-         * 碰撞产生
-         */
-        onCollisionEnter(other: ITransform2D): void;
-
-        /**
-         * 碰撞产生后，结束前，每次计算碰撞结果后调用
-         */
-        onCollisionStay(other: ITransform2D): void;
-
-        /**
-         * 碰撞结束
-         */
-        onCollisionExit(other: ITransform2D): void;
 
         /**
          * 移动
@@ -337,12 +376,12 @@ declare module world2d {
         readonly rotation: number;
 
         /**
-         * 包围盒
+         * 实体对象
          */
-        readonly bounds: IBounds;
+        readonly entity: T;
 
         /**
-         * 碰撞体
+         * 对撞机
          */
         readonly collider: ICollider2D;
 
@@ -354,7 +393,7 @@ declare module world2d {
         /**
          * 刚体
          */
-        readonly rigidbody: IRigidbody2D;
+        readonly rigidbody: IRigidbody2D<T>;
     }
 
     /**
@@ -369,17 +408,27 @@ declare module world2d {
         /**
          * 相加
          */
-        add(vec2: IVector2D): IVector2D;
+        add(a: IPoint2D): IVector2D;
 
         /**
          * 相减
          */
-        sub(vec2: IVector2D): IVector2D;
+        sub(a: IVector2D): IVector2D;
 
         /**
          * 相乘
          */
         mul(value: number): IVector2D;
+
+        /**
+         * 点积
+         */
+        dot(a: IVector2D): number;
+
+        /**
+         * 叉积
+         */
+        cross(a: IVector2D): number;
 
         /**
          * 归零
@@ -394,7 +443,7 @@ declare module world2d {
         /**
          * 旋转（弘度）
          */
-        rotate(angle: number): IVector2D;
+        rotate(radian: number): IVector2D;
 
         /**
          * 向量与x轴之间的弧度
@@ -446,7 +495,7 @@ declare module world2d {
      * 需求来自：
      * 1. 捕鱼达人
      */
-    export interface IWorld2D {
+    export interface IWorld2D<T extends IEntity<any>> {
 
         /**
          * 更新物理
@@ -455,13 +504,14 @@ declare module world2d {
 
         /**
          * 添加对象
+         * @layer: 默认为 CollisionLayerEnum.DEFAULT
          */
-        addTransform(transform: ITransform2D, layer?: CollisionLayerEnum): void;
+        addTransform(transform: ITransform2D<T>, layer?: CollisionLayerEnum): void;
 
         /**
          * 移除对象
          */
-        removeTransform(transform: ITransform2D): void;
+        removeTransform(transform: ITransform2D<T>): void;
 
         /**
          * 指定碰撞层级
@@ -471,7 +521,7 @@ declare module world2d {
         /**
          * 对象集合
          */
-        readonly transforms: Array<ITransform2D>;
+        readonly transforms: Array<ITransform2D<T>>;
     }
 
     /**
@@ -485,59 +535,34 @@ declare module world2d {
     }
 
     /**
-     * 对撞机接口
+     * 碰撞体接口，用来保存对撞机数据模型在世界空间中的映射数据，包括矩形绝对区域、圆绝对半径和多边形的顶点绝对坐标
      */
-    export interface ICollider2D extends IPoint2D {
+    export interface ICollision2D extends IPoint2D {
 
         /**
-         * 变形
+         * 矩形区域
          */
-        scale(value: number): void;
+        bounds: IBounds;
 
         /**
-         * 旋转
+         * 更新矩形区域
          */
-        rotate(angle: number): void;
-
-        /**
-         * 克隆
-         */
-        clone(): ICollider2D;
+        updateBounds(): void;
 
         /**
          * 形状
          */
-        readonly shap: ColliderShapEnum2D;
-    }
-
-    /**
-     * 圆形对撞机接口
-     */
-    export interface IColliderCircle2D extends ICollider2D, ICircle2D {
-
-    }
-
-    /**
-     * 多边形对撞机接口
-     */
-    export interface IColliderPolygon2D extends ICollider2D, IPolygon2D {
-
-        /**
-         * 更新顶点数据
-         * NOTE: 此更新并不会触发collision的刷新
-         */
-        updateVertexs(vertexs: Array<IVector2D>): void;
+        readonly shap: CollisionShapEnum2D;
     }
 
     /**
      * 圆形碰撞区域接口（效率最高）
      */
-    export interface ICollisionCircle2D extends ICollision2D, ICircle2D {
-
+    export interface ICollisionCircle2D extends ICollision2D {
         /**
-         * 更新数据
+         * 半径
          */
-        updateBounds(x: number, y: number, radius: number): void;
+        radius: number;
     }
 
     /**
@@ -548,18 +573,28 @@ declare module world2d {
         /**
          * 更新顶点数据
          */
-        updateVertexs(x: number, y: number, vertexs: Array<IVector2D>): void;
+        updateVertexs(vertexs: Array<IPoint2D>): void;
+
+        /**
+         * 准备顶点数据
+         */
+        prepareVertexs(): void;
 
         /**
          * 准备线段数据（为多边形计算每条边的信息）
          */
         prepareSegments(): void;
+
+        /**
+         * 顶点数据是否被修改过
+         */
+        readonly modified: boolean;
     }
 
     /**
      * 矩型碰撞区域接口（效率中等）
      */
-    export interface ICollisionRectangle2D extends ICollision2D, IBounds, IPolygon2D {
+    export interface ICollisionRectangle2D extends ICollision2D, IPolygon2D {
 
         /**
          * 准备顶点数据（为矩型计算顶点信息）
@@ -590,26 +625,16 @@ declare module world2d {
     }
 
     /**
-     * 对撞机
+     * 对撞机接口，仅用来保存对撞机的模型数据，如圆形对撞机的半径、多边形对撞机的顶点坐标等，坐标、缩放、旋转等数据不在此模型中
+     * 此对象仅仅是数据结构，不具有任何行为方法
      */
     export abstract class Collider2D implements ICollider2D {
         /**
-         * 坐标
+         * 形状
          */
-        x: number;
-        y: number;
+        protected $shap: ColliderShapEnum2D;
 
-        constructor(x: number, y: number, shap: ColliderShapEnum2D);
-
-        /**
-         * 变形
-         */
-        abstract scale(value: number): void;
-
-        /**
-         * 旋转
-         */
-        abstract rotate(value: number): void;
+        constructor(shap: ColliderShapEnum2D);
 
         /**
          * 克隆
@@ -631,17 +656,7 @@ declare module world2d {
          */
         radius: number;
 
-        constructor(x: number, y: number, radius: number);
-
-        /**
-         * 变形
-         */
-        scale(value: number): void;
-
-        /**
-         * 旋转
-         */
-        rotate(angle: number): void;
+        constructor(radius: number);
 
         /**
          * 克隆
@@ -657,27 +672,7 @@ declare module world2d {
          * 顶点数据
          */
         vertexs: Array<IVector2D>;
-
-        /**
-         * @vertexs: 原始顶点数据
-         */
-        constructor(x: number, y: number, vertexs: Array<IVector2D>);
-
-        /**
-         * 变形
-         */
-        scale(value: number): void;
-
-        /**
-         * 旋转
-         */
-        rotate(angle: number): void;
-
-        /**
-         * 更新顶点数据
-         * NOTE: 此更新并不会触发collision的刷新
-         */
-        updateVertexs(vertexs: Array<IVector2D>): void;
+        constructor(vertexs: Array<IVector2D>);
 
         /**
          * 克隆
@@ -686,11 +681,32 @@ declare module world2d {
     }
 
     /**
-     * 碰撞区域
+     * 碰撞体，用来保存对撞机数据模型在世界空间中的映射数据，包括绝对坐标，绝对矩形区域、圆绝对半径、多边形顶点的绝对坐标
+     * 此对象仅仅是数据结构，不具有任何行为方法
      */
     export abstract class Collision2D implements ICollision2D {
+        /**
+         * 形状
+         */
+        protected $shap: CollisionShapEnum2D;
+
+        /**
+         * 坐标
+         */
+        x: number;
+        y: number;
+
+        /**
+         * 矩形区域
+         */
+        bounds: IBounds;
 
         constructor(shap: CollisionShapEnum2D);
+
+        /**
+         * 更新矩形区域
+         */
+        abstract updateBounds(): void;
 
         /**
          * 形状
@@ -703,12 +719,6 @@ declare module world2d {
      */
     export class CollisionCircle2D extends Collision2D implements ICollisionCircle2D {
         /**
-         * 坐标
-         */
-        x: number;
-        y: number;
-
-        /**
          * 半径
          */
         radius: number;
@@ -716,14 +726,14 @@ declare module world2d {
         constructor(radius: number);
 
         /**
-         * 更新碰撞区域
+         * 更新矩形区域
          */
-        updateBounds(x: number, y: number, radius: number): void;
+        updateBounds(): void;
     }
 
-    export class CollisionContact2D implements ICollisionContact2D {
+    export class CollisionContact2D<T extends IEntity<any>> implements ICollisionContact2D<T> {
 
-        constructor(a: ITransform2D, b: ITransform2D);
+        constructor(a: ITransform2D<T>, b: ITransform2D<T>);
 
         /**
          * 检测是否相撞
@@ -732,9 +742,9 @@ declare module world2d {
 
         doCollide(type: CollisionType): void;
 
-        readonly a: ITransform2D;
+        readonly a: ITransform2D<T>;
 
-        readonly b: ITransform2D;
+        readonly b: ITransform2D<T>;
 
         /**
          * 相撞标记
@@ -756,34 +766,38 @@ declare module world2d {
          */
         segments: Array<IVector2D>;
 
-        /**
-         * 仅适用于多边型碰撞体
-         */
         constructor(collider: IColliderPolygon2D);
+
+        /**
+         * 更新矩形区域
+         */
+        updateBounds(): void;
 
         /**
          * 更新顶点数据
          */
-        updateVertexs(x: number, y: number, vertexs: Array<IVector2D>): void;
+        updateVertexs(vertexs: Array<IVector2D>): void;
+
+        /**
+         * 准备顶点数据
+         */
+        prepareVertexs(): void;
 
         /**
          * 准备线段数据（为多边形计算每条边的信息）
          */
         prepareSegments(): void;
+
+        /**
+         * 顶点数据是否被修改过
+         */
+        readonly modified: boolean;
     }
 
     /**
      * 矩型碰撞区域（效率中等）
      */
     export class CollisionRectangle2D extends Collision2D implements ICollisionRectangle2D {
-        /**
-         * 矩形区域
-         */
-        left: number;
-        right: number;
-        top: number;
-        bottom: number;
-
         /**
          * 项点数据，当矩型与圆和多边型发生碰撞时，需要使用顶点数据
          */
@@ -799,7 +813,7 @@ declare module world2d {
         /**
          * 更新矩型区域
          */
-        updateBounds(left: number, right: number, top: number, bottom: number): void;
+        updateBounds(): void;
 
         /**
          * 准备顶点数据（为矩型计算顶点信息）
@@ -830,7 +844,7 @@ declare module world2d {
         /**
          * 检测圆与多边形是否相交
          */
-        static circle2Polygin(c: ICircle2D, polygon: IPolygon2D): boolean;
+        static circle2Polygin(c: ICircle2D, d: IPolygon2D): boolean;
 
         /**
          * 判断一组顶点与多边型顶点在多边型每条边的法线上的投影是否全部重合
@@ -868,7 +882,7 @@ declare module world2d {
 
         static clear(): void;
 
-        static draw(transforms: Array<ITransform2D>): void;
+        static draw<T extends IEntity<any>>(transforms: Array<ITransform2D<T>>): void;
 
         static drawLine(a: IPoint2D, b: IVector2D, lineColor: string): void;
 
@@ -895,12 +909,17 @@ declare module world2d {
         /**
          * 角度换算为弧度
          */
-        static d2a(d: number): number;
+        static d2r(d: number): number;
 
         /**
          * 弧度换算为角度
          */
-        static a2d(a: number): number;
+        static r2d(a: number): number;
+
+        /**
+         * 获取绝对值
+         */
+        static abs(a: number): number;
 
         /**
          * 获取较小值
@@ -913,15 +932,20 @@ declare module world2d {
         static max(a: number, b: number): number;
 
         /**
-         * 获取绝对值
+         * 为一组顶点计算边界值
          */
-        static abs(a: number): number;
+        static calculateBoundsForVertexs(vertexs: Array<IVector2D>, bounds: IBounds): void;
     }
 
     /**
      * 物理类
      */
     export class Physics {
+
+        /**
+         * 返回所有与指定点碰撞的图形
+         */
+        static testPoint<T extends IEntity<any>>(p: IVector2D): ITransform2D<T>;
 
         /**
          * 射线检测
@@ -932,11 +956,11 @@ declare module world2d {
     /**
      * 刚体
      */
-    export class Rigidbody2D implements IRigidbody2D {
+    export class Rigidbody2D<T extends IEntity<any>> implements IRigidbody2D<T> {
         /**
          * 物理对象
          */
-        transform: ITransform2D;
+        transform: ITransform2D<T>;
 
         /**
          * 速率
@@ -975,9 +999,9 @@ declare module world2d {
     }
 
     /**
-     * 物理数据转化对象
+     * 转换器，用来保存对撞机数据模型在世界空间中的坐标、旋转和缩放值，并提供变换的接口
      */
-    export class Transform2D implements ITransform2D {
+    export class Transform2D<T extends IEntity<any>> implements ITransform2D<T> {
 
         /**
          * 层级
@@ -992,27 +1016,12 @@ declare module world2d {
         /**
          * @vertexs: 原始顶点数据
          */
-        constructor(collider: ICollider2D, rigidbody: IRigidbody2D, collision: ICollision2D);
+        constructor(entity: T, collider: ICollider2D, rigidbody: IRigidbody2D<T>, collision: ICollision2D);
 
         /**
          * 2D世界通过调用此方法完成对象的数据转换与碰撞
          */
         transform(delta: number): void;
-
-        /**
-         * 碰撞产生
-         */
-        onCollisionEnter(other: ITransform2D): void;
-
-        /**
-         * 碰撞产生后，结束前，每次计算碰撞结果后调用
-         */
-        onCollisionStay(other: ITransform2D): void;
-
-        /**
-         * 碰撞结束
-         */
-        onCollisionExit(other: ITransform2D): void;
 
         /**
          * 移动
@@ -1071,24 +1080,24 @@ declare module world2d {
         readonly rotation: number;
 
         /**
-         * 包围盒
+         * 获取实体对象
          */
-        readonly bounds: IBounds;
+        readonly entity: T;
 
         /**
-         * 获取碰撞体
+         * 对撞机
          */
         readonly collider: ICollider2D;
 
         /**
-         * 碰撞区域
+         * 碰撞体
          */
         readonly collision: ICollision2D;
 
         /**
          * 获取刚体
          */
-        readonly rigidbody: IRigidbody2D;
+        readonly rigidbody: IRigidbody2D<T>;
     }
 
     /**
@@ -1111,17 +1120,27 @@ declare module world2d {
         /**
          * 相加
          */
-        add(vec2: IVector2D): IVector2D;
+        add(vec2: IPoint2D): IVector2D;
 
         /**
          * 相减
          */
-        sub(vec2: IVector2D): IVector2D;
+        sub(vec2: IPoint2D): IVector2D;
 
         /**
          * 相乘
          */
         mul(value: number): IVector2D;
+
+        /**
+         * 点积
+         */
+        dot(a: IPoint2D): number;
+
+        /**
+         * 叉积
+         */
+        cross(a: IPoint2D): number;
 
         /**
          * 相反
@@ -1131,7 +1150,7 @@ declare module world2d {
         /**
          * 旋转（弘度）
          */
-        rotate(angle: number): IVector2D;
+        rotate(radian: number): IVector2D;
 
         /**
          * 向量与x轴之间的弧度
@@ -1187,29 +1206,39 @@ declare module world2d {
         /**
          * 两向量相加
          */
-        static add(a: IVector2D, b: IVector2D): IVector2D;
+        static add(a: IPoint2D, b: IPoint2D): IVector2D;
 
         /**
          * 两向量相减
          */
-        static sub(a: IVector2D, b: IVector2D): IVector2D;
+        static sub(a: IPoint2D, b: IPoint2D): IVector2D;
 
         /**
          * 法向量
          */
-        static normal(a: IVector2D, b: IVector2D): IVector2D;
+        static normal(a: IPoint2D, b: IPoint2D): IVector2D;
+
+        /**
+         * 计算两个向量之间的夹角
+         */
+        static angle(a: IVector2D, b: IVector2D): number;
     }
 
     /**
      * 2D世界
      * 此类主要实现2D世界的碰撞
      */
-    export class World2D implements IWorld2D {
+    export class World2D<T extends IEntity<any>> implements IWorld2D<T> {
+
+        /**
+         * 调试模式
+         */
+        static DEBUG: boolean;
 
         /**
          * 单例对象
          */
-        static inst: IWorld2D;
+        static inst: IWorld2D<any>;
 
         /**
          * 碰撞分组，一经设置不可更改
@@ -1223,13 +1252,14 @@ declare module world2d {
 
         /**
          * 添加对象
+         * @layer: 默认为 CollisionLayerEnum.DEFAULT
          */
-        addTransform(transform: ITransform2D, layer?: CollisionLayerEnum): void;
+        addTransform(transform: ITransform2D<T>, layer: CollisionLayerEnum): void;
 
         /**
          * 移除对象
          */
-        removeTransform(transform: ITransform2D): void;
+        removeTransform(transform: ITransform2D<T>): void;
 
         /**
          * 添加探测器
@@ -1239,7 +1269,7 @@ declare module world2d {
         /**
          * 获取对象集合
          */
-        readonly transforms: Array<ITransform2D>;
+        readonly transforms: Array<ITransform2D<T>>;
     }
 
 }

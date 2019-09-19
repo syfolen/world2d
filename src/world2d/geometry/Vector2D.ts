@@ -78,11 +78,11 @@ module world2d {
         /**
          * 旋转（弘度）
          */
-        rotate(angle: number): IVector2D {
+        rotate(radian: number): IVector2D {
             const x: number = this.x;
             const y: number = this.y;
-            const cos: number = Math.cos(angle);
-            const sin: number = Math.sin(angle);
+            const cos: number = Math.cos(radian);
+            const sin: number = Math.sin(radian);
             this.x = x * cos - y * sin;
             this.y = x * sin + y * cos;
             return this;
@@ -92,12 +92,12 @@ module world2d {
          * 向量与x轴之间的弧度
          */
         angle(): number {
-            const angle: number = Math.atan2(this.y, this.x);
-            if (angle < 0) {
-                return angle + 2 * Math.PI;
+            const radian: number = Math.atan2(this.y, this.x);
+            if (radian < 0) {
+                return radian + 2 * Math.PI;
             }
             else {
-                return angle;
+                return radian;
             }
         }
 

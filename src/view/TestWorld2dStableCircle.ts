@@ -8,7 +8,7 @@ module world2d {
         }
 
         protected $createCollider(): ICollider2D {
-            return new ColliderCircle2D(200, 100, 80);
+            return new ColliderCircle2D(80);
         }
 
         protected $createCollision(): ICollision2D {

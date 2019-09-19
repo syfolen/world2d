@@ -17,38 +17,42 @@ module world2d {
             // 绘制所有包围盒
             for (let i: number = 0; i < transforms.length; i++) {
                 const transform: ITransform2D<T> = transforms[i];
-                const bounds: IBounds = transform.bounds;
+                const bounds: IBounds = transform.collision.bounds;
                 DrawAPI2D.drawRect(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, "#FF0000");
             }
 
             // 绘制所有对撞机
             for (let i: number = 0; i < transforms.length; i++) {
                 const transform: ITransform2D<T> = transforms[i];
-                if (transform.collider.shap === ColliderShapEnum2D.CIRCLE) {
-                    const collider: IColliderCircle2D = transform.collider as IColliderCircle2D;
-                    DrawAPI2D.drawCircle(collider.x, collider.y, collider.radius, "#FF0000");
+                if (transform.collision.shap === CollisionShapEnum2D.CIRCLE) {
+                    const collision = transform.collision as ICollisionCircle2D;
+                    DrawAPI2D.drawCircle(transform.x, transform.y, collision.radius, "#FF0000");
                 }
-                else if (transform.collider.shap === ColliderShapEnum2D.POLYGON) {
-                    const collider: IColliderPolygon2D = transform.collider as IColliderPolygon2D;
-                    DrawAPI2D.drawPolygon(collider.x, collider.y, collider.vertexs, "#FF0000");
+                else if (transform.collision.shap === CollisionShapEnum2D.POLYGON) {
+                    const collision = transform.collision as ICollisionPolygon2D;
+                    DrawAPI2D.drawPolygon(0, 0, collision.vertexs, "#FF0000");
+                }
+                else {
+                    const collision = transform.collision as ICollisionRectangle2D;
+                    DrawAPI2D.drawPolygon(0, 0, collision.vertexs, "#FF0000");
                 }
             }
 
-            // 绘制所有碰撞区域
+            // 绘制所有碰撞体
             for (let i: number = 0; i < transforms.length; i++) {
                 const transform: ITransform2D<T> = transforms[i];
-                const lineColor: string = transform.hitNum == 0 ? "#0000FF" : "#00FF00";
+                const lineColor: string = transform.hitNum === 0 ? "#0000FF" : "#00FF00";
                 if (transform.collision.shap === CollisionShapEnum2D.CIRCLE) {
                     const collision: ICollisionCircle2D = transform.collision as ICollisionCircle2D;
-                    DrawAPI2D.drawCircle(collision.x, collision.y, collision.radius, lineColor);
+                    DrawAPI2D.drawCircle(transform.x, transform.y, collision.radius, lineColor);
                 }
-                else if (transform.collision.shap === CollisionShapEnum2D.RECTANGLE) {
-                    const collision: ICollisionRectangle2D = transform.collision as ICollisionRectangle2D;
-                    DrawAPI2D.drawRect(collision.left, collision.top, collision.right - collision.left, collision.bottom - collision.top, lineColor);
-                }
-                else {
+                else if (transform.collision.shap === CollisionShapEnum2D.POLYGON) {
                     const collision: ICollisionPolygon2D = transform.collision as ICollisionPolygon2D;
                     DrawAPI2D.drawPolygon(0, 0, collision.vertexs, lineColor);
+                }
+                else {
+                    const bounds = transform.collision.bounds;
+                    DrawAPI2D.drawRect(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, lineColor);
                 }
             }
         }
@@ -73,7 +77,7 @@ module world2d {
         static drawPolygon(x: number, y: number, vertexs: Array<IVector2D>, lineColor: string): void {
             for (let i: number = 0; i < vertexs.length; i++) {
                 const a: IVector2D = vertexs[i];
-                const b: IVector2D = i == 0 ? vertexs[vertexs.length - 1] : vertexs[i - 1];
+                const b: IVector2D = i === 0 ? vertexs[vertexs.length - 1] : vertexs[i - 1];
                 DrawAPI2D.graphics.drawLine(a.x + x, a.y + y, b.x + x, b.y + y, lineColor);
             }
         }

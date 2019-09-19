@@ -2,20 +2,10 @@
 module world2d {
 
     /**
-     * 对撞机接口
+     * 对撞机接口，仅用来保存对撞机的模型数据，如圆形对撞机的半径、多边形对撞机的顶点等，坐标、缩放、旋转等数据不在此模型中
      */
-    export interface ICollider2D extends IPoint2D {
-
-        /**
-         * 变形
-         */
-        scale(value: number): void;
-
-        /**
-         * 旋转
-         */
-        rotate(angle: number): void;
-
+    export interface ICollider2D {
+        
         /**
          * 克隆
          */

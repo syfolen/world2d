@@ -18,6 +18,7 @@ module world2d {
 
         /**
          * 添加对象
+         * @layer: 默认为 CollisionLayerEnum.DEFAULT
          */
         addTransform(transform: ITransform2D<T>, layer?: CollisionLayerEnum): void;
 

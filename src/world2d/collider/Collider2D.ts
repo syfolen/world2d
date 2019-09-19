@@ -2,7 +2,8 @@
 module world2d {
 
     /**
-     * 对撞机
+     * 对撞机接口，仅用来保存对撞机的模型数据，如圆形对撞机的半径、多边形对撞机的顶点坐标等，坐标、缩放、旋转等数据不在此模型中
+     * 此对象仅仅是数据结构，不具有任何行为方法
      */
     export abstract class Collider2D implements ICollider2D {
         /**
@@ -10,27 +11,9 @@ module world2d {
          */
         protected $shap: ColliderShapEnum2D;
 
-        /**
-         * 坐标
-         */
-        x: number;
-        y: number;
-
-        constructor(x: number, y: number, shap: ColliderShapEnum2D) {
-            this.x = x;
-            this.y = y;
+        constructor(shap: ColliderShapEnum2D) {
             this.$shap = shap;
         }
-
-        /**
-         * 变形
-         */
-        abstract scale(value: number): void;
-
-        /**
-         * 旋转
-         */
-        abstract rotate(value: number): void;
 
         /**
          * 克隆

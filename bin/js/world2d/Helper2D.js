@@ -6,14 +6,23 @@ var world2d;
         /**
          * 角度换算为弧度
          */
-        Helper2D.d2a = function (d) {
+        Helper2D.d2r = function (d) {
             return d * Math.PI / 180;
         };
         /**
          * 弧度换算为角度
          */
-        Helper2D.a2d = function (a) {
+        Helper2D.r2d = function (a) {
             return a * 180 / Math.PI;
+        };
+        /**
+         * 获取绝对值
+         */
+        Helper2D.abs = function (a) {
+            if (a < 0) {
+                return -a;
+            }
+            return a;
         };
         /**
          * 获取较小值
@@ -28,13 +37,30 @@ var world2d;
             return a > b ? a : b;
         };
         /**
-         * 获取绝对值
+         * 为一组顶点计算边界值
          */
-        Helper2D.abs = function (a) {
-            if (a < 0) {
-                return -a;
+        Helper2D.calculateBoundsForVertexs = function (vertexs, bounds) {
+            var p = vertexs[0];
+            var left = p.x;
+            var right = p.x;
+            var top = p.y;
+            var bottom = p.y;
+            for (var i = 1; i < vertexs.length; i++) {
+                var p_1 = vertexs[i];
+                if (left > p_1.x) {
+                    left = p_1.x;
+                }
+                else if (right < p_1.x) {
+                    right = p_1.x;
+                }
+                if (top > p_1.y) {
+                    top = p_1.y;
+                }
+                else if (bottom < p_1.y) {
+                    bottom = p_1.y;
+                }
             }
-            return a;
+            bounds.updateBounds(left, right, top, bottom);
         };
         /**
          * PI

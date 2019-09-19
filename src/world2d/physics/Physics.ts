@@ -13,15 +13,15 @@ module world2d {
             const transforms = World2D.inst.transforms.slice(0);
             for (let i = 0; i < transforms.length; i++) {
                 const transform = transforms[i];
+                const collision = transform.collision as ICollisionCircle2D;
                 if (transform.collision.shap === CollisionShapEnum2D.CIRCLE) {
-                    const collision: ICollisionCircle2D = transform.collision as ICollisionCircle2D;
-                    if (p.distanceTo(collision) <= collision.radius) {
+                    if (p.distanceTo(transform) <= collision.radius) {
                         return transform;
                     }
                 }
                 else if (transform.collision.shap === CollisionShapEnum2D.RECTANGLE) {
-                    const collision: ICollisionRectangle2D = transform.collision as ICollisionRectangle2D;
-                    if (p.x >= collision.left && p.x <= collision.right && p.y >= collision.top && p.y <= collision.bottom) {
+                    const bounds = transform.collision.bounds;
+                    if (p.x >= bounds.left && p.x <= bounds.right && p.y >= bounds.top && p.y <= bounds.bottom) {
                         return transform;
                     }
                 }
@@ -29,17 +29,17 @@ module world2d {
                     const collision: ICollisionPolygon2D = transform.collision as ICollisionPolygon2D;
                     const vertexs = collision.vertexs;
 
-                    let angle: number = 0;
+                    let radian: number = 0;
                     for (let i = 0; i < vertexs.length; i++) {
                         const a = vertexs[i];
                         const b = i === 0 ? vertexs[vertexs.length - 1] : vertexs[i - 1];
                         if (a.x === b.x && a.y === b.y) {
                             continue;
                         }
-                        angle += Vector2D.angle(Vector2D.sub(a, p), Vector2D.sub(b, p));
+                        radian += Vector2D.angle(Vector2D.sub(a, p), Vector2D.sub(b, p));
                     }
 
-                    if (Helper2D.abs(Helper2D.a2d(angle) - 360) < 0.1) {
+                    if (Helper2D.abs(Helper2D.r2d(radian) - 360) < 0.1) {
                         return transform;
                     }
                 }
@@ -82,7 +82,7 @@ module world2d {
                         continue;
                     }
                     // 未与射线的包围盒发生碰撞
-                    if (CollisionResolution2D.bounds2Bounds(bounds, transform.bounds) === false) {
+                    if (CollisionResolution2D.bounds2Bounds(bounds, transform.collision.bounds) === false) {
                         continue;
                     }
                     array.push(transform);

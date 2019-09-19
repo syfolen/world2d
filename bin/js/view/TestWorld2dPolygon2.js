@@ -19,7 +19,7 @@ var world2d;
             return _super.call(this, world2d.CollisionLayerEnum.POLYGON) || this;
         }
         TestWorld2dPolygon2.prototype.$createCollider = function () {
-            return new world2d.ColliderPolygon2D(this.$posX, this.$posY, [
+            return new world2d.ColliderPolygon2D([
                 new world2d.Vector2D(-this.$width, 0),
                 new world2d.Vector2D(-this.$width * 0.5, this.$height * 0.5),
                 new world2d.Vector2D(0, this.$height * 0.8),

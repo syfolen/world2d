@@ -35,9 +35,9 @@ module world2d {
         /**
          * 检测圆与多边形是否相交
          */
-        static circle2Polygin(c: ICircle2D, polygon: IPolygon2D): boolean {
+        static circle2Polygin(c: ICircle2D, d: IPolygon2D): boolean {
             // 多边形顶点数据
-            const vertexs: Array<IVector2D> = polygon.vertexs;
+            const vertexs: Array<IVector2D> = d.vertexs;
             // 半径平方
             const radiusSquared: number = c.radius * c.radius;
 
@@ -84,7 +84,7 @@ module world2d {
             }
 
             const array: Array<IVector2D> = [a, b];
-            const segments: Array<IVector2D> = polygon.segments;
+            const segments: Array<IVector2D> = d.segments;
 
             // 检测圆与多边形顶点在多边形每条边的方向上的投影是否重合
             for (let i: number = 0; i < segments.length; i++) {

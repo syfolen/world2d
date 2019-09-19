@@ -40,10 +40,11 @@ var world2d;
                 this.$contacts[i].test();
             }
             // 绘制世界
-            World2D.DEBUG == true && world2d.DrawAPI2D.draw(this.$transforms);
+            World2D.DEBUG === true && world2d.DrawAPI2D.draw(this.$transforms);
         };
         /**
          * 添加对象
+         * @layer: 默认为 CollisionLayerEnum.DEFAULT
          */
         World2D.prototype.addTransform = function (transform, layer) {
             if (layer === void 0) { layer = world2d.CollisionLayerEnum.DEFAULT; }

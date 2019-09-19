@@ -13,28 +13,22 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var world2d;
 (function (world2d) {
-    /**
-     * 多边形对撞机
-     */
-    var ColliderPolygon2D = /** @class */ (function (_super) {
-        __extends(ColliderPolygon2D, _super);
-        function ColliderPolygon2D(vertexs) {
-            var _this = _super.call(this, world2d.ColliderShapEnum2D.POLYGON) || this;
-            _this.vertexs = vertexs;
+    var ColliderRectangle2D = /** @class */ (function (_super) {
+        __extends(ColliderRectangle2D, _super);
+        function ColliderRectangle2D(width, height) {
+            var _this = _super.call(this, world2d.ColliderShapEnum2D.RECTANGLE) || this;
+            _this.width = width;
+            _this.height = height;
             return _this;
         }
         /**
          * 克隆
          */
-        ColliderPolygon2D.prototype.clone = function () {
-            var vertexs = [];
-            for (var i = 0; i < this.vertexs.length; i++) {
-                vertexs.push(this.vertexs[i].copy());
-            }
-            return new ColliderPolygon2D(vertexs);
+        ColliderRectangle2D.prototype.clone = function () {
+            return new ColliderRectangle2D(this.width, this.height);
         };
-        return ColliderPolygon2D;
+        return ColliderRectangle2D;
     }(world2d.Collider2D));
-    world2d.ColliderPolygon2D = ColliderPolygon2D;
+    world2d.ColliderRectangle2D = ColliderRectangle2D;
 })(world2d || (world2d = {}));
-//# sourceMappingURL=ColliderPolygon2D.js.map
+//# sourceMappingURL=ColliderRectangle2D.js.map

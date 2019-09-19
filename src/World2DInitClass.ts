@@ -18,11 +18,11 @@ module world2d {
             // const b: TestWorld2dStableRectangle = new TestWorld2dStableRectangle();
 
             for (let i = 0; i < count; i++) {
-                const item = new TestWorld2dCircle();
+                new TestWorld2dCircle();
             }
 
             for (let i = 0; i < count; i++) {
-                const item = new TestWorld2dRectangle();
+                new TestWorld2dRectangle();
             }
 
             for (let i = 0; i < count; i++) {

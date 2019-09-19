@@ -6,12 +6,6 @@ module world2d {
      */
     export class CollisionCircle2D extends Collision2D implements ICollisionCircle2D {
         /**
-         * 坐标
-         */
-        x: number;
-        y: number;
-
-        /**
          * 半径
          */
         radius: number;
@@ -23,12 +17,10 @@ module world2d {
         }
 
         /**
-         * 更新碰撞区域
+         * 更新矩形区域
          */
-        updateBounds(x: number, y: number, radius: number): void {
-            this.x = x;
-            this.y = y;
-            this.radius = radius;
+        updateBounds(): void {
+            this.bounds.updateBounds(this.x - this.radius, this.x + this.radius, this.y - this.radius, this.y + this.radius);
         }
     }
 }

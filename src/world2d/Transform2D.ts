@@ -2,9 +2,32 @@
 module world2d {
 
     /**
-     * 物理数据转化对象
+     * 转换器，用来保存对撞机数据模型在世界空间中的坐标、旋转和缩放值，并提供变换的接口
      */
     export class Transform2D<T extends IEntity<any>> implements ITransform2D<T> {
+        /**
+         * 坐标
+         */
+        private $x: number = 0;
+        private $y: number = 0;
+
+        /**
+         * 缩放
+         */
+        private $scale: number;
+        private $scaleTo: number = 1;
+
+        /**
+         * 旋转（弧度）
+         */
+        private $radian: number;
+        private $rotateTo: number = 0;
+
+        /**
+         * 旋转（角度）
+         */
+        private $rotation: number = 0;
+
         /**
          * 实体对象
          */
@@ -24,31 +47,6 @@ module world2d {
          * 刚体
          */
         private $rigidbody: IRigidbody2D<T> = null;
-
-        /**
-         * 矩型包围盒
-         */
-        private $bounds: IBounds;
-
-        /**
-         * 缩放值
-         */
-        private $scale: number = 1;
-
-        /**
-         * 旋转（弧度）
-         */
-        private $angle: number = 0;
-
-        /**
-         * 旋转度
-         */
-        private $rotation: number = 0;
-
-        /**
-         * 属性是否发生改变
-         */
-        private $modified: boolean = false;
 
         /**
          * 层级
@@ -73,17 +71,7 @@ module world2d {
             // 碰撞区域
             this.$collision = collision;
             // 为刚体指定实体对象
-            if (rigidbody !== null) {
-                rigidbody.transform = this;
-            }
-            // 创建包围盒
-            this.$bounds = new Bounds();
-            // 更新包围盒数据
-            this.$updateBounds();
-            // 更新碰撞区域
-            if (collision !== null) {
-                this.$updateCollision();
-            }
+            if (rigidbody !== null) { rigidbody.transform = this; }
         }
 
         /**
@@ -94,15 +82,36 @@ module world2d {
             if (this.$rigidbody !== null) {
                 this.$rigidbody.update(delta);
             }
-            // 若数据未发生变化，则直接返回
-            if (this.$modified === false) {
+
+            const needUpdate = this.$needUpdate();
+            const isModifiedByExtern = this.$isModifiedByExtern();
+
+            // 不需要更新数据
+            if (needUpdate === false && isModifiedByExtern === false) {
                 return;
             }
-            // 标记数据未变化
-            this.$modified = false;
-            // 更新包围盒数据
-            this.$updateBounds();
-            // 更新碰撞区域
+
+            // 无论是否从外部更新的数据，变形、旋转和位移的操作始终是有效的
+
+            this.$scale = this.$scaleTo;
+            this.$radian = this.$rotateTo;
+
+            this.$collision.x = this.$x;
+            this.$collision.y = this.$y;
+
+            if (isModifiedByExtern === false) {
+                // 注意这三个函数的调用顺序不可互换
+                this.$applyScale();
+                this.$applyRotate();
+                this.$applyPosition();
+            }
+            // 必为多边形
+            else {
+                const collision: ICollisionPolygon2D = this.$collision as ICollisionPolygon2D;
+                collision.prepareVertexs();
+            }
+
+            // 更新碰撞体数据
             this.$updateCollision();
         }
 
@@ -110,75 +119,146 @@ module world2d {
          * 移动
          */
         moveBy(x: number, y: number): void {
-            this.$collider.x += x;
-            this.$collider.y += y;
-            this.$modified = true;
+            this.$x += x;
+            this.$y += y;
         }
 
         /**
          * 移动至
          */
         moveTo(x: number, y: number): void {
-            this.$collider.x = x;
-            this.$collider.y = y;
-            this.$modified = true;
+            this.$x = x;
+            this.$y = y;
         }
 
         /**
          * 变形
          */
         scaleBy(value: number): void {
-            this.$scale += value;
-            this.$collider.scale(1 / this.$scale + value);
-            this.$modified = true;
+            this.$scaleTo *= value;
         }
 
         /**
          * 变形至
          */
         scaleTo(value: number): void {
-            this.$collider.scale(value / this.$scale);
-            this.$scale = value;
-            this.$modified = true;
+            this.$scaleTo = value;
         }
 
         /**
          * 旋转（弧度）
          */
-        rotateBy(angle: number): void {
-            this.$collider.rotate(angle);
-            this.$updateAngle(this.$angle + angle);
-            // 多边型在旋转之后需要更新矩形显示区域
-            if (this.$collider.shap == ColliderShapEnum2D.POLYGON) {
-                this.$modified = true;
-            }
+        rotateBy(value: number): void {
+            this.$updateRadian(this.$rotateTo + value);
         }
 
         /**
          * 旋转至（弧度）
          */
-        rotateTo(angle: number): void {
-            this.$collider.rotate(angle - this.$angle);
-            this.$updateAngle(angle);
-            // 多边型在旋转之后需要更新矩形显示区域
-            if (this.$collider.shap == ColliderShapEnum2D.POLYGON) {
-                this.$modified = true;
+        rotateTo(value: number): void {
+            this.$updateRadian(value);
+        }
+
+        /**
+         * 更新弧度（此方法将旋转角度限定在0到2PI之间）
+         */
+        private $updateRadian(radian: number): void {
+            if (radian < 0) {
+                radian %= Helper2D.PI2;
+                radian += Helper2D.PI2;
+            }
+            else if (radian >= Helper2D.PI2) {
+                radian %= Helper2D.PI2;
+            }
+            if (this.$rotateTo !== radian) {
+                this.$rotateTo = radian;
+                this.$rotation = Helper2D.r2d(radian);
             }
         }
 
         /**
-         * 更新旋转角度（此方法将旋转角度限定在0到360之间）
+         * 更新碰撞区域
          */
-        private $updateAngle(angle: number): void {
-            if (angle < 0) {
-                angle %= Helper2D.PI2;
-                angle += Helper2D.PI2;
+        private $updateCollision(): void {
+            // 更新包围盒数据
+            this.$collision.updateBounds();
+
+            // 多边形还需要准备边数据
+            if (this.$collision.shap === CollisionShapEnum2D.POLYGON) {
+                const collision: ICollisionPolygon2D = this.$collision as ICollisionPolygon2D;
+                collision.prepareSegments();
             }
-            else if (angle >= Helper2D.PI2) {
-                angle %= Helper2D.PI2;
+            // 矩形还需要准备顶点数据和边数据
+            else if (this.$collision.shap === CollisionShapEnum2D.RECTANGLE) {
+                const collision = this.$collision as ICollisionRectangle2D;
+                collision.prepareVertexs();
+                collision.prepareSegments();
             }
-            this.$angle = angle;
-            this.$rotation = Helper2D.a2d(angle);
+        }
+
+        private $applyPosition(): void {
+            // 多边形需要更新重组所有顶点的位置
+            if (this.$collider.shap !== ColliderShapEnum2D.CIRCLE) {
+                const collision = this.$collision as CollisionPolygon2D;
+                for (let i = 0; i < collision.vertexs.length; i++) {
+                    const p = collision.vertexs[i];
+                    p.x += this.$x;
+                    p.y += this.$y;
+                }
+            }
+        }
+
+        private $applyRotate(): void {
+            // 只有多边形对撞机才支持旋转
+            if (this.$collider.shap === ColliderShapEnum2D.POLYGON) {
+                const collision = this.$collision as ICollisionPolygon2D;
+                for (let i = 0; i < collision.vertexs.length; i++) {
+                    const p = collision.vertexs[i];
+                    p.rotate(this.$radian);
+                }
+            }
+        }
+
+        private $applyScale(): void {
+            if (this.$collision.shap === CollisionShapEnum2D.CIRCLE) {
+                const collider = this.$collider as IColliderCircle2D;
+                const collision = this.$collision as ICollisionCircle2D;
+                // 对半径进行缩放
+                collision.radius = collider.radius * this.$scale;
+            }
+            else {
+                const collider = this.$collider as IColliderPolygon2D;
+                const collision: IPolygon2D = this.$collision as any;
+                // 对顶点向量进行缩放
+                for (let i = 0; i < collider.vertexs.length; i++) {
+                    const a = collider.vertexs[i];
+                    const b = collision.vertexs[i];
+                    b.assign(a.x, a.y).mul(this.$scale);
+                }
+            }
+        }
+
+        private $needUpdate(): boolean {
+            if (this.$scale !== this.$scaleTo) {
+                return true;
+            }
+            else if (this.$radian !== this.$rotateTo) {
+                return true;
+            }
+            else if (this.$x !== this.$collision.x || this.$y !== this.$collision.y) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        private $isModifiedByExtern(): boolean {
+            if (this.$collision.shap === CollisionShapEnum2D.POLYGON) {
+                const collision = this.$collision as ICollisionPolygon2D;
+                return collision.modified;
+            }
+            return false;
         }
 
         /**
@@ -192,119 +272,31 @@ module world2d {
          * 设置旋转角度
          */
         setRotation(rotation: number): void {
-            this.rotateTo(Helper2D.d2a(rotation));
-        }
-
-        /**
-         * 更新包围盒数据
-         */
-        private $updateBounds(): void {
-            const x: number = this.$collider.x;
-            const y: number = this.$collider.y;
-
-            // 更新碰撞边界
-            if (this.$collider.shap === ColliderShapEnum2D.CIRCLE) {
-                const collider: IColliderCircle2D = this.$collider as IColliderCircle2D;
-
-                const x: number = collider.x;
-                const y: number = collider.y;
-                const radius: number = collider.radius;
-
-                this.$bounds.updateBounds(x - radius, x + radius, y - radius, y + radius);
-            }
-            else {
-                const collider: IColliderPolygon2D = this.$collider as IColliderPolygon2D;
-
-                const x: number = collider.x;
-                const y: number = collider.y;
-                const vertexs: Array<IVector2D> = collider.vertexs;
-
-                const vertex: IVector2D = vertexs[0];
-
-                let left: number = vertex.x;
-                let right: number = vertex.x;
-                let top: number = vertex.y;
-                let bottom: number = vertex.y;
-
-                for (let i: number = 1; i < vertexs.length; i++) {
-                    const vertex: IVector2D = vertexs[i];
-                    if (vertex.x < left) {
-                        left = vertex.x;
-                    }
-                    else if (vertex.x > right) {
-                        right = vertex.x;
-                    }
-                    if (vertex.y < top) {
-                        top = vertex.y;
-                    }
-                    else if (vertex.y > bottom) {
-                        bottom = vertex.y;
-                    }
-                }
-
-                this.$bounds.updateBounds(x + left, x + right, y + top, y + bottom);
-            }
-        }
-
-        /**
-         * 更新碰撞区域
-         */
-        private $updateCollision(): void {
-            // 圆形需要更新坐标和半径
-            if (this.$collision.shap === CollisionShapEnum2D.CIRCLE) {
-                const collider: IColliderCircle2D = this.$collider as IColliderCircle2D;
-                const collision: ICollisionCircle2D = this.$collision as ICollisionCircle2D;
-                collision.updateBounds(collider.x, collider.y, collider.radius);
-            }
-            // 矩形直接以包围盒数据作为更新
-            else if (this.$collision.shap === CollisionShapEnum2D.RECTANGLE) {
-                const collision: ICollisionRectangle2D = this.$collision as ICollisionRectangle2D;
-                collision.updateBounds(this.$bounds.left, this.$bounds.right, this.$bounds.top, this.$bounds.bottom);
-                // 矩形还需要准备顶点数据
-                collision.prepareVertexs();
-                // 准备边数据
-                collision.prepareSegments();
-            }
-            // 多边形需要更新顶点数据
-            else {
-                const collider: IColliderPolygon2D = this.$collider as IColliderPolygon2D;
-                const collision: ICollisionPolygon2D = this.$collision as ICollisionPolygon2D;
-                // 更新坐标和顶点数据
-                collision.updateVertexs(collider.x, collider.y, collider.vertexs);
-                // 多边形还需要准备边数据
-                collision.prepareSegments();
-            }
+            this.rotateTo(Helper2D.d2r(rotation));
         }
 
         /**
          * 获取坐标
          */
         get x(): number {
-            return this.$collider.x;
+            return this.$x;
         }
         get y(): number {
-            return this.$collider.y;
+            return this.$y;
         }
 
         /**
          * 变形
          */
         get scale(): number {
-            return this.$scale;
+            return this.$scaleTo;
         }
 
         /**
          * 旋转（弧度）
          */
         get rotation(): number {
-            return this.$angle;
-        }
-
-        /**
-         * 包围盒
-         */
-        get bounds(): IBounds {
-            return this.$bounds;
+            return this.$rotateTo;
         }
 
         /**
@@ -315,14 +307,14 @@ module world2d {
         }
 
         /**
-         * 获取碰撞体
+         * 对撞机
          */
         get collider(): ICollider2D {
             return this.$collider;
         }
 
         /**
-         * 碰撞区域
+         * 碰撞体
          */
         get collision(): ICollision2D {
             return this.$collision;

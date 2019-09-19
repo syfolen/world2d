@@ -4,8 +4,8 @@ module world2d {
     /**
      * 矩型碰撞区域接口（效率中等）
      */
-    export interface ICollisionRectangle2D extends ICollision2D, IBounds, IPolygon2D {
-
+    export interface ICollisionRectangle2D extends ICollision2D, IPolygon2D {
+        
         /**
          * 准备顶点数据（为矩型计算顶点信息）
          */

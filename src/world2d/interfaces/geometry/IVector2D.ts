@@ -13,12 +13,12 @@ module world2d {
         /**
          * 相加
          */
-        add(vec2: IVector2D): IVector2D;
+        add(a: IPoint2D): IVector2D;
 
         /**
          * 相减
          */
-        sub(vec2: IVector2D): IVector2D;
+        sub(a: IVector2D): IVector2D;
 
         /**
          * 相乘
@@ -48,7 +48,7 @@ module world2d {
         /**
          * 旋转（弘度）
          */
-        rotate(angle: number): IVector2D;
+        rotate(radian: number): IVector2D;
 
         /**
          * 向量与x轴之间的弧度

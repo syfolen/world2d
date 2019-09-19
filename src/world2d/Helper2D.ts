@@ -15,15 +15,25 @@ module world2d {
         /**
          * 角度换算为弧度
          */
-        static d2a(d: number): number {
+        static d2r(d: number): number {
             return d * Math.PI / 180;
         }
 
         /**
          * 弧度换算为角度
          */
-        static a2d(a: number): number {
+        static r2d(a: number): number {
             return a * 180 / Math.PI;
+        }
+
+        /**
+         * 获取绝对值
+         */
+        static abs(a: number): number {
+            if (a < 0) {
+                return -a;
+            }
+            return a;
         }
 
         /**
@@ -41,13 +51,33 @@ module world2d {
         }
 
         /**
-         * 获取绝对值
+         * 为一组顶点计算边界值
          */
-        static abs(a: number): number {
-            if (a < 0) {
-                return -a;
+        static calculateBoundsForVertexs(vertexs: Array<IVector2D>, bounds: IBounds): void {
+            const p = vertexs[0];
+
+            let left = p.x;
+            let right = p.x;
+            let top = p.y;
+            let bottom = p.y;
+
+            for (let i = 1; i < vertexs.length; i++) {
+                const p = vertexs[i];
+                if (left > p.x) {
+                    left = p.x;
+                }
+                else if (right < p.x) {
+                    right = p.x;
+                }
+                if (top > p.y) {
+                    top = p.y;
+                }
+                else if (bottom < p.y) {
+                    bottom = p.y;
+                }
             }
-            return a;
+
+            bounds.updateBounds(left, right, top, bottom);
         }
     }
 }

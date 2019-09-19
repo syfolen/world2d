@@ -19,7 +19,7 @@ var world2d;
             return _super.call(this, world2d.CollisionLayerEnum.RECTANLE) || this;
         }
         TestWorld2dStableRectangle.prototype.$createCollider = function () {
-            return new world2d.ColliderPolygon2D(115, 195, [
+            return new world2d.ColliderPolygon2D([
                 new world2d.Vector2D(-30, -30),
                 new world2d.Vector2D(30, -30),
                 new world2d.Vector2D(30, 30),

@@ -13,6 +13,10 @@ var world2d;
              * 扭矩（最大转向弧度）
              */
             this.$torque = 180;
+            /**
+             * 速率
+             */
+            this.velocity = null;
         }
         /**
          * 更新数据
@@ -35,19 +39,19 @@ var world2d;
                 var min = rotation - world2d.Helper2D.PI;
                 var max = rotation + world2d.Helper2D.PI;
                 // 当前速率角度（弧度）
-                var angle = this.velocity.angle();
+                var radian = this.velocity.angle();
                 // 修正速率方向
-                if (angle < min) {
-                    angle += world2d.Helper2D.PI2;
+                if (radian < min) {
+                    radian += world2d.Helper2D.PI2;
                 }
-                else if (angle > max) {
-                    angle -= world2d.Helper2D.PI2;
+                else if (radian > max) {
+                    radian -= world2d.Helper2D.PI2;
                 }
                 // 若面向差大于扭矩，则进行偏移
-                var abs = world2d.Helper2D.abs(angle - rotation);
-                if (abs != 0) {
+                var abs = world2d.Helper2D.abs(radian - rotation);
+                if (abs !== 0) {
                     if (abs > torque) {
-                        if (angle > rotation) {
+                        if (radian > rotation) {
                             this.transform.rotateBy(torque);
                         }
                         else {
@@ -55,14 +59,14 @@ var world2d;
                         }
                     }
                     else {
-                        this.transform.rotateTo(angle);
+                        this.transform.rotateTo(radian);
                     }
                 }
                 // 计算实时速率
                 this.$velocity.assign(this.velocity.x, this.velocity.y);
                 // 修正当前速率的角度
                 if (abs !== 0) {
-                    this.$velocity.rotate(rotation - angle);
+                    this.$velocity.rotate(rotation - radian);
                 }
                 // 移动
                 this.transform.moveBy(this.$velocity.x * delta, this.$velocity.y * delta);
@@ -73,10 +77,10 @@ var world2d;
              * 扭矩（最大转向角度）
              */
             get: function () {
-                return world2d.Helper2D.a2d(this.$torque);
+                return world2d.Helper2D.r2d(this.$torque);
             },
             set: function (value) {
-                this.$torque = world2d.Helper2D.d2a(value);
+                this.$torque = world2d.Helper2D.d2r(value);
             },
             enumerable: true,
             configurable: true

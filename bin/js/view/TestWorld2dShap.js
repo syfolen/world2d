@@ -16,6 +16,7 @@ var world2d;
             var rigidbody = new world2d.Rigidbody2D();
             rigidbody.velocity = new world2d.Vector2D(this.$speedX, this.$speedY);
             this.$transform = new world2d.Transform2D(this, this.$collider, rigidbody, this.$collision);
+            this.$transform.moveTo(this.$posX, this.$posY);
             var world = Global.world2d;
             world.addTransform(this.$transform, world2d.CollisionLayerEnum.DEFAULT);
             Laya.timer.frameLoop(1, this, this.$onEnterFrame);

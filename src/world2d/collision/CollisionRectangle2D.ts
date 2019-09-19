@@ -6,14 +6,6 @@ module world2d {
      */
     export class CollisionRectangle2D extends Collision2D implements ICollisionRectangle2D {
         /**
-         * 矩形区域
-         */
-        left: number;
-        right: number;
-        top: number;
-        bottom: number;
-
-        /**
          * 项点数据，当矩型与圆和多边型发生碰撞时，需要使用顶点数据
          */
         vertexs: Array<IVector2D> = [];
@@ -26,7 +18,7 @@ module world2d {
         constructor() {
             super(CollisionShapEnum2D.RECTANGLE);
             // 初始化顶点数据
-            for (let i: number = 0; i < 4; i++) {
+            for (let i = 0; i < 4; i++) {
                 this.vertexs.push(new Vector2D(0, 0));
                 this.segments.push(new Vector2D(0, 0));
             }
@@ -35,21 +27,18 @@ module world2d {
         /**
          * 更新矩型区域
          */
-        updateBounds(left: number, right: number, top: number, bottom: number): void {
-            this.left = left;
-            this.right = right;
-            this.top = top;
-            this.bottom = bottom;
+        updateBounds(): void {
+            Helper2D.calculateBoundsForVertexs(this.vertexs, this.bounds);
         }
 
         /**
          * 准备顶点数据（为矩型计算顶点信息）
          */
         prepareVertexs(): void {
-            this.vertexs[0].assign(this.left, this.bottom);
-            this.vertexs[1].assign(this.right, this.bottom);
-            this.vertexs[2].assign(this.right, this.top);
-            this.vertexs[3].assign(this.left, this.top);
+            this.vertexs[0].assign(this.bounds.left, this.bounds.bottom);
+            this.vertexs[1].assign(this.bounds.right, this.bounds.bottom);
+            this.vertexs[2].assign(this.bounds.right, this.bounds.top);
+            this.vertexs[3].assign(this.bounds.left, this.bounds.top);
         }
 
         /**

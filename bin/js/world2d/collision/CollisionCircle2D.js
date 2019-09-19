@@ -25,12 +25,10 @@ var world2d;
             return _this;
         }
         /**
-         * 更新碰撞区域
+         * 更新矩形区域
          */
-        CollisionCircle2D.prototype.updateBounds = function (x, y, radius) {
-            this.x = x;
-            this.y = y;
-            this.radius = radius;
+        CollisionCircle2D.prototype.updateBounds = function () {
+            this.bounds.updateBounds(this.x - this.radius, this.x + this.radius, this.y - this.radius, this.y + this.radius);
         };
         return CollisionCircle2D;
     }(world2d.Collision2D));

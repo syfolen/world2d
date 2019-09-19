@@ -13,7 +13,7 @@ module world2d {
             return true;
         }
 
-        static circle2Polygon(p: IVector2D, radius: number, polygon: Array<IVector2D>): boolean {
+        static circle2Polygon(p: IPoint2D, radius: number, polygon: Array<IVector2D>): boolean {
             var position = p;
             if (CollisionResolutionBox2D.pointInPolygon(position, polygon)) {
                 return true;
@@ -58,7 +58,7 @@ module world2d {
             return false;
         }
 
-        static pointInPolygon(point: IVector2D, polygon: Array<IVector2D>): boolean {
+        static pointInPolygon(point: IPoint2D, polygon: Array<IVector2D>): boolean {
             var inside = false;
             var x = point.x;
             var y = point.y;
@@ -78,7 +78,7 @@ module world2d {
             return inside;
         }
 
-        static pointLineDistance(point: IVector2D, start: IVector2D, end: IVector2D, isSegment: boolean): number {
+        static pointLineDistance(point: IPoint2D, start: IVector2D, end: IVector2D, isSegment: boolean): number {
             var dx = end.x - start.x;
             var dy = end.y - start.y;
             var d = dx * dx + dy * dy;

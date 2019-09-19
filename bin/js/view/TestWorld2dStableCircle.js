@@ -19,7 +19,7 @@ var world2d;
             return _super.call(this, world2d.CollisionLayerEnum.CIRCLE) || this;
         }
         TestWorld2dStableCircle.prototype.$createCollider = function () {
-            return new world2d.ColliderCircle2D(200, 100, 80);
+            return new world2d.ColliderCircle2D(80);
         };
         TestWorld2dStableCircle.prototype.$createCollision = function () {
             return new world2d.CollisionCircle2D(80);

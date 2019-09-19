@@ -69,7 +69,7 @@ var world2d;
         CollisionContact2D.prototype.test = function () {
             var a = this.$a;
             var b = this.$b;
-            var collide = this.$testAABB == false ? true : world2d.CollisionResolution2D.bounds2Bounds(a.bounds, b.bounds);
+            var collide = this.$testAABB == false ? true : world2d.CollisionResolution2D.bounds2Bounds(a.collision.bounds, b.collision.bounds);
             // 若包围盒发生碰撞，则继续检测
             if (collide === true) {
                 collide = this.$testFunc.call(this, a.collision, b.collision);
@@ -118,26 +118,27 @@ var world2d;
          * 矩型与圆
          */
         CollisionContact2D.prototype.$c2r = function (c, r) {
-            if (this.useBox2d === true) {
-                return world2d.CollisionResolutionBox2D.circle2Polygon(new world2d.Vector2D(c.x, c.y), c.radius, r.vertexs);
-            }
             return world2d.CollisionResolution2D.circle2Polygin(c, r);
         };
         /**
          * 多边型与圆
          */
-        CollisionContact2D.prototype.$c2p = function (c, p) {
+        CollisionContact2D.prototype.$c2p = function (a, b) {
+            var collide;
             if (this.useBox2d === true) {
-                return world2d.CollisionResolutionBox2D.circle2Polygon(new world2d.Vector2D(c.x, c.y), c.radius, p.vertexs);
+                collide = world2d.CollisionResolutionBox2D.circle2Polygon(a, a.radius, b.vertexs);
             }
-            return world2d.CollisionResolution2D.circle2Polygin(c, p);
+            else {
+                collide = world2d.CollisionResolution2D.circle2Polygin(a, b);
+            }
+            return collide;
         };
         /**
          * 矩型与矩型
          */
         CollisionContact2D.prototype.$r2r = function () {
             // 直接返回边框的碰撞结果
-            return world2d.CollisionResolution2D.bounds2Bounds(this.$a.bounds, this.$b.bounds);
+            return world2d.CollisionResolution2D.bounds2Bounds(this.$a.collision.bounds, this.$b.collision.bounds);
         };
         /**
          * 矩型与多边型

@@ -13,31 +13,31 @@ var world2d;
             var transforms = world2d.World2D.inst.transforms.slice(0);
             for (var i = 0; i < transforms.length; i++) {
                 var transform = transforms[i];
+                var collision = transform.collision;
                 if (transform.collision.shap === world2d.CollisionShapEnum2D.CIRCLE) {
-                    var collision = transform.collision;
-                    if (p.distanceTo(collision) <= collision.radius) {
+                    if (p.distanceTo(transform) <= collision.radius) {
                         return transform;
                     }
                 }
                 else if (transform.collision.shap === world2d.CollisionShapEnum2D.RECTANGLE) {
-                    var collision = transform.collision;
-                    if (p.x >= collision.left && p.x <= collision.right && p.y >= collision.top && p.y <= collision.bottom) {
+                    var bounds = transform.collision.bounds;
+                    if (p.x >= bounds.left && p.x <= bounds.right && p.y >= bounds.top && p.y <= bounds.bottom) {
                         return transform;
                     }
                 }
                 else {
-                    var collision = transform.collision;
-                    var vertexs = collision.vertexs;
-                    var angle = 0;
+                    var collision_1 = transform.collision;
+                    var vertexs = collision_1.vertexs;
+                    var radian = 0;
                     for (var i_1 = 0; i_1 < vertexs.length; i_1++) {
                         var a = vertexs[i_1];
                         var b = i_1 === 0 ? vertexs[vertexs.length - 1] : vertexs[i_1 - 1];
                         if (a.x === b.x && a.y === b.y) {
                             continue;
                         }
-                        angle += world2d.Vector2D.angle(world2d.Vector2D.sub(a, p), world2d.Vector2D.sub(b, p));
+                        radian += world2d.Vector2D.angle(world2d.Vector2D.sub(a, p), world2d.Vector2D.sub(b, p));
                     }
-                    if (world2d.Helper2D.abs(world2d.Helper2D.a2d(angle) - 360) < 0.1) {
+                    if (world2d.Helper2D.abs(world2d.Helper2D.r2d(radian) - 360) < 0.1) {
                         return transform;
                     }
                 }
@@ -70,7 +70,7 @@ var world2d;
                         continue;
                     }
                     // 未与射线的包围盒发生碰撞
-                    if (world2d.CollisionResolution2D.bounds2Bounds(bounds, transform.bounds) === false) {
+                    if (world2d.CollisionResolution2D.bounds2Bounds(bounds, transform.collision.bounds) === false) {
                         continue;
                     }
                     array.push(transform);

@@ -90,7 +90,7 @@ module world2d {
             const a: ITransform2D<T> = this.$a;
             const b: ITransform2D<T> = this.$b;
 
-            let collide: boolean = this.$testAABB == false ? true : CollisionResolution2D.bounds2Bounds(a.bounds, b.bounds);
+            let collide: boolean = this.$testAABB == false ? true : CollisionResolution2D.bounds2Bounds(a.collision.bounds, b.collision.bounds);
 
             // 若包围盒发生碰撞，则继续检测
             if (collide === true) {
@@ -137,7 +137,7 @@ module world2d {
         /**
          * 圆与圆
          */
-        private $c2c(a: ICollisionCircle2D, b: ICollisionCircle2D): boolean {
+        private $c2c(a: ICircle2D, b: ICircle2D): boolean {
             return CollisionResolution2D.circle2Circle(a, b);
         }
 
@@ -145,20 +145,21 @@ module world2d {
          * 矩型与圆
          */
         private $c2r(c: ICollisionCircle2D, r: ICollisionRectangle2D): boolean {
-            if (this.useBox2d === true) {
-                return CollisionResolutionBox2D.circle2Polygon(new Vector2D(c.x, c.y), c.radius, r.vertexs);
-            }
             return CollisionResolution2D.circle2Polygin(c, r);
         }
 
         /**
          * 多边型与圆
          */
-        private $c2p(c: ICollisionCircle2D, p: ICollisionPolygon2D): boolean {
+        private $c2p(a: ICollisionCircle2D, b: ICollisionPolygon2D): boolean {
+            let collide: boolean;
             if (this.useBox2d === true) {
-                return CollisionResolutionBox2D.circle2Polygon(new Vector2D(c.x, c.y), c.radius, p.vertexs);
+                collide = CollisionResolutionBox2D.circle2Polygon(a, a.radius, b.vertexs);
             }
-            return CollisionResolution2D.circle2Polygin(c, p);
+            else {
+                collide = CollisionResolution2D.circle2Polygin(a, b);
+            }
+            return collide;
         }
 
         /**
@@ -166,7 +167,7 @@ module world2d {
          */
         private $r2r(): boolean {
             // 直接返回边框的碰撞结果
-            return CollisionResolution2D.bounds2Bounds(this.$a.bounds, this.$b.bounds);
+            return CollisionResolution2D.bounds2Bounds(this.$a.collision.bounds, this.$b.collision.bounds);
         }
 
         /**

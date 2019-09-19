@@ -33,9 +33,9 @@ var world2d;
         /**
          * 检测圆与多边形是否相交
          */
-        CollisionResolution2D.circle2Polygin = function (c, polygon) {
+        CollisionResolution2D.circle2Polygin = function (c, d) {
             // 多边形顶点数据
-            var vertexs = polygon.vertexs;
+            var vertexs = d.vertexs;
             // 半径平方
             var radiusSquared = c.radius * c.radius;
             // 与圆最近的顶点
@@ -76,7 +76,7 @@ var world2d;
                 return false;
             }
             var array = [a, b];
-            var segments = polygon.segments;
+            var segments = d.segments;
             // 检测圆与多边形顶点在多边形每条边的方向上的投影是否重合
             for (var i = 0; i < segments.length; i++) {
                 var segment = segments[i];

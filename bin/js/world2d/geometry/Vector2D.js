@@ -63,11 +63,11 @@ var world2d;
         /**
          * 旋转（弘度）
          */
-        Vector2D.prototype.rotate = function (angle) {
+        Vector2D.prototype.rotate = function (radian) {
             var x = this.x;
             var y = this.y;
-            var cos = Math.cos(angle);
-            var sin = Math.sin(angle);
+            var cos = Math.cos(radian);
+            var sin = Math.sin(radian);
             this.x = x * cos - y * sin;
             this.y = x * sin + y * cos;
             return this;
@@ -76,12 +76,12 @@ var world2d;
          * 向量与x轴之间的弧度
          */
         Vector2D.prototype.angle = function () {
-            var angle = Math.atan2(this.y, this.x);
-            if (angle < 0) {
-                return angle + 2 * Math.PI;
+            var radian = Math.atan2(this.y, this.x);
+            if (radian < 0) {
+                return radian + 2 * Math.PI;
             }
             else {
-                return angle;
+                return radian;
             }
         };
         /**

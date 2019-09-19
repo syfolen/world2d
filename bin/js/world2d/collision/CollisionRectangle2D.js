@@ -38,20 +38,17 @@ var world2d;
         /**
          * 更新矩型区域
          */
-        CollisionRectangle2D.prototype.updateBounds = function (left, right, top, bottom) {
-            this.left = left;
-            this.right = right;
-            this.top = top;
-            this.bottom = bottom;
+        CollisionRectangle2D.prototype.updateBounds = function () {
+            world2d.Helper2D.calculateBoundsForVertexs(this.vertexs, this.bounds);
         };
         /**
          * 准备顶点数据（为矩型计算顶点信息）
          */
         CollisionRectangle2D.prototype.prepareVertexs = function () {
-            this.vertexs[0].assign(this.left, this.bottom);
-            this.vertexs[1].assign(this.right, this.bottom);
-            this.vertexs[2].assign(this.right, this.top);
-            this.vertexs[3].assign(this.left, this.top);
+            this.vertexs[0].assign(this.bounds.left, this.bounds.bottom);
+            this.vertexs[1].assign(this.bounds.right, this.bounds.bottom);
+            this.vertexs[2].assign(this.bounds.right, this.bounds.top);
+            this.vertexs[3].assign(this.bounds.left, this.bounds.top);
         };
         /**
          * 准备线段数据（为多边形计算每条边的信息）

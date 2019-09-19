@@ -56,11 +56,12 @@ module world2d {
                 this.$contacts[i].test();
             }
             // 绘制世界
-            World2D.DEBUG == true && DrawAPI2D.draw(this.$transforms);
+            World2D.DEBUG === true && DrawAPI2D.draw(this.$transforms);
         }
 
         /**
          * 添加对象
+         * @layer: 默认为 CollisionLayerEnum.DEFAULT
          */
         addTransform(transform: ITransform2D<T>, layer: CollisionLayerEnum = CollisionLayerEnum.DEFAULT): void {
             transform.layer = layer;

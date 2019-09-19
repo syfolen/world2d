@@ -18,11 +18,12 @@ var world2d;
      */
     var CollisionPolygon2D = /** @class */ (function (_super) {
         __extends(CollisionPolygon2D, _super);
-        /**
-         * 仅适用于多边型碰撞体
-         */
         function CollisionPolygon2D(collider) {
             var _this = _super.call(this, world2d.CollisionShapEnum2D.POLYGON) || this;
+            /**
+             * 临时顶点数据
+             */
+            _this.$tempVertexs = null;
             /**
              * 顶点数据
              */
@@ -34,20 +35,34 @@ var world2d;
             for (var i = 0; i < collider.vertexs.length; i++) {
                 var vertex = collider.vertexs[i];
                 // 复制所有顶点信息作为碰撞数据
-                _this.vertexs.push(new world2d.Vector2D(collider.x + vertex.x, collider.y + vertex.y));
+                _this.vertexs.push(vertex.copy());
                 // 初始化线段数据
                 _this.segments.push(new world2d.Vector2D(0, 0));
             }
             return _this;
         }
         /**
+         * 更新矩形区域
+         */
+        CollisionPolygon2D.prototype.updateBounds = function () {
+            world2d.Helper2D.calculateBoundsForVertexs(this.vertexs, this.bounds);
+        };
+        /**
          * 更新顶点数据
          */
-        CollisionPolygon2D.prototype.updateVertexs = function (x, y, vertexs) {
-            for (var i = 0; i < vertexs.length; i++) {
-                this.vertexs[i].x = x + vertexs[i].x;
-                this.vertexs[i].y = y + vertexs[i].y;
+        CollisionPolygon2D.prototype.updateVertexs = function (vertexs) {
+            this.$tempVertexs = vertexs;
+        };
+        /**
+         * 准备顶点数据
+         */
+        CollisionPolygon2D.prototype.prepareVertexs = function () {
+            for (var i = 0; i < this.$tempVertexs.length; i++) {
+                var a = this.vertexs[i];
+                var b = this.$tempVertexs[i];
+                a.assign(b.x, b.y);
             }
+            this.$tempVertexs = null;
         };
         /**
          * 准备线段数据（为多边形计算每条边的信息）
@@ -59,6 +74,16 @@ var world2d;
                 this.segments[i].assign(a.x - b.x, a.y - b.y);
             }
         };
+        Object.defineProperty(CollisionPolygon2D.prototype, "modified", {
+            /**
+             * 顶点数据是否被修改过
+             */
+            get: function () {
+                return this.$tempVertexs !== null;
+            },
+            enumerable: true,
+            configurable: true
+        });
         return CollisionPolygon2D;
     }(world2d.Collision2D));
     world2d.CollisionPolygon2D = CollisionPolygon2D;

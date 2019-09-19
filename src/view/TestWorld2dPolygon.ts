@@ -8,7 +8,7 @@ module world2d {
         }
 
         protected $createCollider(): ICollider2D {
-            return new ColliderPolygon2D(this.$posX, this.$posY, [
+            return new ColliderPolygon2D([
                 new Vector2D(-this.$width, 0),
                 new Vector2D(-this.$width * 0.5, this.$height * 0.5),
                 new Vector2D(0, this.$height * 0.8),

@@ -23,7 +23,7 @@ module world2d {
         /**
          * 速率
          */
-        velocity: IVector2D;
+        velocity: IVector2D = null;
 
         /**
          * 更新数据
@@ -49,20 +49,20 @@ module world2d {
                 const max: number = rotation + Helper2D.PI;
 
                 // 当前速率角度（弧度）
-                let angle: number = this.velocity.angle();
+                let radian: number = this.velocity.angle();
                 // 修正速率方向
-                if (angle < min) {
-                    angle += Helper2D.PI2;
+                if (radian < min) {
+                    radian += Helper2D.PI2;
                 }
-                else if (angle > max) {
-                    angle -= Helper2D.PI2;
+                else if (radian > max) {
+                    radian -= Helper2D.PI2;
                 }
 
                 // 若面向差大于扭矩，则进行偏移
-                const abs: number = Helper2D.abs(angle - rotation);
-                if (abs != 0) {
+                const abs: number = Helper2D.abs(radian - rotation);
+                if (abs !== 0) {
                     if (abs > torque) {
-                        if (angle > rotation) {
+                        if (radian > rotation) {
                             this.transform.rotateBy(torque);
                         }
                         else {
@@ -70,7 +70,7 @@ module world2d {
                         }
                     }
                     else {
-                        this.transform.rotateTo(angle);
+                        this.transform.rotateTo(radian);
                     }
                 }
 
@@ -78,7 +78,7 @@ module world2d {
                 this.$velocity.assign(this.velocity.x, this.velocity.y);
                 // 修正当前速率的角度
                 if (abs !== 0) {
-                    this.$velocity.rotate(rotation - angle);
+                    this.$velocity.rotate(rotation - radian);
                 }
                 // 移动
                 this.transform.moveBy(this.$velocity.x * delta, this.$velocity.y * delta);
@@ -89,10 +89,10 @@ module world2d {
          * 扭矩（最大转向角度）
          */
         get torque(): number {
-            return Helper2D.a2d(this.$torque);
+            return Helper2D.r2d(this.$torque);
         }
         set torque(value: number) {
-            this.$torque = Helper2D.d2a(value);
+            this.$torque = Helper2D.d2r(value);
         }
     }
 }

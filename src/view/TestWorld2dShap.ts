@@ -30,6 +30,7 @@ module world2d {
             rigidbody.velocity = new Vector2D(this.$speedX, this.$speedY);
 
             this.$transform = new Transform2D<TestWorld2dShap>(this, this.$collider, rigidbody, this.$collision);
+            this.$transform.moveTo(this.$posX, this.$posY);
 
             const world: IWorld2D<TestWorld2dShap> = Global.world2d;
             world.addTransform(this.$transform, world2d.CollisionLayerEnum.DEFAULT);
