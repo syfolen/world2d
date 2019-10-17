@@ -20,6 +20,10 @@ var world2d;
         CollisionLayerEnum[CollisionLayerEnum["POLYGON"] = 8] = "POLYGON";
         CollisionLayerEnum[CollisionLayerEnum["CIRCLE"] = 16] = "CIRCLE";
         CollisionLayerEnum[CollisionLayerEnum["RECTANLE"] = 32] = "RECTANLE";
+        /**
+         * 鱼的子集
+         */
+        CollisionLayerEnum[CollisionLayerEnum["FISH_2"] = 64] = "FISH_2";
         CollisionLayerEnum[CollisionLayerEnum["ALL"] = 4096] = "ALL";
     })(CollisionLayerEnum = world2d.CollisionLayerEnum || (world2d.CollisionLayerEnum = {}));
 })(world2d || (world2d = {}));

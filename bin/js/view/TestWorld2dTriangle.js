@@ -20,10 +20,21 @@ var world2d;
         }
         TestWorld2dTriangle.prototype.$createCollider = function () {
             return new world2d.ColliderPolygon2D([
-                new world2d.Vector2D(-this.$width * 0.5, this.$height * 0.5),
-                new world2d.Vector2D(-this.$width * 0.5, this.$height * 0.5 - 15),
-                new world2d.Vector2D(this.$width * 0.5, -this.$height * 0.5)
+                // new Vector2D(-this.$width * 0.5, this.$height * 0.5),
+                // new Vector2D(-this.$width * 0.5, this.$height * 0.5 - 15),
+                // new Vector2D(this.$width * 0.5, -this.$height * 0.5)
+                new world2d.Vector2D(0, -10),
+                new world2d.Vector2D(0, 10),
+                new world2d.Vector2D(50, 0)
             ]);
+        };
+        TestWorld2dTriangle.prototype.$createRigidbody = function () {
+            var rigidbody = new world2d.Rigidbody2D();
+            rigidbody.torque = 10;
+            rigidbody.moveSpeed = 20;
+            return rigidbody;
+        };
+        TestWorld2dTriangle.prototype.$onEnterFrame = function () {
         };
         TestWorld2dTriangle.prototype.$createCollision = function () {
             return new world2d.CollisionPolygon2D(this.$collider);

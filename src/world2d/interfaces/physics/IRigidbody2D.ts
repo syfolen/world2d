@@ -11,9 +11,14 @@ module world2d {
         transform: ITransform2D<T>;
 
         /**
-         * 速率
+         * 追踪的目标
          */
-        velocity: IVector2D;
+        target: ITransform2D<any>;
+
+        /**
+         * 移动速度
+         */
+        moveSpeed: number;
 
         /**
          * 扭矩（最大转向角度）

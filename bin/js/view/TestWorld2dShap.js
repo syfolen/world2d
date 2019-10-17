@@ -13,27 +13,33 @@ var world2d;
             this.$scale = 0.01;
             this.$collider = this.$createCollider();
             this.$collision = this.$createCollision();
-            var rigidbody = new world2d.Rigidbody2D();
-            rigidbody.velocity = new world2d.Vector2D(this.$speedX, this.$speedY);
+            var rigidbody = this.$createRigidbody();
+            if (rigidbody === null) {
+                rigidbody = new world2d.Rigidbody2D();
+                rigidbody.torque = 5;
+            }
             this.$transform = new world2d.Transform2D(this, this.$collider, rigidbody, this.$collision);
             this.$transform.moveTo(this.$posX, this.$posY);
             var world = Global.world2d;
             world.addTransform(this.$transform, world2d.CollisionLayerEnum.DEFAULT);
             Laya.timer.frameLoop(1, this, this.$onEnterFrame);
         }
+        TestWorld2dShap.prototype.$createRigidbody = function () {
+            return null;
+        };
         TestWorld2dShap.prototype.$onEnterFrame = function () {
-            if (this.$transform.x < 0) {
-                this.$transform.rigidbody.velocity.x = Math.abs(this.$transform.rigidbody.velocity.x);
-            }
-            else if (this.$transform.x > Global.WIDTH) {
-                this.$transform.rigidbody.velocity.x = -Math.abs(this.$transform.rigidbody.velocity.x);
-            }
-            if (this.$transform.y < 0) {
-                this.$transform.rigidbody.velocity.y = Math.abs(this.$transform.rigidbody.velocity.y);
-            }
-            else if (this.$transform.y > Global.HEIGHT) {
-                this.$transform.rigidbody.velocity.y = -Math.abs(this.$transform.rigidbody.velocity.y);
-            }
+            // if (this.$transform.x < 0) {
+            //     this.$transform.rigidbody.velocity.x = Math.abs(this.$transform.rigidbody.velocity.x);
+            // }
+            // else if (this.$transform.x > Global.WIDTH) {
+            //     this.$transform.rigidbody.velocity.x = -Math.abs(this.$transform.rigidbody.velocity.x);
+            // }
+            // if (this.$transform.y < 0) {
+            //     this.$transform.rigidbody.velocity.y = Math.abs(this.$transform.rigidbody.velocity.y);
+            // }
+            // else if (this.$transform.y > Global.HEIGHT) {
+            //     this.$transform.rigidbody.velocity.y = -Math.abs(this.$transform.rigidbody.velocity.y);
+            // }
             // this.$transform.scaleBy(this.$scale);
             // if (this.$transform.scale > 1.5 && this.$scale > 0) {
             //     this.$scale = -0.01;

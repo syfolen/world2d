@@ -10,7 +10,12 @@ module world2d {
         /**
          * 调试模式
          */
-        static DEBUG: boolean = true;
+        static DEBUG: boolean = false;
+
+        /**
+         * 对象的碰撞层级发生了变化
+         */
+        static TRANSFORM_LAYER_CHANGED: string = "world2d.TRANSFORM_LAYER_CHANGED";
 
         /**
          * 单例对象
@@ -65,6 +70,7 @@ module world2d {
          */
         addTransform(transform: ITransform2D<T>, layer: CollisionLayerEnum = CollisionLayerEnum.DEFAULT): void {
             transform.layer = layer;
+            transform.addEventListener(World2D.TRANSFORM_LAYER_CHANGED, this.$onTransformLayerChanged, this);
             for (let i: number = 0; i < this.$transforms.length; i++) {
                 const transform2: ITransform2D<T> = this.$transforms[i];
                 if (this.$shouldCollide(transform.layer, transform2.layer) === true) {
@@ -84,6 +90,7 @@ module world2d {
                 return;
             }
             this.$transforms.splice(index, 1);
+            transform.removeEventListener(World2D.TRANSFORM_LAYER_CHANGED, this.$onTransformLayerChanged, this);
             for (let i: number = this.$contacts.length - 1; i > -1; i--) {
                 const contact: ICollisionContact2D<T> = this.$contacts[i];
                 if (contact.a === transform || contact.b === transform) {
@@ -93,6 +100,14 @@ module world2d {
                     this.$contacts.splice(i, 1);
                 }
             }
+        }
+
+        /**
+         * 对象的碰撞层级发生了变化
+         */
+        private $onTransformLayerChanged(transform: ITransform2D<T>): void {
+            this.removeTransform(transform);
+            this.addTransform(transform, transform.layer);
         }
 
         /**

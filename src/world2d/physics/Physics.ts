@@ -9,11 +9,14 @@ module world2d {
         /**
          * 返回所有与指定点碰撞的图形
          */
-        static testPoint<T extends IEntity<any>>(p: IVector2D): ITransform2D<T> {
+        static testPoint<T extends IEntity<any>>(p: IVector2D, layer: CollisionLayerEnum = CollisionLayerEnum.ALL): ITransform2D<T> {
             const transforms = World2D.inst.transforms.slice(0);
             for (let i = 0; i < transforms.length; i++) {
                 const transform = transforms[i];
                 const collision = transform.collision as ICollisionCircle2D;
+                if (layer !== CollisionLayerEnum.ALL && layer !== transform.layer) {
+                    continue;
+                }
                 if (transform.collision.shap === CollisionShapEnum2D.CIRCLE) {
                     if (p.distanceTo(transform) <= collision.radius) {
                         return transform;

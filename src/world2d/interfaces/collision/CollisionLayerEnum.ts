@@ -26,6 +26,16 @@ module world2d {
 
         RECTANLE = 0x20,
 
+        /**
+         * 鱼的子集
+         */
+        FISH_2 = 0x40,
+
+        /**
+         * 锁定的子弹
+         */
+        BULLET_2 = 0x80,
+
         ALL = 0x1000
     }
 }

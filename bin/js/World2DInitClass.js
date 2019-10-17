@@ -9,39 +9,41 @@ var world2d;
             var count = 1;
             // const a: TestWorld2dStableCircle = new TestWorld2dStableCircle();
             // const b: TestWorld2dStableRectangle = new TestWorld2dStableRectangle();
+            var circle = null;
             for (var i = 0; i < count; i++) {
-                new world2d.TestWorld2dCircle();
+                circle = new world2d.TestWorld2dCircle();
             }
+            // for (let i = 0; i < count; i++) {
+            //     new TestWorld2dRectangle();
+            // }
+            // for (let i = 0; i < count; i++) {
+            //     new TestWorld2dRectangle2();
+            // }
             for (var i = 0; i < count; i++) {
-                new world2d.TestWorld2dRectangle();
+                var x = new world2d.TestWorld2dTriangle();
+                x.transform.rigidbody.target = circle.transform;
             }
-            for (var i = 0; i < count; i++) {
-                new world2d.TestWorld2dRectangle2();
-            }
-            for (var i = 0; i < count; i++) {
-                new world2d.TestWorld2dTriangle();
-            }
-            for (var i = 0; i < count; i++) {
-                new world2d.TestWorld2dTriangle2();
-            }
-            for (var i = 0; i < count; i++) {
-                new world2d.TestWorld2dRightTriangle();
-            }
-            for (var i = 0; i < count; i++) {
-                new world2d.TestWorld2dRightTriangle2();
-            }
-            for (var i = 0; i < count; i++) {
-                new world2d.TestWorld2dPolygonRectangle();
-            }
-            for (var i = 0; i < count; i++) {
-                new world2d.TestWorld2dPolygonRectangle2();
-            }
-            for (var i = 0; i < count; i++) {
-                var item = new world2d.TestWorld2dPolygon();
-            }
-            for (var i = 0; i < count; i++) {
-                new world2d.TestWorld2dPolygon2();
-            }
+            // for (let i = 0; i < count; i++) {
+            //     new TestWorld2dTriangle2();
+            // }
+            // for (let i = 0; i < count; i++) {
+            //     new TestWorld2dRightTriangle();
+            // }
+            // for (let i = 0; i < count; i++) {
+            //     new TestWorld2dRightTriangle2();
+            // }
+            // for (let i = 0; i < count; i++) {
+            //     new TestWorld2dPolygonRectangle();
+            // }
+            // for (let i = 0; i < count; i++) {
+            //     new TestWorld2dPolygonRectangle2();
+            // }
+            // for (let i = 0; i < count; i++) {
+            //     const item = new TestWorld2dPolygon();
+            // }
+            // for (let i = 0; i < count; i++) {
+            //     new TestWorld2dPolygon2();
+            // }
             Laya.stage.addChild(this.$image);
             world2d.DrawAPI2D.graphics = this.$image.graphics;
             Laya.timer.frameLoop(1, this, this.$onEnterFrame);

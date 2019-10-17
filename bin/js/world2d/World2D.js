@@ -118,7 +118,7 @@ var world2d;
         /**
          * 调试模式
          */
-        World2D.DEBUG = true;
+        World2D.DEBUG = false;
         return World2D;
     }());
     world2d.World2D = World2D;

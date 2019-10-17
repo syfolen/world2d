@@ -6,11 +6,6 @@ module world2d {
      */
     export class Rigidbody2D<T extends IEntity<any>> implements IRigidbody2D<T> {
         /**
-         * 当前速率，此为临时变量
-         */
-        private $velocity: IVector2D = new Vector2D(0, 0);
-
-        /**
          * 扭矩（最大转向弧度）
          */
         private $torque: number = 180;
@@ -21,68 +16,79 @@ module world2d {
         transform: ITransform2D<T>;
 
         /**
-         * 速率
+         * 追踪的目标
          */
-        velocity: IVector2D = null;
+        target: ITransform2D<any> = null;
+
+        /**
+         * 移动速度
+         */
+        moveSpeed: number = 0;
 
         /**
          * 更新数据
          */
         update(delta: number): void {
-            // 若速率为0，则直接返回
-            if (this.velocity === null || this.velocity.length() === 0) {
+            // 若移动速度为0，则直接返回
+            if (this.moveSpeed === 0) {
                 return;
             }
 
-            // 若扭矩为180，则进行简单的移动
-            if (this.$torque === 180) {
-                this.transform.moveBy(this.velocity.x * delta, this.velocity.y * delta);
+            // 若目标无效，则放弃追踪
+            if (this.target !== null && this.target.enabled === false) {
+                this.target = null;
             }
-            else {
-                // 刚体的旋转弧度
-                const rotation: number = this.transform.rotation;
-                // 扭矩换算
-                const torque: number = this.$torque * delta * 10;
 
-                // 计算转向极限能力
-                const min: number = rotation - Helper2D.PI;
-                const max: number = rotation + Helper2D.PI;
+            const p: IVector2D = suncom.Pool.getItemByClass<IVector2D>("world2d.Vector2D", Vector2D, [0, 0]);
 
-                // 当前速率角度（弧度）
-                let radian: number = this.velocity.angle();
-                // 修正速率方向
-                if (radian < min) {
-                    radian += Helper2D.PI2;
+            // 若存在目标，则调整速率角度
+            if (this.target !== null) {
+                p.assign(this.target.x - this.transform.x, this.target.y - this.transform.y);
+
+                // 目标方向
+                let rotate2: number = p.angle();
+
+                // 若扭矩为180，则直接旋转至目标方向
+                if (this.$torque === 180) {
+                    this.transform.rotateTo(rotate2);
                 }
-                else if (radian > max) {
-                    radian -= Helper2D.PI2;
-                }
+                // 否则需要考虑旋转极限
+                else {
+                    // 转向极限
+                    let min: number = this.transform.rotation - Helper2D.PI;
+                    let max: number = this.transform.rotation + Helper2D.PI;
 
-                // 若面向差大于扭矩，则进行偏移
-                const abs: number = Helper2D.abs(radian - rotation);
-                if (abs !== 0) {
-                    if (abs > torque) {
-                        if (radian > rotation) {
-                            this.transform.rotateBy(torque);
-                        }
-                        else {
-                            this.transform.rotateBy(-torque);
-                        }
+                    if (rotate2 < min) {
+                        rotate2 += Helper2D.PI2;
+                    }
+                    else if (rotate2 > max) {
+                        rotate2 -= Helper2D.PI2;
+                    }
+
+                    // 需要旋转的弧度值
+                    const rotation: number = rotate2 - this.transform.rotation;
+                    // 扭矩限制转向能力
+                    const torque: number = suncom.Common.clamp(this.$torque * delta * 10, 0, Helper2D.PI);
+
+                    // 转向
+                    if (rotation < -torque) {
+                        this.transform.rotateBy(-torque);
+                    }
+                    else if (rotation > torque) {
+                        this.transform.rotateBy(torque);
                     }
                     else {
-                        this.transform.rotateTo(radian);
+                        this.transform.rotateBy(rotation);
                     }
                 }
-
-                // 计算实时速率
-                this.$velocity.assign(this.velocity.x, this.velocity.y);
-                // 修正当前速率的角度
-                if (abs !== 0) {
-                    this.$velocity.rotate(rotation - radian);
-                }
-                // 移动
-                this.transform.moveBy(this.$velocity.x * delta, this.$velocity.y * delta);
             }
+
+            // 计算实时速率
+            p.assign(this.moveSpeed, 0).rotate(this.transform.rotation);
+            // 移动
+            this.transform.moveBy(p.x * delta, p.y * delta);
+
+            suncom.Pool.recover("world2d.Vector2D", p);
         }
 
         /**

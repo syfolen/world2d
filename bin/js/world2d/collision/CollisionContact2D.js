@@ -77,8 +77,6 @@ var world2d;
             if (collide === true) {
                 if (this.$touching === false) {
                     this.$touching = true;
-                    a.hitNum++;
-                    b.hitNum++;
                     this.doCollide(world2d.CollisionType.COLLISION_ENTER);
                 }
                 else {
@@ -87,8 +85,6 @@ var world2d;
             }
             else if (this.$touching === true) {
                 this.$touching = false;
-                a.hitNum--;
-                b.hitNum--;
                 this.doCollide(world2d.CollisionType.COLLISION_EXIT);
             }
         };
@@ -96,10 +92,14 @@ var world2d;
             var a = this.$a;
             var b = this.$b;
             if (type === world2d.CollisionType.COLLISION_ENTER) {
+                a.hitNum++;
+                b.hitNum++;
                 a.entity.onCollisionEnter(b.entity);
                 b.entity.onCollisionEnter(a.entity);
             }
             else if (type === world2d.CollisionType.COLLISION_EXIT) {
+                a.hitNum--;
+                b.hitNum--;
                 a.entity.onCollisionExit(b.entity);
                 b.entity.onCollisionExit(a.entity);
             }

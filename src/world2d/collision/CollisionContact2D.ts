@@ -90,6 +90,30 @@ module world2d {
             const a: ITransform2D<T> = this.$a;
             const b: ITransform2D<T> = this.$b;
 
+            /**
+             * 捕鱼专属开始
+             */
+
+            // 找出子弹和鱼
+            let x: ITransform2D<T>, y: ITransform2D<T>;
+            if (a.rigidbody !== null) {
+                x = a;
+                y = b;
+            }
+            else {
+                x = b;
+                y = a;
+            }
+
+            // 若x己锁定了目标，且目标有效，且目标不为y，则不检测碰撞
+            if (x.rigidbody.target !== null && x.rigidbody.target !== y) {
+                return;
+            }
+
+            /**
+             * 捕鱼专属结束
+             */
+
             let collide: boolean = this.$testAABB == false ? true : CollisionResolution2D.bounds2Bounds(a.collision.bounds, b.collision.bounds);
 
             // 若包围盒发生碰撞，则继续检测
@@ -100,8 +124,6 @@ module world2d {
             if (collide === true) {
                 if (this.$touching === false) {
                     this.$touching = true;
-                    a.hitNum++;
-                    b.hitNum++;
                     this.doCollide(CollisionType.COLLISION_ENTER);
                 }
                 else {
@@ -110,8 +132,6 @@ module world2d {
             }
             else if (this.$touching === true) {
                 this.$touching = false;
-                a.hitNum--;
-                b.hitNum--;
                 this.doCollide(CollisionType.COLLISION_EXIT);
             }
         }
@@ -121,10 +141,14 @@ module world2d {
             const b: ITransform2D<T> = this.$b;
 
             if (type === CollisionType.COLLISION_ENTER) {
+                a.hitNum++;
+                b.hitNum++;
                 a.entity.onCollisionEnter(b.entity);
                 b.entity.onCollisionEnter(a.entity);
             }
             else if (type === CollisionType.COLLISION_EXIT) {
+                a.hitNum--;
+                b.hitNum--;
                 a.entity.onCollisionExit(b.entity);
                 b.entity.onCollisionExit(a.entity);
             }

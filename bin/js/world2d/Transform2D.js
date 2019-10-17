@@ -258,6 +258,16 @@ var world2d;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Transform2D.prototype, "enabled", {
+            /**
+             * 是否有效（一次性值，默认为true，当其被置成false时，将永远不会被重置）
+             */
+            get: function () {
+                return true;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Transform2D.prototype, "entity", {
             /**
              * 获取实体对象

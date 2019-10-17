@@ -4,7 +4,7 @@ module world2d {
     /**
      * 转换器接口，用来保存对撞机数据模型在世界空间中旋转和缩放值，并提供变换的接口
      */
-    export interface ITransform2D<T extends IEntity<any>> {
+    export interface ITransform2D<T extends IEntity<any>> extends suncom.IEventSystem {
         /**
          * 层级
          */
@@ -61,6 +61,11 @@ module world2d {
         setRotation(rotation: number): void;
 
         /**
+         * 设置为无效
+         */
+        disabled(): void;
+
+        /**
          * 坐标
          */
         readonly x: number;
@@ -75,6 +80,11 @@ module world2d {
          * 旋转（弧度）
          */
         readonly rotation: number;
+
+        /**
+         * 是否有效（一次性值，默认为true，当其被置成false时，将永远不会被重置）
+         */
+        readonly enabled: boolean;
 
         /**
          * 实体对象

@@ -4,7 +4,12 @@ module world2d {
     /**
      * 转换器，用来保存对撞机数据模型在世界空间中的坐标、旋转和缩放值，并提供变换的接口
      */
-    export class Transform2D<T extends IEntity<any>> implements ITransform2D<T> {
+    export class Transform2D<T extends IEntity<any>> extends suncom.EventSystem implements ITransform2D<T> {
+        /**
+         * 碰撞层级
+         */
+        private $layer: CollisionLayerEnum;
+
         /**
          * 坐标
          */
@@ -29,6 +34,11 @@ module world2d {
         private $rotation: number = 0;
 
         /**
+         * 是否有效（一次性值，默认为true，当其被置成false时，将永远不会被重置）
+         */
+        private $enabled: boolean = true;
+
+        /**
          * 实体对象
          */
         private $entity: T = null;
@@ -49,11 +59,6 @@ module world2d {
         private $rigidbody: IRigidbody2D<T> = null;
 
         /**
-         * 层级
-         */
-        layer: CollisionLayerEnum;
-
-        /**
          * 碰撞次数，大于0说明对象发生了碰撞
          */
         hitNum: number = 0;
@@ -62,6 +67,7 @@ module world2d {
          * @vertexs: 原始顶点数据
          */
         constructor(entity: T, collider: ICollider2D, rigidbody: IRigidbody2D<T>, collision: ICollision2D) {
+            super();
             // 实体对象
             this.$entity = entity;
             // 碰撞体
@@ -276,6 +282,24 @@ module world2d {
         }
 
         /**
+         * 设置为无效
+         */
+        disabled(): void {
+            this.$enabled = false;
+        }
+
+        /**
+         * 碰撞层级
+         */
+        get layer(): CollisionLayerEnum {
+            return this.$layer;
+        }
+        set layer(value: CollisionLayerEnum) {
+            this.$layer = value;
+            this.dispatchEvent(World2D.TRANSFORM_LAYER_CHANGED, this);
+        }
+
+        /**
          * 获取坐标
          */
         get x(): number {
@@ -297,6 +321,13 @@ module world2d {
          */
         get rotation(): number {
             return this.$rotateTo;
+        }
+
+        /**
+         * 是否有效（一次性值，默认为true，当其被置成false时，将永远不会被重置）
+         */
+        get enabled(): boolean {
+            return this.$enabled;
         }
 
         /**

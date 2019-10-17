@@ -9,11 +9,15 @@ var world2d;
         /**
          * 返回所有与指定点碰撞的图形
          */
-        Physics.testPoint = function (p) {
+        Physics.testPoint = function (p, layer) {
+            if (layer === void 0) { layer = world2d.CollisionLayerEnum.ALL; }
             var transforms = world2d.World2D.inst.transforms.slice(0);
             for (var i = 0; i < transforms.length; i++) {
                 var transform = transforms[i];
                 var collision = transform.collision;
+                if (layer !== world2d.CollisionLayerEnum.ALL && layer !== transform.layer) {
+                    continue;
+                }
                 if (transform.collision.shap === world2d.CollisionShapEnum2D.CIRCLE) {
                     if (p.distanceTo(transform) <= collision.radius) {
                         return transform;

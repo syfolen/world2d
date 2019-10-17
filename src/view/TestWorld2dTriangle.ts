@@ -9,10 +9,25 @@ module world2d {
 
         protected $createCollider(): ICollider2D {
             return new ColliderPolygon2D([
-                new Vector2D(-this.$width * 0.5, this.$height * 0.5),
-                new Vector2D(-this.$width * 0.5, this.$height * 0.5 - 15),
-                new Vector2D(this.$width * 0.5, -this.$height * 0.5)
+                // new Vector2D(-this.$width * 0.5, this.$height * 0.5),
+                // new Vector2D(-this.$width * 0.5, this.$height * 0.5 - 15),
+                // new Vector2D(this.$width * 0.5, -this.$height * 0.5)
+                new Vector2D(0, -10),
+                new Vector2D(0, 10),
+                new Vector2D(50, 0)
             ]);
+        }
+
+        protected $createRigidbody(): IRigidbody2D<TestWorld2dShap> {
+            const rigidbody = new Rigidbody2D<TestWorld2dShap>();
+            rigidbody.torque = 10;
+            rigidbody.moveSpeed = 20;
+
+            return rigidbody;
+        }
+
+        protected $onEnterFrame() {
+
         }
 
         protected $createCollision(): ICollision2D {
