@@ -4,7 +4,7 @@ module world2d {
     /**
      * 转换器，用来保存对撞机数据模型在世界空间中的坐标、旋转和缩放值，并提供变换的接口
      */
-    export class Transform2D<T extends IEntity<any>> extends suncom.EventSystem implements ITransform2D<T> {
+    export class Transform2D extends suncom.EventSystem implements ITransform2D {
         /**
          * 碰撞层级
          */
@@ -41,7 +41,7 @@ module world2d {
         /**
          * 实体对象
          */
-        private $entity: T = null;
+        private $entity: IEntity = null;
 
         /**
          * 对撞机
@@ -56,7 +56,7 @@ module world2d {
         /**
          * 刚体
          */
-        private $rigidbody: IRigidbody2D<T> = null;
+        private $rigidbody: IRigidbody2D = null;
 
         /**
          * 碰撞次数，大于0说明对象发生了碰撞
@@ -66,7 +66,7 @@ module world2d {
         /**
          * @vertexs: 原始顶点数据
          */
-        constructor(entity: T, collider: ICollider2D, rigidbody: IRigidbody2D<T>, collision: ICollision2D) {
+        constructor(entity: IEntity, collider: ICollider2D, rigidbody: IRigidbody2D, collision: ICollision2D) {
             super();
             // 实体对象
             this.$entity = entity;
@@ -333,7 +333,7 @@ module world2d {
         /**
          * 获取实体对象
          */
-        get entity(): T {
+        get entity(): IEntity {
             return this.$entity;
         }
 
@@ -354,7 +354,7 @@ module world2d {
         /**
          * 获取刚体
          */
-        get rigidbody(): IRigidbody2D<T> {
+        get rigidbody(): IRigidbody2D {
             return this.$rigidbody;
         }
     }

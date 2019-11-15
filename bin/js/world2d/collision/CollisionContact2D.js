@@ -69,6 +69,26 @@ var world2d;
         CollisionContact2D.prototype.test = function () {
             var a = this.$a;
             var b = this.$b;
+            /**
+             * 捕鱼专属开始
+             */
+            // 找出子弹和鱼
+            var x, y;
+            if (a.rigidbody !== null) {
+                x = a;
+                y = b;
+            }
+            else {
+                x = b;
+                y = a;
+            }
+            // 若x己锁定了目标，且目标有效，且目标不为y，则不检测碰撞
+            if (x.rigidbody.target !== null && x.rigidbody.target !== y) {
+                return;
+            }
+            /**
+             * 捕鱼专属结束
+             */
             var collide = this.$testAABB == false ? true : world2d.CollisionResolution2D.bounds2Bounds(a.collision.bounds, b.collision.bounds);
             // 若包围盒发生碰撞，则继续检测
             if (collide === true) {

@@ -9,7 +9,7 @@ module world2d {
         /**
          * 返回所有与指定点碰撞的图形
          */
-        static testPoint<T extends IEntity<any>>(p: IVector2D, layer: CollisionLayerEnum = CollisionLayerEnum.ALL): ITransform2D<T> {
+        static testPoint(p: IVector2D, layer: CollisionLayerEnum = CollisionLayerEnum.ALL): ITransform2D {
             const transforms = World2D.inst.transforms.slice(0);
             for (let i = 0; i < transforms.length; i++) {
                 const transform = transforms[i];
@@ -53,7 +53,7 @@ module world2d {
         /**
          * 射线检测
          */
-        static raycast<T extends IEntity<any>>(origin: IVector2D, direction: IVector2D, maxDistance: number, layers: CollisionLayerEnum): void {
+        static raycast(origin: IVector2D, direction: IVector2D, maxDistance: number, layers: CollisionLayerEnum): void {
             // 射线目标位置
             const destination: IVector2D = direction.copy().normalize().mul(maxDistance).add(origin);
             DrawAPI2D.drawLine(origin, destination, "#FF0000");
@@ -67,10 +67,10 @@ module world2d {
                 Helper2D.max(origin.y, destination.y)
             );
 
-            const transforms: Array<ITransform2D<T>> = World2D.inst.transforms;
+            const transforms: Array<ITransform2D> = World2D.inst.transforms;
 
             // 参与检测的对象列表
-            let array: Array<ITransform2D<T>> = (layers & CollisionLayerEnum.ALL) ? null : [];
+            let array: Array<ITransform2D> = (layers & CollisionLayerEnum.ALL) ? null : [];
 
             // 默认检测所有对象
             if (array === null) {
@@ -79,7 +79,7 @@ module world2d {
             // 获取与射线包围盒发生碰撞的对象
             else {
                 for (let i: number = 0; i < transforms.length; i++) {
-                    const transform: ITransform2D<T> = transforms[i];
+                    const transform: ITransform2D = transforms[i];
                     // 不在指定的层级之中
                     if ((transform.layer & layers) === 0) {
                         continue;

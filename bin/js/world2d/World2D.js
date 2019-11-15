@@ -49,6 +49,7 @@ var world2d;
         World2D.prototype.addTransform = function (transform, layer) {
             if (layer === void 0) { layer = world2d.CollisionLayerEnum.DEFAULT; }
             transform.layer = layer;
+            transform.addEventListener(World2D.TRANSFORM_LAYER_CHANGED, this.$onTransformLayerChanged, this);
             for (var i = 0; i < this.$transforms.length; i++) {
                 var transform2 = this.$transforms[i];
                 if (this.$shouldCollide(transform.layer, transform2.layer) === true) {
@@ -67,6 +68,7 @@ var world2d;
                 return;
             }
             this.$transforms.splice(index, 1);
+            transform.removeEventListener(World2D.TRANSFORM_LAYER_CHANGED, this.$onTransformLayerChanged, this);
             for (var i = this.$contacts.length - 1; i > -1; i--) {
                 var contact = this.$contacts[i];
                 if (contact.a === transform || contact.b === transform) {
@@ -76,6 +78,13 @@ var world2d;
                     this.$contacts.splice(i, 1);
                 }
             }
+        };
+        /**
+         * 对象的碰撞层级发生了变化
+         */
+        World2D.prototype.$onTransformLayerChanged = function (transform) {
+            this.removeTransform(transform);
+            this.addTransform(transform, transform.layer);
         };
         /**
          * 添加探测器
@@ -119,6 +128,10 @@ var world2d;
          * 调试模式
          */
         World2D.DEBUG = false;
+        /**
+         * 对象的碰撞层级发生了变化
+         */
+        World2D.TRANSFORM_LAYER_CHANGED = "world2d.TRANSFORM_LAYER_CHANGED";
         return World2D;
     }());
     world2d.World2D = World2D;

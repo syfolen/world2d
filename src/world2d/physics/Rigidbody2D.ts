@@ -4,7 +4,7 @@ module world2d {
     /**
      * 刚体
      */
-    export class Rigidbody2D<T extends IEntity<any>> implements IRigidbody2D<T> {
+    export class Rigidbody2D implements IRigidbody2D {
         /**
          * 扭矩（最大转向弧度）
          */
@@ -13,12 +13,12 @@ module world2d {
         /**
          * 物理对象
          */
-        transform: ITransform2D<T>;
+        transform: ITransform2D;
 
         /**
          * 追踪的目标
          */
-        target: ITransform2D<any> = null;
+        target: ITransform2D = null;
 
         /**
          * 移动速度

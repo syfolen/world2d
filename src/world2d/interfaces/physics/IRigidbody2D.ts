@@ -4,16 +4,16 @@ module world2d {
     /**
      * 刚体接口
      */
-    export interface IRigidbody2D<T extends IEntity<any>> {
+    export interface IRigidbody2D {
         /**
          * 物理对象
          */
-        transform: ITransform2D<T>;
+        transform: ITransform2D;
 
         /**
          * 追踪的目标
          */
-        target: ITransform2D<any>;
+        target: ITransform2D;
 
         /**
          * 移动速度

@@ -1,7 +1,7 @@
 
 module world2d {
 
-    export class CollisionContact2D<T extends IEntity<any>> implements ICollisionContact2D<T> {
+    export class CollisionContact2D implements ICollisionContact2D {
         /**
          * 是否使用box2d的碰撞算法
          * NOTE: box2d中的碰撞算法效率很高，但并不精确
@@ -21,19 +21,19 @@ module world2d {
         /**
          * 对象 a
          */
-        private $a: ITransform2D<T>;
+        private $a: ITransform2D;
 
         /**
          * 对象 b
          */
-        private $b: ITransform2D<T>;
+        private $b: ITransform2D;
 
         /**
          * 相撞标记
          */
         private $touching: boolean = false;
 
-        constructor(a: ITransform2D<T>, b: ITransform2D<T>) {
+        constructor(a: ITransform2D, b: ITransform2D) {
             if (a.collision.shap === CollisionShapEnum2D.CIRCLE) {
                 this.$a = a;
                 this.$b = b;
@@ -87,15 +87,15 @@ module world2d {
          * 检测是否相撞
          */
         test(): void {
-            const a: ITransform2D<T> = this.$a;
-            const b: ITransform2D<T> = this.$b;
+            const a: ITransform2D = this.$a;
+            const b: ITransform2D = this.$b;
 
             /**
              * 捕鱼专属开始
              */
 
             // 找出子弹和鱼
-            let x: ITransform2D<T>, y: ITransform2D<T>;
+            let x: ITransform2D, y: ITransform2D;
             if (a.rigidbody !== null) {
                 x = a;
                 y = b;
@@ -137,8 +137,8 @@ module world2d {
         }
 
         doCollide(type: CollisionType): void {
-            const a: ITransform2D<T> = this.$a;
-            const b: ITransform2D<T> = this.$b;
+            const a: ITransform2D = this.$a;
+            const b: ITransform2D = this.$b;
 
             if (type === CollisionType.COLLISION_ENTER) {
                 a.hitNum++;
@@ -214,11 +214,11 @@ module world2d {
             return CollisionResolution2D.polygon2Vertexs(p1, p2.vertexs) && CollisionResolution2D.polygon2Vertexs(p2, p1.vertexs);
         }
 
-        get a(): ITransform2D<T> {
+        get a(): ITransform2D {
             return this.$a;
         }
 
-        get b(): ITransform2D<T> {
+        get b(): ITransform2D {
             return this.$b;
         }
 

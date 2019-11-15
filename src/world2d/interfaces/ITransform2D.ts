@@ -4,7 +4,7 @@ module world2d {
     /**
      * 转换器接口，用来保存对撞机数据模型在世界空间中旋转和缩放值，并提供变换的接口
      */
-    export interface ITransform2D<T extends IEntity<any>> extends suncom.IEventSystem {
+    export interface ITransform2D extends suncom.IEventSystem {
         /**
          * 层级
          */
@@ -89,7 +89,7 @@ module world2d {
         /**
          * 实体对象
          */
-        readonly entity: T;
+        readonly entity: IEntity;
 
         /**
          * 对撞机
@@ -104,6 +104,6 @@ module world2d {
         /**
          * 刚体
          */
-        readonly rigidbody: IRigidbody2D<T>;
+        readonly rigidbody: IRigidbody2D;
     }
 }

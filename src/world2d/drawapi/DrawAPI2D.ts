@@ -9,21 +9,21 @@ module world2d {
             DrawAPI2D.graphics.clear();
         }
 
-        static draw<T extends IEntity<any>>(transforms: Array<ITransform2D<T>>): void {
+        static draw(transforms: Array<ITransform2D>): void {
             // 绘制坐标系
             // DrawAPI2D.graphics.drawLine(Global.WIDTH * 0.5, 0, Global.WIDTH * 0.5, Global.WIDTH, "#FF0000");
             // DrawAPI2D.graphics.drawLine(0, Global.HEIGHT * 0.5, Global.WIDTH, Global.HEIGHT * 0.5, "#FF0000");
 
             // 绘制所有包围盒
             for (let i: number = 0; i < transforms.length; i++) {
-                const transform: ITransform2D<T> = transforms[i];
+                const transform: ITransform2D = transforms[i];
                 const bounds: IBounds = transform.collision.bounds;
                 DrawAPI2D.drawRect(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, "#FF0000");
             }
 
             // 绘制所有对撞机
             for (let i: number = 0; i < transforms.length; i++) {
-                const transform: ITransform2D<T> = transforms[i];
+                const transform: ITransform2D = transforms[i];
                 if (transform.collision.shap === CollisionShapEnum2D.CIRCLE) {
                     const collision = transform.collision as ICollisionCircle2D;
                     DrawAPI2D.drawCircle(transform.x, transform.y, collision.radius, "#FF0000");
@@ -40,7 +40,7 @@ module world2d {
 
             // 绘制所有碰撞体
             for (let i: number = 0; i < transforms.length; i++) {
-                const transform: ITransform2D<T> = transforms[i];
+                const transform: ITransform2D = transforms[i];
                 const lineColor: string = transform.hitNum === 0 ? "#0000FF" : "#00FF00";
                 if (transform.collision.shap === CollisionShapEnum2D.CIRCLE) {
                     const collision: ICollisionCircle2D = transform.collision as ICollisionCircle2D;

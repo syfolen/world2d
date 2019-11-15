@@ -1,7 +1,7 @@
 
 module world2d {
 
-    export interface ICollisionContact2D<T extends IEntity<any>> {
+    export interface ICollisionContact2D {
 
         /**
          * 检测是否相撞
@@ -16,12 +16,12 @@ module world2d {
         /**
          * 碰撞对象
          */
-        readonly a: ITransform2D<T>;
+        readonly a: ITransform2D;
 
         /**
          * 碰撞对象
          */
-        readonly b: ITransform2D<T>;
+        readonly b: ITransform2D;
 
         /**
          * 相撞标记

@@ -1,48 +1,68 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var world2d;
 (function (world2d) {
     /**
      * 转换器，用来保存对撞机数据模型在世界空间中的坐标、旋转和缩放值，并提供变换的接口
      */
-    var Transform2D = /** @class */ (function () {
+    var Transform2D = /** @class */ (function (_super) {
+        __extends(Transform2D, _super);
         /**
          * @vertexs: 原始顶点数据
          */
         function Transform2D(entity, collider, rigidbody, collision) {
+            var _this = _super.call(this) || this;
             /**
              * 坐标
              */
-            this.$x = 0;
-            this.$y = 0;
-            this.$scaleTo = 1;
-            this.$rotateTo = 0;
+            _this.$x = 0;
+            _this.$y = 0;
+            _this.$scaleTo = 1;
+            _this.$rotateTo = 0;
             /**
              * 旋转（角度）
              */
-            this.$rotation = 0;
+            _this.$rotation = 0;
+            /**
+             * 是否有效（一次性值，默认为true，当其被置成false时，将永远不会被重置）
+             */
+            _this.$enabled = true;
             /**
              * 实体对象
              */
-            this.$entity = null;
+            _this.$entity = null;
             /**
              * 刚体
              */
-            this.$rigidbody = null;
+            _this.$rigidbody = null;
             /**
              * 碰撞次数，大于0说明对象发生了碰撞
              */
-            this.hitNum = 0;
+            _this.hitNum = 0;
             // 实体对象
-            this.$entity = entity;
+            _this.$entity = entity;
             // 碰撞体
-            this.$collider = collider;
+            _this.$collider = collider;
             // 刚体对象
-            this.$rigidbody = rigidbody;
+            _this.$rigidbody = rigidbody;
             // 碰撞区域
-            this.$collision = collision;
+            _this.$collision = collision;
             // 为刚体指定实体对象
             if (rigidbody !== null) {
-                rigidbody.transform = this;
+                rigidbody.transform = _this;
             }
+            return _this;
         }
         /**
          * 2D世界通过调用此方法完成对象的数据转换与碰撞
@@ -221,6 +241,26 @@ var world2d;
         Transform2D.prototype.setRotation = function (rotation) {
             this.rotateTo(world2d.Helper2D.d2r(rotation));
         };
+        /**
+         * 设置为无效
+         */
+        Transform2D.prototype.disabled = function () {
+            this.$enabled = false;
+        };
+        Object.defineProperty(Transform2D.prototype, "layer", {
+            /**
+             * 碰撞层级
+             */
+            get: function () {
+                return this.$layer;
+            },
+            set: function (value) {
+                this.$layer = value;
+                this.dispatchEvent(world2d.World2D.TRANSFORM_LAYER_CHANGED, this);
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Transform2D.prototype, "x", {
             /**
              * 获取坐标
@@ -263,7 +303,7 @@ var world2d;
              * 是否有效（一次性值，默认为true，当其被置成false时，将永远不会被重置）
              */
             get: function () {
-                return true;
+                return this.$enabled;
             },
             enumerable: true,
             configurable: true
@@ -309,7 +349,7 @@ var world2d;
             configurable: true
         });
         return Transform2D;
-    }());
+    }(suncom.EventSystem));
     world2d.Transform2D = Transform2D;
 })(world2d || (world2d = {}));
 //# sourceMappingURL=Transform2D.js.map

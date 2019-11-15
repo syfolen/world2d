@@ -5,7 +5,7 @@ module world2d {
      * 2D世界
      * 此类主要实现2D世界的碰撞
      */
-    export class World2D<T extends IEntity<any>> implements IWorld2D<T> {
+    export class World2D implements IWorld2D {
 
         /**
          * 调试模式
@@ -20,7 +20,7 @@ module world2d {
         /**
          * 单例对象
          */
-        static inst: IWorld2D<any>;
+        static inst: IWorld2D;
 
         /**
          * 层级关系
@@ -30,12 +30,12 @@ module world2d {
         /**
          * 碰撞关系
          */
-        private $contacts: Array<ICollisionContact2D<T>> = [];
+        private $contacts: Array<ICollisionContact2D> = [];
 
         /**
          * 世界中的对象
          */
-        private $transforms: Array<ITransform2D<T>> = [];
+        private $transforms: Array<ITransform2D> = [];
 
         /**
          * 碰撞分组，一经设置不可更改
@@ -68,13 +68,13 @@ module world2d {
          * 添加对象
          * @layer: 默认为 CollisionLayerEnum.DEFAULT
          */
-        addTransform(transform: ITransform2D<T>, layer: CollisionLayerEnum = CollisionLayerEnum.DEFAULT): void {
+        addTransform(transform: ITransform2D, layer: CollisionLayerEnum = CollisionLayerEnum.DEFAULT): void {
             transform.layer = layer;
             transform.addEventListener(World2D.TRANSFORM_LAYER_CHANGED, this.$onTransformLayerChanged, this);
             for (let i: number = 0; i < this.$transforms.length; i++) {
-                const transform2: ITransform2D<T> = this.$transforms[i];
+                const transform2: ITransform2D = this.$transforms[i];
                 if (this.$shouldCollide(transform.layer, transform2.layer) === true) {
-                    const contact: ICollisionContact2D<T> = new CollisionContact2D(transform, transform2);
+                    const contact: ICollisionContact2D = new CollisionContact2D(transform, transform2);
                     this.$contacts.push(contact);
                 }
             }
@@ -84,15 +84,16 @@ module world2d {
         /**
          * 移除对象
          */
-        removeTransform(transform: ITransform2D<T>): void {
+        removeTransform(transform: ITransform2D): void {
             const index: number = this.$transforms.indexOf(transform);
             if (index < 0) {
                 return;
             }
+			transform.disabled();
             this.$transforms.splice(index, 1);
             transform.removeEventListener(World2D.TRANSFORM_LAYER_CHANGED, this.$onTransformLayerChanged, this);
             for (let i: number = this.$contacts.length - 1; i > -1; i--) {
-                const contact: ICollisionContact2D<T> = this.$contacts[i];
+                const contact: ICollisionContact2D = this.$contacts[i];
                 if (contact.a === transform || contact.b === transform) {
                     if (contact.touching === true) {
                         contact.doCollide(CollisionType.COLLISION_EXIT);
@@ -105,7 +106,7 @@ module world2d {
         /**
          * 对象的碰撞层级发生了变化
          */
-        private $onTransformLayerChanged(transform: ITransform2D<T>): void {
+        private $onTransformLayerChanged(transform: ITransform2D): void {
             this.removeTransform(transform);
             this.addTransform(transform, transform.layer);
         }
@@ -143,7 +144,7 @@ module world2d {
         /**
          * 获取对象集合
          */
-        get transforms(): Array<ITransform2D<T>> {
+        get transforms(): Array<ITransform2D> {
             return this.$transforms;
         }
     }
