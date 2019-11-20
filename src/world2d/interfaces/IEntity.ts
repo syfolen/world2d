@@ -24,6 +24,6 @@ module world2d {
         /**
          * 物理数据转换器
          */
-        readonly transform: ITransform2D<IEntity>;
+        readonly transform: ITransform2D;
     }
 }
