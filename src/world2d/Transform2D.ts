@@ -3,6 +3,7 @@ module world2d {
 
     /**
      * 转换器，用来保存对撞机数据模型在世界空间中的坐标、旋转和缩放值，并提供变换的接口
+     * export
      */
     export class Transform2D extends suncom.EventSystem implements ITransform2D {
         /**
@@ -65,6 +66,7 @@ module world2d {
 
         /**
          * @vertexs: 原始顶点数据
+         * export
          */
         constructor(entity: IEntity, collider: ICollider2D, rigidbody: IRigidbody2D, collision: ICollision2D) {
             super();
@@ -131,6 +133,7 @@ module world2d {
 
         /**
          * 移动至
+         * export
          */
         moveTo(x: number, y: number): void {
             this.$x = x;
@@ -160,6 +163,7 @@ module world2d {
 
         /**
          * 旋转至（弧度）
+         * export
          */
         rotateTo(value: number): void {
             this.$updateRadian(value);
@@ -269,6 +273,7 @@ module world2d {
 
         /**
          * 获取旋转角度
+         * export
          */
         getRotation(): number {
             return this.$rotation;
@@ -276,6 +281,7 @@ module world2d {
 
         /**
          * 设置旋转角度
+         * export
          */
         setRotation(rotation: number): void {
             this.rotateTo(Helper2D.d2r(rotation));
@@ -283,6 +289,7 @@ module world2d {
 
         /**
          * 设置为无效
+         * export
          */
         disabled(): void {
             this.$enabled = false;
@@ -301,10 +308,14 @@ module world2d {
 
         /**
          * 获取坐标
+         * export
          */
         get x(): number {
             return this.$x;
         }
+        /**
+         * export
+         */
         get y(): number {
             return this.$y;
         }
@@ -325,6 +336,7 @@ module world2d {
 
         /**
          * 是否有效（一次性值，默认为true，当其被置成false时，将永远不会被重置）
+         * export
          */
         get enabled(): boolean {
             return this.$enabled;
@@ -332,6 +344,7 @@ module world2d {
 
         /**
          * 获取实体对象
+         * export
          */
         get entity(): IEntity {
             return this.$entity;
@@ -346,6 +359,7 @@ module world2d {
 
         /**
          * 碰撞体
+         * export
          */
         get collision(): ICollision2D {
             return this.$collision;
@@ -353,6 +367,7 @@ module world2d {
 
         /**
          * 获取刚体
+         * export
          */
         get rigidbody(): IRigidbody2D {
             return this.$rigidbody;

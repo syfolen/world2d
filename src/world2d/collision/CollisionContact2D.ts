@@ -90,6 +90,10 @@ module world2d {
             const a: ITransform2D = this.$a;
             const b: ITransform2D = this.$b;
 
+            if (a.enabled === false || b.enabled === false) {
+                return;
+            }
+
             /**
              * 捕鱼专属开始
              */

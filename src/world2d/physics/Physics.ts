@@ -3,11 +3,13 @@ module world2d {
 
     /**
      * 物理类
+     * export
      */
     export class Physics {
 
         /**
          * 返回所有与指定点碰撞的图形
+         * export
          */
         static testPoint(p: IVector2D, layer: CollisionLayerEnum = CollisionLayerEnum.ALL): ITransform2D {
             const transforms = World2D.inst.transforms.slice(0);

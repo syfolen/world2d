@@ -3,6 +3,7 @@ module world2d {
 
     /**
      * 刚体
+     * export
      */
     export class Rigidbody2D implements IRigidbody2D {
         /**
@@ -17,11 +18,13 @@ module world2d {
 
         /**
          * 追踪的目标
+         * export
          */
         target: ITransform2D = null;
 
         /**
          * 移动速度
+         * export
          */
         moveSpeed: number = 0;
 

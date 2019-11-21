@@ -3,20 +3,24 @@ module world2d {
 
     /**
      * 碰撞层级
+     * export
      */
     export enum CollisionLayerEnum {
         /**
          * 默认
+         * export
          */
         DEFAULT = 0x1,
 
         /**
          * 鱼
+         * export
          */
         FISH = 0x2,
 
         /**
          * 子弹
+         * export
          */
         BULLET = 0x4,
 

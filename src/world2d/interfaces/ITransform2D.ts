@@ -3,6 +3,7 @@ module world2d {
 
     /**
      * 转换器接口，用来保存对撞机数据模型在世界空间中旋转和缩放值，并提供变换的接口
+     * export
      */
     export interface ITransform2D extends suncom.IEventSystem {
         /**
@@ -27,6 +28,7 @@ module world2d {
 
         /**
          * 移动至
+         * export
          */
         moveTo(x: number, y: number): void;
 
@@ -47,28 +49,36 @@ module world2d {
 
         /**
          * 旋转至（弧度）
+         * export
          */
         rotateTo(rotation: number): void;
 
         /**
          * 获取旋转角度
+         * export
          */
         getRotation(): number;
 
         /**
          * 设置旋转角度
+         * export
          */
         setRotation(rotation: number): void;
 
         /**
          * 设置为无效
+         * export
          */
         disabled(): void;
 
         /**
          * 坐标
+         * export
          */
         readonly x: number;
+        /**
+         * export
+         */
         readonly y: number;
 
         /**
@@ -83,11 +93,13 @@ module world2d {
 
         /**
          * 是否有效（一次性值，默认为true，当其被置成false时，将永远不会被重置）
+         * export
          */
         readonly enabled: boolean;
 
         /**
          * 实体对象
+         * export
          */
         readonly entity: IEntity;
 
@@ -98,11 +110,13 @@ module world2d {
 
         /**
          * 碰撞区域
+         * export
          */
         readonly collision: ICollision2D;
 
         /**
          * 刚体
+         * export
          */
         readonly rigidbody: IRigidbody2D;
     }

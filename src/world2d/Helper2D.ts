@@ -1,6 +1,8 @@
 
 module world2d {
-
+    /**
+     * export
+     */
     export abstract class Helper2D {
         /**
          * PI
@@ -14,6 +16,7 @@ module world2d {
 
         /**
          * 角度换算为弧度
+         * export
          */
         static d2r(d: number): number {
             return d * Math.PI / 180;
@@ -21,6 +24,7 @@ module world2d {
 
         /**
          * 弧度换算为角度
+         * export
          */
         static r2d(a: number): number {
             return a * 180 / Math.PI;

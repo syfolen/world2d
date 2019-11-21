@@ -3,14 +3,23 @@ module world2d {
 
     /**
      * 向量
+     * export
      */
     export class Vector2D implements IVector2D {
         /**
          * 坐标
+         * export
          */
         x: number;
+        /**
+         * 坐标
+         * export
+         */
         y: number;
 
+        /**
+         * export
+         */
         constructor(x: number, y: number) {
             this.x = x;
             this.y = y;
@@ -18,6 +27,7 @@ module world2d {
 
         /**
          * 赋值
+         * export
          */
         assign(x: number, y: number): IVector2D {
             this.x = x;
@@ -77,6 +87,7 @@ module world2d {
 
         /**
          * 旋转（弘度）
+         * export
          */
         rotate(radian: number): IVector2D {
             const x: number = this.x;
@@ -90,6 +101,7 @@ module world2d {
 
         /**
          * 向量与x轴之间的弧度
+         * export
          */
         angle(): number {
             const radian: number = Math.atan2(this.y, this.x);
@@ -132,6 +144,7 @@ module world2d {
 
         /**
          * 长度
+         * export
          */
         length(): number {
             return Math.sqrt(this.x * this.x + this.y * this.y);

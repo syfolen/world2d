@@ -4,11 +4,13 @@ module world2d {
     /**
      * 2D世界
      * 此类主要实现2D世界的碰撞
+     * export
      */
     export class World2D implements IWorld2D {
 
         /**
          * 调试模式
+         * export
          */
         static DEBUG: boolean = false;
 
@@ -19,6 +21,7 @@ module world2d {
 
         /**
          * 单例对象
+         * export
          */
         static inst: IWorld2D;
 
@@ -38,7 +41,7 @@ module world2d {
         private $transforms: Array<ITransform2D> = [];
 
         /**
-         * 碰撞分组，一经设置不可更改
+         * export
          */
         constructor(graphics: Laya.Graphics) {
             // 保存世界对象为单例
@@ -51,6 +54,7 @@ module world2d {
 
         /**
          * 实时物理计算
+         * export
          */
         update(delta: number): void {
             // 世界数据转换
@@ -67,6 +71,7 @@ module world2d {
         /**
          * 添加对象
          * @layer: 默认为 CollisionLayerEnum.DEFAULT
+         * export
          */
         addTransform(transform: ITransform2D, layer: CollisionLayerEnum = CollisionLayerEnum.DEFAULT): void {
             transform.layer = layer;
@@ -83,6 +88,7 @@ module world2d {
 
         /**
          * 移除对象
+         * export
          */
         removeTransform(transform: ITransform2D): void {
             const index: number = this.$transforms.indexOf(transform);
@@ -113,6 +119,7 @@ module world2d {
 
         /**
          * 添加探测器
+         * export
          */
         addDetector(a: CollisionLayerEnum, b: CollisionLayerEnum): void {
             if (a > b) {

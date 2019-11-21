@@ -3,10 +3,12 @@ module world2d {
 
     /**
      * 向量接口
+     * export
      */
     export interface IVector2D extends IPoint2D {
         /**
          * 赋值
+         * export
          */
         assign(x: number, y: number): IVector2D;
 
@@ -47,11 +49,13 @@ module world2d {
 
         /**
          * 旋转（弘度）
+         * export
          */
         rotate(radian: number): IVector2D;
 
         /**
          * 向量与x轴之间的弧度
+         * export
          */
         angle(): number;
 
@@ -68,6 +72,7 @@ module world2d {
 
         /**
          * 长量
+         * export
          */
         length(): number;
 
