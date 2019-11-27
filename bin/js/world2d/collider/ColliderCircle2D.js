@@ -15,9 +15,13 @@ var world2d;
 (function (world2d) {
     /**
      * 圆形对撞机
+     * export
      */
     var ColliderCircle2D = /** @class */ (function (_super) {
         __extends(ColliderCircle2D, _super);
+        /**
+         * export
+         */
         function ColliderCircle2D(radius) {
             var _this = _super.call(this, world2d.ColliderShapEnum2D.CIRCLE) || this;
             _this.radius = radius;

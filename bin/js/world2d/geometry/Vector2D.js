@@ -2,14 +2,19 @@ var world2d;
 (function (world2d) {
     /**
      * 向量
+     * export
      */
     var Vector2D = /** @class */ (function () {
+        /**
+         * export
+         */
         function Vector2D(x, y) {
             this.x = x;
             this.y = y;
         }
         /**
          * 赋值
+         * export
          */
         Vector2D.prototype.assign = function (x, y) {
             this.x = x;
@@ -62,6 +67,7 @@ var world2d;
         };
         /**
          * 旋转（弘度）
+         * export
          */
         Vector2D.prototype.rotate = function (radian) {
             var x = this.x;
@@ -74,6 +80,7 @@ var world2d;
         };
         /**
          * 向量与x轴之间的弧度
+         * export
          */
         Vector2D.prototype.angle = function () {
             var radian = Math.atan2(this.y, this.x);
@@ -112,6 +119,7 @@ var world2d;
         };
         /**
          * 长度
+         * export
          */
         Vector2D.prototype.length = function () {
             return Math.sqrt(this.x * this.x + this.y * this.y);

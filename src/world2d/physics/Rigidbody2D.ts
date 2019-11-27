@@ -42,7 +42,7 @@ module world2d {
                 this.target = null;
             }
 
-            const p: IVector2D = suncom.Pool.getItemByClass<IVector2D>("world2d.Vector2D", Vector2D, [0, 0]);
+            const p: IVector2D = suncom.Pool.getItemByClass("world2d.Vector2D", Vector2D, [0, 0]);
 
             // 若存在目标，则调整速率角度
             if (this.target !== null) {

@@ -1,11 +1,11 @@
 
 module world2d {
 
-    export abstract class TestWorld2dShap implements world2d.IEntity<TestWorld2dShap> {
+    export abstract class TestWorld2dShap implements world2d.IEntity {
 
         protected $collider: ICollider2D;
         protected $collision: ICollision2D;
-        protected $transform: ITransform2D<TestWorld2dShap>;
+        protected $transform: ITransform2D;
 
         protected $posX: number = Math.random() * Global.WIDTH;
         protected $posY: number = Math.random() * Global.HEIGHT;
@@ -26,23 +26,23 @@ module world2d {
             this.$collider = this.$createCollider();
             this.$collision = this.$createCollision();
 
-            let rigidbody: IRigidbody2D<TestWorld2dShap> = this.$createRigidbody();
+            let rigidbody: IRigidbody2D = this.$createRigidbody();
 
             if (rigidbody === null) {
-                rigidbody = new Rigidbody2D<TestWorld2dShap>();
+                rigidbody = new Rigidbody2D();
                 rigidbody.torque = 5;
             }
 
-            this.$transform = new Transform2D<TestWorld2dShap>(this, this.$collider, rigidbody, this.$collision);
+            this.$transform = new Transform2D(this, this.$collider, rigidbody, this.$collision);
             this.$transform.moveTo(this.$posX, this.$posY);
 
-            const world: IWorld2D<TestWorld2dShap> = Global.world2d;
+            const world: IWorld2D = Global.world2d;
             world.addTransform(this.$transform, world2d.CollisionLayerEnum.DEFAULT);
 
             Laya.timer.frameLoop(1, this, this.$onEnterFrame);
         }
 
-        protected $createRigidbody(): IRigidbody2D<TestWorld2dShap> {
+        protected $createRigidbody(): IRigidbody2D {
             return null;
         }
 
@@ -76,28 +76,28 @@ module world2d {
         /**
          * 碰撞产生
          */
-        onCollisionEnter(other: IEntity<TestWorld2dShap>): void {
+        onCollisionEnter(other: IEntity): void {
 
         }
 
         /**
          * 碰撞产生后，结束前，每次计算碰撞结果后调用
          */
-        onCollisionStay(other: IEntity<TestWorld2dShap>): void {
+        onCollisionStay(other: IEntity): void {
 
         }
 
         /**
          * 碰撞结束
          */
-        onCollisionExit(other: IEntity<TestWorld2dShap>): void {
+        onCollisionExit(other: IEntity): void {
 
         }
 
         /**
          * 物理数据转换器
          */
-        get transform(): ITransform2D<TestWorld2dShap> {
+        get transform(): ITransform2D {
             return this.$transform;
         }
     }

@@ -2,12 +2,14 @@ var world2d;
 (function (world2d) {
     /**
      * 物理类
+     * export
      */
     var Physics = /** @class */ (function () {
         function Physics() {
         }
         /**
          * 返回所有与指定点碰撞的图形
+         * export
          */
         Physics.testPoint = function (p, layer) {
             if (layer === void 0) { layer = world2d.CollisionLayerEnum.ALL; }

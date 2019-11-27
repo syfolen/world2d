@@ -1,16 +1,21 @@
 var world2d;
 (function (world2d) {
+    /**
+     * export
+     */
     var Helper2D = /** @class */ (function () {
         function Helper2D() {
         }
         /**
          * 角度换算为弧度
+         * export
          */
         Helper2D.d2r = function (d) {
             return d * Math.PI / 180;
         };
         /**
          * 弧度换算为角度
+         * export
          */
         Helper2D.r2d = function (a) {
             return a * 180 / Math.PI;

@@ -2,6 +2,7 @@ var world2d;
 (function (world2d) {
     /**
      * 刚体
+     * export
      */
     var Rigidbody2D = /** @class */ (function () {
         function Rigidbody2D() {
@@ -11,10 +12,12 @@ var world2d;
             this.$torque = 180;
             /**
              * 追踪的目标
+             * export
              */
             this.target = null;
             /**
              * 移动速度
+             * export
              */
             this.moveSpeed = 0;
         }

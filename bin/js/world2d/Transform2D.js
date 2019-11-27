@@ -15,11 +15,13 @@ var world2d;
 (function (world2d) {
     /**
      * 转换器，用来保存对撞机数据模型在世界空间中的坐标、旋转和缩放值，并提供变换的接口
+     * export
      */
     var Transform2D = /** @class */ (function (_super) {
         __extends(Transform2D, _super);
         /**
          * @vertexs: 原始顶点数据
+         * export
          */
         function Transform2D(entity, collider, rigidbody, collision) {
             var _this = _super.call(this) || this;
@@ -106,6 +108,7 @@ var world2d;
         };
         /**
          * 移动至
+         * export
          */
         Transform2D.prototype.moveTo = function (x, y) {
             this.$x = x;
@@ -131,6 +134,7 @@ var world2d;
         };
         /**
          * 旋转至（弧度）
+         * export
          */
         Transform2D.prototype.rotateTo = function (value) {
             this.$updateRadian(value);
@@ -231,18 +235,21 @@ var world2d;
         };
         /**
          * 获取旋转角度
+         * export
          */
         Transform2D.prototype.getRotation = function () {
             return this.$rotation;
         };
         /**
          * 设置旋转角度
+         * export
          */
         Transform2D.prototype.setRotation = function (rotation) {
             this.rotateTo(world2d.Helper2D.d2r(rotation));
         };
         /**
          * 设置为无效
+         * export
          */
         Transform2D.prototype.disabled = function () {
             this.$enabled = false;
@@ -264,6 +271,7 @@ var world2d;
         Object.defineProperty(Transform2D.prototype, "x", {
             /**
              * 获取坐标
+             * export
              */
             get: function () {
                 return this.$x;
@@ -272,6 +280,9 @@ var world2d;
             configurable: true
         });
         Object.defineProperty(Transform2D.prototype, "y", {
+            /**
+             * export
+             */
             get: function () {
                 return this.$y;
             },
@@ -301,6 +312,7 @@ var world2d;
         Object.defineProperty(Transform2D.prototype, "enabled", {
             /**
              * 是否有效（一次性值，默认为true，当其被置成false时，将永远不会被重置）
+             * export
              */
             get: function () {
                 return this.$enabled;
@@ -311,6 +323,7 @@ var world2d;
         Object.defineProperty(Transform2D.prototype, "entity", {
             /**
              * 获取实体对象
+             * export
              */
             get: function () {
                 return this.$entity;
@@ -331,6 +344,7 @@ var world2d;
         Object.defineProperty(Transform2D.prototype, "collision", {
             /**
              * 碰撞体
+             * export
              */
             get: function () {
                 return this.$collision;
@@ -341,6 +355,7 @@ var world2d;
         Object.defineProperty(Transform2D.prototype, "rigidbody", {
             /**
              * 获取刚体
+             * export
              */
             get: function () {
                 return this.$rigidbody;

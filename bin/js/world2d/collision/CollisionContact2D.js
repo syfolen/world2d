@@ -69,6 +69,9 @@ var world2d;
         CollisionContact2D.prototype.test = function () {
             var a = this.$a;
             var b = this.$b;
+            if (a.enabled === false || b.enabled === false) {
+                return;
+            }
             /**
              * 捕鱼专属开始
              */

@@ -4,7 +4,7 @@ module world2d {
     export class World2DIniClass {
 
         private $image: Laya.Image = new Laya.Image();
-        private $world: world2d.IWorld2D<IEntity<any>>;
+        private $world: world2d.IWorld2D;
 
         private $direction: IVector2D = new Vector2D(1, 0);
 

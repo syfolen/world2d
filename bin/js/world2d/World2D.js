@@ -3,10 +3,11 @@ var world2d;
     /**
      * 2D世界
      * 此类主要实现2D世界的碰撞
+     * export
      */
     var World2D = /** @class */ (function () {
         /**
-         * 碰撞分组，一经设置不可更改
+         * export
          */
         function World2D(graphics) {
             /**
@@ -30,6 +31,7 @@ var world2d;
         }
         /**
          * 实时物理计算
+         * export
          */
         World2D.prototype.update = function (delta) {
             // 世界数据转换
@@ -45,6 +47,7 @@ var world2d;
         /**
          * 添加对象
          * @layer: 默认为 CollisionLayerEnum.DEFAULT
+         * export
          */
         World2D.prototype.addTransform = function (transform, layer) {
             if (layer === void 0) { layer = world2d.CollisionLayerEnum.DEFAULT; }
@@ -61,12 +64,14 @@ var world2d;
         };
         /**
          * 移除对象
+         * export
          */
         World2D.prototype.removeTransform = function (transform) {
             var index = this.$transforms.indexOf(transform);
             if (index < 0) {
                 return;
             }
+            transform.disabled();
             this.$transforms.splice(index, 1);
             transform.removeEventListener(World2D.TRANSFORM_LAYER_CHANGED, this.$onTransformLayerChanged, this);
             for (var i = this.$contacts.length - 1; i > -1; i--) {
@@ -88,6 +93,7 @@ var world2d;
         };
         /**
          * 添加探测器
+         * export
          */
         World2D.prototype.addDetector = function (a, b) {
             if (a > b) {
@@ -126,6 +132,7 @@ var world2d;
         });
         /**
          * 调试模式
+         * export
          */
         World2D.DEBUG = false;
         /**

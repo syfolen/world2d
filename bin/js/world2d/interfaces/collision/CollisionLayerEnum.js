@@ -2,19 +2,23 @@ var world2d;
 (function (world2d) {
     /**
      * 碰撞层级
+     * export
      */
     var CollisionLayerEnum;
     (function (CollisionLayerEnum) {
         /**
          * 默认
+         * export
          */
         CollisionLayerEnum[CollisionLayerEnum["DEFAULT"] = 1] = "DEFAULT";
         /**
          * 鱼
+         * export
          */
         CollisionLayerEnum[CollisionLayerEnum["FISH"] = 2] = "FISH";
         /**
          * 子弹
+         * export
          */
         CollisionLayerEnum[CollisionLayerEnum["BULLET"] = 4] = "BULLET";
         CollisionLayerEnum[CollisionLayerEnum["POLYGON"] = 8] = "POLYGON";

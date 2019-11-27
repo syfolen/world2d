@@ -18,8 +18,8 @@ module world2d {
             ]);
         }
 
-        protected $createRigidbody(): IRigidbody2D<TestWorld2dShap> {
-            const rigidbody = new Rigidbody2D<TestWorld2dShap>();
+        protected $createRigidbody(): IRigidbody2D {
+            const rigidbody = new Rigidbody2D();
             rigidbody.torque = 10;
             rigidbody.moveSpeed = 20;
 

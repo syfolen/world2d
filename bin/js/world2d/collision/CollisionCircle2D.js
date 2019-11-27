@@ -15,9 +15,13 @@ var world2d;
 (function (world2d) {
     /**
      * 圆形碰撞区域（效率最高）
+     * export
      */
     var CollisionCircle2D = /** @class */ (function (_super) {
         __extends(CollisionCircle2D, _super);
+        /**
+         * export
+         */
         function CollisionCircle2D(radius) {
             var _this = _super.call(this, world2d.CollisionShapEnum2D.CIRCLE) || this;
             // 默认半径
