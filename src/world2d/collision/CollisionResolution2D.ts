@@ -1,6 +1,5 @@
 
 module world2d {
-
     /**
      * 2D碰撞检测
      */
