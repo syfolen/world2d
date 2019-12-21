@@ -1,28 +1,3 @@
-/**
- * MIT License
- * 
- * Copyright (c) 2019 Binfeng Sun<christon.sun@qq.com>
- * https://blog.csdn.net/syfolen
- * https://github.com/syfolen/world2d
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -51,6 +26,8 @@ var world2d;
         CollisionLayerEnum[CollisionLayerEnum["POLYGON"] = 8] = "POLYGON";
         CollisionLayerEnum[CollisionLayerEnum["CIRCLE"] = 16] = "CIRCLE";
         CollisionLayerEnum[CollisionLayerEnum["RECTANLE"] = 32] = "RECTANLE";
+        CollisionLayerEnum[CollisionLayerEnum["FISH_2"] = 64] = "FISH_2";
+        CollisionLayerEnum[CollisionLayerEnum["BULLET_2"] = 128] = "BULLET_2";
         CollisionLayerEnum[CollisionLayerEnum["ALL"] = 4096] = "ALL";
     })(CollisionLayerEnum = world2d.CollisionLayerEnum || (world2d.CollisionLayerEnum = {}));
     var CollisionShapEnum2D;
@@ -203,6 +180,21 @@ var world2d;
         CollisionContact2D.prototype.test = function () {
             var a = this.$a;
             var b = this.$b;
+            if (a.enabled === false || b.enabled === false) {
+                return;
+            }
+            var x, y;
+            if (a.rigidbody !== null) {
+                x = a;
+                y = b;
+            }
+            else {
+                x = b;
+                y = a;
+            }
+            if (x.rigidbody.target !== null && x.rigidbody.target !== y) {
+                return;
+            }
             var collide = this.$testAABB == false ? true : CollisionResolution2D.bounds2Bounds(a.collision.bounds, b.collision.bounds);
             if (collide === true) {
                 collide = this.$testFunc.call(this, a.collision, b.collision);
@@ -210,8 +202,6 @@ var world2d;
             if (collide === true) {
                 if (this.$touching === false) {
                     this.$touching = true;
-                    a.hitNum++;
-                    b.hitNum++;
                     this.doCollide(CollisionType.COLLISION_ENTER);
                 }
                 else {
@@ -220,8 +210,6 @@ var world2d;
             }
             else if (this.$touching === true) {
                 this.$touching = false;
-                a.hitNum--;
-                b.hitNum--;
                 this.doCollide(CollisionType.COLLISION_EXIT);
             }
         };
@@ -229,10 +217,14 @@ var world2d;
             var a = this.$a;
             var b = this.$b;
             if (type === CollisionType.COLLISION_ENTER) {
+                a.hitNum++;
+                b.hitNum++;
                 a.entity.onCollisionEnter(b.entity);
                 b.entity.onCollisionEnter(a.entity);
             }
             else if (type === CollisionType.COLLISION_EXIT) {
+                a.hitNum--;
+                b.hitNum--;
                 a.entity.onCollisionExit(b.entity);
                 b.entity.onCollisionExit(a.entity);
             }
@@ -785,11 +777,15 @@ var world2d;
     var Physics = (function () {
         function Physics() {
         }
-        Physics.testPoint = function (p) {
+        Physics.testPoint = function (p, layer) {
+            if (layer === void 0) { layer = CollisionLayerEnum.ALL; }
             var transforms = World2D.inst.transforms.slice(0);
             for (var i = 0; i < transforms.length; i++) {
                 var transform = transforms[i];
                 var collision = transform.collision;
+                if (layer !== CollisionLayerEnum.ALL && layer !== transform.layer) {
+                    continue;
+                }
                 if (transform.collision.shap === CollisionShapEnum2D.CIRCLE) {
                     if (p.distanceTo(transform) <= collision.radius) {
                         return transform;
@@ -848,49 +844,49 @@ var world2d;
     world2d.Physics = Physics;
     var Rigidbody2D = (function () {
         function Rigidbody2D() {
-            this.$velocity = new Vector2D(0, 0);
             this.$torque = 180;
-            this.velocity = null;
+            this.target = null;
+            this.moveSpeed = 0;
         }
         Rigidbody2D.prototype.update = function (delta) {
-            if (this.velocity === null || this.velocity.length() === 0) {
+            if (this.moveSpeed === 0) {
                 return;
             }
-            if (this.$torque === 180) {
-                this.transform.moveBy(this.velocity.x * delta, this.velocity.y * delta);
+            if (this.target !== null && this.target.enabled === false) {
+                this.target = null;
             }
-            else {
-                var rotation = this.transform.rotation;
-                var torque = this.$torque * delta * 10;
-                var min = rotation - Helper2D.PI;
-                var max = rotation + Helper2D.PI;
-                var radian = this.velocity.angle();
-                if (radian < min) {
-                    radian += Helper2D.PI2;
+            var p = suncom.Pool.getItemByClass("world2d.Vector2D", Vector2D, [0, 0]);
+            if (this.target !== null) {
+                p.assign(this.target.x - this.transform.x, this.target.y - this.transform.y);
+                var rotate2 = p.angle();
+                if (this.$torque === 180) {
+                    this.transform.rotateTo(rotate2);
                 }
-                else if (radian > max) {
-                    radian -= Helper2D.PI2;
-                }
-                var abs = Helper2D.abs(radian - rotation);
-                if (abs !== 0) {
-                    if (abs > torque) {
-                        if (radian > rotation) {
-                            this.transform.rotateBy(torque);
-                        }
-                        else {
-                            this.transform.rotateBy(-torque);
-                        }
+                else {
+                    var min = this.transform.rotation - Helper2D.PI;
+                    var max = this.transform.rotation + Helper2D.PI;
+                    if (rotate2 < min) {
+                        rotate2 += Helper2D.PI2;
+                    }
+                    else if (rotate2 > max) {
+                        rotate2 -= Helper2D.PI2;
+                    }
+                    var rotation = rotate2 - this.transform.rotation;
+                    var torque = suncom.Common.clamp(this.$torque * delta * 10, 0, Helper2D.PI);
+                    if (rotation < -torque) {
+                        this.transform.rotateBy(-torque);
+                    }
+                    else if (rotation > torque) {
+                        this.transform.rotateBy(torque);
                     }
                     else {
-                        this.transform.rotateTo(radian);
+                        this.transform.rotateBy(rotation);
                     }
                 }
-                this.$velocity.assign(this.velocity.x, this.velocity.y);
-                if (abs !== 0) {
-                    this.$velocity.rotate(rotation - radian);
-                }
-                this.transform.moveBy(this.$velocity.x * delta, this.$velocity.y * delta);
             }
+            p.assign(this.moveSpeed, 0).rotate(this.transform.rotation);
+            this.transform.moveBy(p.x * delta, p.y * delta);
+            suncom.Pool.recover("world2d.Vector2D", p);
         };
         Object.defineProperty(Rigidbody2D.prototype, "torque", {
             get: function () {
@@ -914,23 +910,27 @@ var world2d;
         return Segment2D;
     }());
     world2d.Segment2D = Segment2D;
-    var Transform2D = (function () {
+    var Transform2D = (function (_super) {
+        __extends(Transform2D, _super);
         function Transform2D(entity, collider, rigidbody, collision) {
-            this.$x = 0;
-            this.$y = 0;
-            this.$scaleTo = 1;
-            this.$rotateTo = 0;
-            this.$rotation = 0;
-            this.$entity = null;
-            this.$rigidbody = null;
-            this.hitNum = 0;
-            this.$entity = entity;
-            this.$collider = collider;
-            this.$rigidbody = rigidbody;
-            this.$collision = collision;
+            var _this = _super.call(this) || this;
+            _this.$x = 0;
+            _this.$y = 0;
+            _this.$scaleTo = 1;
+            _this.$rotateTo = 0;
+            _this.$rotation = 0;
+            _this.$enabled = true;
+            _this.$entity = null;
+            _this.$rigidbody = null;
+            _this.hitNum = 0;
+            _this.$entity = entity;
+            _this.$collider = collider;
+            _this.$rigidbody = rigidbody;
+            _this.$collision = collision;
             if (rigidbody !== null) {
-                rigidbody.transform = this;
+                rigidbody.transform = _this;
             }
+            return _this;
         }
         Transform2D.prototype.transform = function (delta) {
             if (this.$rigidbody !== null) {
@@ -1063,6 +1063,20 @@ var world2d;
         Transform2D.prototype.setRotation = function (rotation) {
             this.rotateTo(Helper2D.d2r(rotation));
         };
+        Transform2D.prototype.disabled = function () {
+            this.$enabled = false;
+        };
+        Object.defineProperty(Transform2D.prototype, "layer", {
+            get: function () {
+                return this.$layer;
+            },
+            set: function (value) {
+                this.$layer = value;
+                this.dispatchEvent(World2D.TRANSFORM_LAYER_CHANGED, this);
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Transform2D.prototype, "x", {
             get: function () {
                 return this.$x;
@@ -1087,6 +1101,13 @@ var world2d;
         Object.defineProperty(Transform2D.prototype, "rotation", {
             get: function () {
                 return this.$rotateTo;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Transform2D.prototype, "enabled", {
+            get: function () {
+                return this.$enabled;
             },
             enumerable: true,
             configurable: true
@@ -1120,7 +1141,7 @@ var world2d;
             configurable: true
         });
         return Transform2D;
-    }());
+    }(suncom.EventSystem));
     world2d.Transform2D = Transform2D;
     var Vector2D = (function () {
         function Vector2D(x, y) {
@@ -1255,6 +1276,7 @@ var world2d;
         World2D.prototype.addTransform = function (transform, layer) {
             if (layer === void 0) { layer = CollisionLayerEnum.DEFAULT; }
             transform.layer = layer;
+            transform.addEventListener(World2D.TRANSFORM_LAYER_CHANGED, this.$onTransformLayerChanged, this);
             for (var i = 0; i < this.$transforms.length; i++) {
                 var transform2 = this.$transforms[i];
                 if (this.$shouldCollide(transform.layer, transform2.layer) === true) {
@@ -1269,7 +1291,9 @@ var world2d;
             if (index < 0) {
                 return;
             }
+            transform.disabled();
             this.$transforms.splice(index, 1);
+            transform.removeEventListener(World2D.TRANSFORM_LAYER_CHANGED, this.$onTransformLayerChanged, this);
             for (var i = this.$contacts.length - 1; i > -1; i--) {
                 var contact = this.$contacts[i];
                 if (contact.a === transform || contact.b === transform) {
@@ -1279,6 +1303,10 @@ var world2d;
                     this.$contacts.splice(i, 1);
                 }
             }
+        };
+        World2D.prototype.$onTransformLayerChanged = function (transform) {
+            this.removeTransform(transform);
+            this.addTransform(transform, transform.layer);
         };
         World2D.prototype.addDetector = function (a, b) {
             if (a > b) {
@@ -1309,7 +1337,8 @@ var world2d;
             enumerable: true,
             configurable: true
         });
-        World2D.DEBUG = true;
+        World2D.DEBUG = false;
+        World2D.TRANSFORM_LAYER_CHANGED = "world2d.TRANSFORM_LAYER_CHANGED";
         return World2D;
     }());
     world2d.World2D = World2D;

@@ -1,1 +1,0 @@
-//# sourceMappingURL=IPolygon2D.js.map

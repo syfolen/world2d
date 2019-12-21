@@ -1,1 +1,0 @@
-//# sourceMappingURL=IColliderPolygon2D.js.map
