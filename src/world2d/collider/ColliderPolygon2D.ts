@@ -20,7 +20,7 @@ module world2d {
          */
         clone(): IColliderPolygon2D {
             const vertexs: Array<IVector2D> = [];
-            for (let i = 0; i < this.vertexs.length; i++) {
+            for (let i: number = 0; i < this.vertexs.length; i++) {
                 vertexs.push(this.vertexs[i].copy());
             }
             return new ColliderPolygon2D(vertexs);

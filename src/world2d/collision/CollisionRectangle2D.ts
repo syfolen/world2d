@@ -18,7 +18,7 @@ module world2d {
         constructor() {
             super(CollisionShapEnum2D.RECTANGLE);
             // 初始化顶点数据
-            for (let i = 0; i < 4; i++) {
+            for (let i: number = 0; i < 4; i++) {
                 this.vertexs.push(new Vector2D(0, 0));
                 this.segments.push(new Vector2D(0, 0));
             }

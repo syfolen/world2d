@@ -91,8 +91,8 @@ module world2d {
                 this.$rigidbody.update(delta);
             }
 
-            const needUpdate = this.$needUpdate();
-            const isModifiedByExtern = this.$isModifiedByExtern();
+            const needUpdate: boolean = this.$needUpdate();
+            const isModifiedByExtern: boolean = this.$isModifiedByExtern();
 
             // 不需要更新数据
             if (needUpdate === false && isModifiedByExtern === false) {
@@ -200,7 +200,7 @@ module world2d {
             }
             // 矩形还需要准备顶点数据和边数据
             else if (this.$collision.shap === CollisionShapEnum2D.RECTANGLE) {
-                const collision = this.$collision as ICollisionRectangle2D;
+                const collision: ICollisionRectangle2D = this.$collision as ICollisionRectangle2D;
                 collision.prepareVertexs();
                 collision.prepareSegments();
             }
@@ -209,9 +209,9 @@ module world2d {
         private $applyPosition(): void {
             // 多边形需要更新重组所有顶点的位置
             if (this.$collider.shap !== ColliderShapEnum2D.CIRCLE) {
-                const collision = this.$collision as CollisionPolygon2D;
-                for (let i = 0; i < collision.vertexs.length; i++) {
-                    const p = collision.vertexs[i];
+                const collision: ICollisionPolygon2D = this.$collision as ICollisionPolygon2D;
+                for (let i: number = 0; i < collision.vertexs.length; i++) {
+                    const p: IVector2D = collision.vertexs[i];
                     p.x += this.$x;
                     p.y += this.$y;
                 }
@@ -221,9 +221,9 @@ module world2d {
         private $applyRotate(): void {
             // 只有多边形对撞机才支持旋转
             if (this.$collider.shap === ColliderShapEnum2D.POLYGON) {
-                const collision = this.$collision as ICollisionPolygon2D;
-                for (let i = 0; i < collision.vertexs.length; i++) {
-                    const p = collision.vertexs[i];
+                const collision: ICollisionPolygon2D = this.$collision as ICollisionPolygon2D;
+                for (let i: number = 0; i < collision.vertexs.length; i++) {
+                    const p: IVector2D = collision.vertexs[i];
                     p.rotate(this.$radian);
                 }
             }
@@ -231,18 +231,18 @@ module world2d {
 
         private $applyScale(): void {
             if (this.$collision.shap === CollisionShapEnum2D.CIRCLE) {
-                const collider = this.$collider as IColliderCircle2D;
-                const collision = this.$collision as ICollisionCircle2D;
+                const collider: IColliderCircle2D = this.$collider as IColliderCircle2D;
+                const collision: ICollisionCircle2D = this.$collision as ICollisionCircle2D;
                 // 对半径进行缩放
                 collision.radius = collider.radius * this.$scale;
             }
             else {
-                const collider = this.$collider as IColliderPolygon2D;
+                const collider: IColliderPolygon2D = this.$collider as IColliderPolygon2D;
                 const collision: IPolygon2D = this.$collision as any;
                 // 对顶点向量进行缩放
-                for (let i = 0; i < collider.vertexs.length; i++) {
-                    const a = collider.vertexs[i];
-                    const b = collision.vertexs[i];
+                for (let i: number = 0; i < collider.vertexs.length; i++) {
+                    const a: IVector2D = collider.vertexs[i];
+                    const b: IVector2D = collision.vertexs[i];
                     b.assign(a.x, a.y).mul(this.$scale);
                 }
             }
@@ -265,7 +265,7 @@ module world2d {
 
         private $isModifiedByExtern(): boolean {
             if (this.$collision.shap === CollisionShapEnum2D.POLYGON) {
-                const collision = this.$collision as ICollisionPolygon2D;
+                const collision: ICollisionPolygon2D = this.$collision as ICollisionPolygon2D;
                 return collision.modified;
             }
             return false;

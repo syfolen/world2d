@@ -12,10 +12,10 @@ module world2d {
          * export
          */
         static testPoint(p: IVector2D, layer: CollisionLayerEnum = CollisionLayerEnum.ALL): ITransform2D {
-            const transforms = World2D.inst.transforms.slice(0);
-            for (let i = 0; i < transforms.length; i++) {
-                const transform = transforms[i];
-                const collision = transform.collision as ICollisionCircle2D;
+            const transforms: ITransform2D[] = World2D.inst.transforms.slice(0);
+            for (let i: number = 0; i < transforms.length; i++) {
+                const transform: ITransform2D = transforms[i];
+                const collision: ICollisionCircle2D = transform.collision as ICollisionCircle2D;
                 if (layer !== CollisionLayerEnum.ALL && layer !== transform.layer) {
                     continue;
                 }
@@ -25,19 +25,19 @@ module world2d {
                     }
                 }
                 else if (transform.collision.shap === CollisionShapEnum2D.RECTANGLE) {
-                    const bounds = transform.collision.bounds;
+                    const bounds: IBounds = transform.collision.bounds;
                     if (p.x >= bounds.left && p.x <= bounds.right && p.y >= bounds.top && p.y <= bounds.bottom) {
                         return transform;
                     }
                 }
                 else {
                     const collision: ICollisionPolygon2D = transform.collision as ICollisionPolygon2D;
-                    const vertexs = collision.vertexs;
+                    const vertexs: IVector2D[] = collision.vertexs;
 
                     let radian: number = 0;
-                    for (let i = 0; i < vertexs.length; i++) {
-                        const a = vertexs[i];
-                        const b = i === 0 ? vertexs[vertexs.length - 1] : vertexs[i - 1];
+                    for (let i: number = 0; i < vertexs.length; i++) {
+                        const a: IVector2D = vertexs[i];
+                        const b: IVector2D = i === 0 ? vertexs[vertexs.length - 1] : vertexs[i - 1];
                         if (a.x === b.x && a.y === b.y) {
                             continue;
                         }

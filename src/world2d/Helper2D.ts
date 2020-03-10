@@ -58,15 +58,15 @@ module world2d {
          * 为一组顶点计算边界值
          */
         static calculateBoundsForVertexs(vertexs: Array<IVector2D>, bounds: IBounds): void {
-            const p = vertexs[0];
+            const p: IVector2D = vertexs[0];
 
-            let left = p.x;
-            let right = p.x;
-            let top = p.y;
-            let bottom = p.y;
+            let left: number = p.x;
+            let right: number = p.x;
+            let top: number = p.y;
+            let bottom: number = p.y;
 
-            for (let i = 1; i < vertexs.length; i++) {
-                const p = vertexs[i];
+            for (let i: number = 1; i < vertexs.length; i++) {
+                const p: IVector2D = vertexs[i];
                 if (left > p.x) {
                     left = p.x;
                 }

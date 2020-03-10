@@ -19,7 +19,7 @@ module world2d {
         }
 
         protected $createRigidbody(): IRigidbody2D {
-            const rigidbody = new Rigidbody2D();
+            const rigidbody: IRigidbody2D = new Rigidbody2D();
             rigidbody.torque = 10;
             rigidbody.moveSpeed = 20;
 

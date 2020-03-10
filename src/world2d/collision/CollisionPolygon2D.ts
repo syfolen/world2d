@@ -50,8 +50,8 @@ module world2d {
          */
         prepareVertexs(): void {
             for (let i: number = 0; i < this.$tempVertexs.length; i++) {
-                const a = this.vertexs[i];
-                const b = this.$tempVertexs[i];
+                const a: IVector2D = this.vertexs[i];
+                const b: IPoint2D = this.$tempVertexs[i];
                 a.assign(b.x, b.y);
             }
             this.$tempVertexs = null;

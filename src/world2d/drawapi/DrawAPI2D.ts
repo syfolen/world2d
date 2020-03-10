@@ -25,15 +25,15 @@ module world2d {
             for (let i: number = 0; i < transforms.length; i++) {
                 const transform: ITransform2D = transforms[i];
                 if (transform.collision.shap === CollisionShapEnum2D.CIRCLE) {
-                    const collision = transform.collision as ICollisionCircle2D;
+                    const collision: ICollisionCircle2D = transform.collision as ICollisionCircle2D;
                     DrawAPI2D.drawCircle(transform.x, transform.y, collision.radius, "#FF0000");
                 }
                 else if (transform.collision.shap === CollisionShapEnum2D.POLYGON) {
-                    const collision = transform.collision as ICollisionPolygon2D;
+                    const collision: ICollisionPolygon2D = transform.collision as ICollisionPolygon2D;
                     DrawAPI2D.drawPolygon(0, 0, collision.vertexs, "#FF0000");
                 }
                 else {
-                    const collision = transform.collision as ICollisionRectangle2D;
+                    const collision: ICollisionRectangle2D = transform.collision as ICollisionRectangle2D;
                     DrawAPI2D.drawPolygon(0, 0, collision.vertexs, "#FF0000");
                 }
             }
@@ -51,7 +51,7 @@ module world2d {
                     DrawAPI2D.drawPolygon(0, 0, collision.vertexs, lineColor);
                 }
                 else {
-                    const bounds = transform.collision.bounds;
+                    const bounds: IBounds = transform.collision.bounds;
                     DrawAPI2D.drawRect(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, lineColor);
                 }
             }
