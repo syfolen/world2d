@@ -22,7 +22,7 @@ declare module world2d {
         /**
          * 子弹
          */
-        BULLET = 0x4,
+        BULLET = 0x4
     }
 
     /**
@@ -243,7 +243,7 @@ declare module world2d {
          */
         radius: number;
 
-        constructor(radius:number);
+        constructor(radius: number);
     }
 
     /**
@@ -268,7 +268,7 @@ declare module world2d {
          */
         radius: number;
 
-        constructor(radius:number);
+        constructor(radius: number);
     }
 
     abstract class Helper2D {
@@ -276,12 +276,12 @@ declare module world2d {
         /**
          * 角度换算为弧度
          */
-        static d2r(d:number): number;
+        static d2r(d: number): number;
 
         /**
          * 弧度换算为角度
          */
-        static r2d(a:number): number;
+        static r2d(a: number): number;
     }
 
     /**
@@ -292,7 +292,7 @@ declare module world2d {
         /**
          * 返回所有与指定点碰撞的图形
          */
-        static testPoint(p:IVector2D, layer?:CollisionLayerEnum): ITransform2D;
+        static testPoint(p: IVector2D, layer?: CollisionLayerEnum): ITransform2D;
     }
 
     /**
@@ -318,17 +318,17 @@ declare module world2d {
         /**
          * @vertexs: 原始顶点数据
          */
-        constructor(entity:IEntity, collider:ICollider2D, rigidbody:IRigidbody2D, collision:ICollision2D);
+        constructor(entity: IEntity, collider: ICollider2D, rigidbody: IRigidbody2D, collision: ICollision2D);
 
         /**
          * 移动至
          */
-        moveTo(x:number, y:number): void;
+        moveTo(x: number, y: number): void;
 
         /**
          * 旋转至（弧度）
          */
-        rotateTo(value:number): void;
+        rotateTo(value: number): void;
 
         /**
          * 获取旋转角度
@@ -338,7 +338,7 @@ declare module world2d {
         /**
          * 设置旋转角度
          */
-        setRotation(rotation:number): void;
+        setRotation(rotation: number): void;
 
         /**
          * 设置为无效
@@ -387,17 +387,17 @@ declare module world2d {
          */
         y: number;
 
-        constructor(x:number, y:number);
+        constructor(x: number, y: number);
 
         /**
          * 赋值
          */
-        assign(x:number, y:number): IVector2D;
+        assign(x: number, y: number): IVector2D;
 
         /**
          * 旋转（弘度）
          */
-        rotate(radian:number): IVector2D;
+        rotate(radian: number): IVector2D;
 
         /**
          * 向量与x轴之间的弧度
@@ -425,27 +425,27 @@ declare module world2d {
          */
         static inst: IWorld2D;
 
-        constructor(graphics:Laya.Graphics);
+        constructor(graphics: Laya.Graphics);
 
         /**
          * 实时物理计算
          */
-        update(delta:number): void;
+        update(delta: number): void;
 
         /**
          * 添加对象
          * @layer: 默认为 CollisionLayerEnum.DEFAULT
          */
-        addTransform(transform:ITransform2D, layer?:CollisionLayerEnum): void;
+        addTransform(transform: ITransform2D, layer?: CollisionLayerEnum): void;
 
         /**
          * 移除对象
          */
-        removeTransform(transform:ITransform2D): void;
+        removeTransform(transform: ITransform2D): void;
 
         /**
          * 添加探测器
          */
-        addDetector(a:CollisionLayerEnum, b:CollisionLayerEnum): void;
+        addDetector(a: CollisionLayerEnum, b: CollisionLayerEnum): void;
     }
 }
