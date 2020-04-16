@@ -5,39 +5,44 @@ declare module suncom {
      */
     enum DebugMode {
         /**
+         * 任意
+         */
+        ANY = 0x01,
+
+        /**
          * 调试信息
          */
-        DEBUG = 0x1,
+        DEBUG = 0x02,
 
         /**
          * 工程模式
          */
-        ENGINEER = 0x02,
+        ENGINEER = 0x04,
 
         /**
          * 框架
          */
-        ENGINE = 0x4,
+        ENGINE = 0x08,
 
         /**
          * 原生
          */
-        NATIVE = 0x8,
+        NATIVE = 0x10,
 
         /**
          * 网络
          */
-        NETWORK = 0x10,
+        NETWORK = 0x20,
 
         /**
          * 网络心跳
          */
-        NETWORK_HEARTBEAT = 0x20,
+        NETWORK_HEARTBEAT = 0x40,
 
         /**
          * 普通
          */
-        NORMAL = 0x40
+        NORMAL = 0x80
     }
 
     /**
@@ -58,6 +63,71 @@ declare module suncom {
          * 网页版
          */
         WEB
+    }
+
+    /**
+     * 事件优先级
+     */
+    enum EventPriorityEnum {
+        /**
+         * 最低
+         */
+        LAZY = 0,
+
+        /**
+         * 低（默认）
+         */
+        LOW,
+
+        /**
+         * 中
+         */
+        MID,
+
+        /**
+         * 高
+         */
+        HIGH,
+
+        /**
+         * 框架级别
+         */
+        FWL,
+
+        /**
+         * 引擎级别
+         */
+        EGL,
+
+        /**
+         * 系统级别
+         */
+        OSL
+    }
+
+    /**
+     * 日志类型枚举
+     */
+    enum LogTypeEnum {
+        /**
+         * 普通日志
+         */
+        VERBOSE,
+
+        /**
+         * 警告日志
+         */
+        WARN,
+
+        /**
+         * 错误日志
+         */
+        ERROR,
+
+        /**
+         * 文件日志
+         */
+        LOG2F
     }
 
     /**
@@ -86,9 +156,9 @@ declare module suncom {
         /**
          * 事件注册
          * @receiveOnce: 是否只响应一次，默认为false
-         * @priority: 事件优先级，优先级高的先被执行，默认为 1
+         * @priority: 事件优先级，优先级高的先被执行，默认为：EventPriorityEnum.LOW
          */
-        addEventListener(type: string, method: Function, caller: Object, receiveOnce?: boolean, priority?: number): void;
+        addEventListener(type: string, method: Function, caller: Object, receiveOnce?: boolean, priority?: EventPriorityEnum): void;
 
         /**
          * 移除事件
@@ -129,7 +199,7 @@ declare module suncom {
         /**
          * 数据源（请勿直接操作其中的数据）
          */
-        source: Array<T>;
+        source: T[];
 
         /**
          * 添加数据
@@ -183,7 +253,7 @@ declare module suncom {
         /**
          * 己执行的一次性事件对象列表（内置属性，请勿操作）
          */
-        private $onceList: Array<IEventInfo>;
+        private $onceList: IEventInfo[];
 
         /**
          * 事件是否己取消（内置属性，请勿操作）
@@ -197,7 +267,7 @@ declare module suncom {
 
         /**
          * 事件派发
-         * @args[]: 参数列表，允许为任意类型的数据
+         * @args: 参数列表，允许为任意类型的数据
          * @cancelable: 事件是否允许被中断，默认为false
          */
         dispatchEvent(type: string, args?: any, cancelable?: boolean): void;
@@ -205,9 +275,9 @@ declare module suncom {
         /**
          * 事件注册
          * @receiveOnce: 是否只响应一次，默认为false
-         * @priority: 事件优先级，优先级高的先被执行，默认为 1
+         * @priority: 事件优先级，优先级高的先被执行，默认为：EventPriorityEnum.LOW
          */
-        addEventListener(type: string, method: Function, caller: Object, receiveOnce?: boolean, priority?: number): void;
+        addEventListener(type: string, method: Function, caller: Object, receiveOnce?: boolean, priority?: EventPriorityEnum): void;
 
         /**
          * 移除事件
@@ -244,7 +314,7 @@ declare module suncom {
         /**
          * 创建Handler的简单工厂方法
          */
-        static create(caller: Object, method: Function, args?: Array<any>): IHandler;
+        static create(caller: Object, method: Function, args?: any[]): IHandler;
     }
 
     /**
@@ -254,7 +324,7 @@ declare module suncom {
         /**
          * 数据源（请勿直接操作其中的数据）
          */
-        source: Array<T>;
+        source: T[];
 
         /**
          * @primaryKey: 指定主键字段名，哈希表会使用主键值来作为数据索引，所以请确保主键值是恒值
@@ -343,22 +413,7 @@ declare module suncom {
         /**
          * 格式化字符串
          */
-        function formatString(str: string, args: Array<any>): string;
-
-        /**
-         * 返回绝对值
-         */
-        function abs(a: number): number;
-
-        /**
-         * 返回a与b中的较小值
-         */
-        function min(a: number, b: number): number;
-
-        /**
-         * 返回a与b中的较大值
-         */
-        function max(a: number, b: number): number;
+        function formatString(str: string, args: any[]): string;
 
         /**
          * 将value限制于min和max之间
@@ -367,9 +422,8 @@ declare module suncom {
 
         /**
          * 返回近似值
-         * 因各个平台实现的版本可能不一致，故自定义了此方法
          * @n: 需要保留小数位数，默认为0
-         * NOTE: 此方法采用了四舍六入五成双的规则来取近似值
+         * 1. 因各个平台实现的版本可能不一致，故自定义了此方法
          */
         function round(value: number, n?: number): number;
 
@@ -409,6 +463,33 @@ declare module suncom {
         function formatDate(str: string, time: string | number | Date): string;
 
         /**
+         * 返回MD5加密后的串
+         */
+        function md5(str: string): string;
+
+        /**
+         * 获取文件名（不包括后缀名）
+         */
+        function getFileName(path: string): string;
+
+        /**
+         * 获取文件的扩展名
+         */
+        function getFileExtension(path: string): string;
+
+        /**
+         * 替换扩展名，并返回新的路径
+         */
+        function replacePathExtension(path: string, newExt: string): string;
+
+        /**
+         * 生成HTTP签名
+         * @key: 密钥
+         * @sign: 忽略签名字段，默认为："sign"
+         */
+        function createHttpSign(params: Object, key: string, sign?: string): string;
+
+        /**
          * 从数组中查找数据
          * @array: 数据源
          * @method: 查询规则，返回true表示与规则匹配
@@ -427,7 +508,6 @@ declare module suncom {
         function removeItemsFromArray<T>(items: T[], array: T[]): void;
 
         /**
-         * 版本比较
          * 比较版本号
          * 若当前版本低于参数版本，返回 -1
          * 若当前版本高于参数版本，返回 1
@@ -438,6 +518,8 @@ declare module suncom {
 
     /**
      * 伪数据库服务
+     * 说明：
+     * 1. 用于快速存储或读取数据，数据仅保存在内存中
      */
     namespace DBService {
 
@@ -448,8 +530,9 @@ declare module suncom {
 
         /**
          * 存储数据
+         * @name: 若小于0，则存储的数据不可通过get方法获取
          */
-        function put(name: number, data: any): void;
+        function put(name: number, data: any): any;
 
         /**
          * 是否存在
@@ -510,22 +593,34 @@ declare module suncom {
         /**
          * 普通日志
          */
-        function log(...args: Array<any>): void;
+        function log(mod: DebugMode, ...args: any[]): void;
 
         /**
          * 警告日志
          */
-        function warn(...args: Array<any>): void;
+        function warn(mod: DebugMode, ...args: any[]): void;
 
         /**
          * 错误日志
          */
-        function error(...args: Array<any>): void;
+        function error(mod: DebugMode, ...args: any[]): void;
 
         /**
          * 文件日志
          */
-        function log2f(name: number | string, sign: number | string, text: string): void;
+        function log2f(mod: DebugMode, ...args: any[]): void;
+    }
+
+    /**
+     * 命令定义
+     */
+    namespace NotifyKey {
+        /**
+         * 输出打印日志 { text: string }
+         * 说明：
+         * 1. 此事件仅在Global.debugMode为DebugMode.DEBUG时才会被派发
+         */
+        const DEBUG_PRINT: string;
     }
 
     /**
