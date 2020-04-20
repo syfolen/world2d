@@ -7,9 +7,9 @@ module world2d {
         /**
          * 顶点数据
          */
-        vertexs: Array<IVector2D>;
+        vertexs: IVector2D[];
 
-        constructor(vertexs: Array<IVector2D>) {
+        constructor(vertexs: IVector2D[]) {
             super(ColliderShapEnum2D.POLYGON);
             this.vertexs = vertexs;
         }
@@ -18,7 +18,7 @@ module world2d {
          * 克隆
          */
         clone(): IColliderPolygon2D {
-            const vertexs: Array<IVector2D> = [];
+            const vertexs: IVector2D[] = [];
             for (let i: number = 0; i < this.vertexs.length; i++) {
                 vertexs.push(this.vertexs[i].copy());
             }

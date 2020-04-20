@@ -33,17 +33,17 @@ module world2d {
         /**
          * 层级关系
          */
-        private $detectors: Array<Array<boolean>> = [];
+        private $detectors: boolean[][] = [];
 
         /**
          * 碰撞关系
          */
-        private $contacts: Array<ICollisionContact2D> = [];
+        private $contacts: ICollisionContact2D[] = [];
 
         /**
          * 世界中的对象
          */
-        private $transforms: Array<ITransform2D> = [];
+        private $transforms: ITransform2D[] = [];
 
         /**
          * export
@@ -100,7 +100,7 @@ module world2d {
             if (index < 0) {
                 return;
             }
-			transform.disabled();
+            transform.disabled();
             this.$transforms.splice(index, 1);
             transform.removeEventListener(World2D.TRANSFORM_LAYER_CHANGED, this.$onTransformLayerChanged, this);
             for (let i: number = this.$contacts.length - 1; i > -1; i--) {
@@ -156,7 +156,7 @@ module world2d {
         /**
          * 获取对象集合
          */
-        get transforms(): Array<ITransform2D> {
+        get transforms(): ITransform2D[] {
             return this.$transforms;
         }
     }

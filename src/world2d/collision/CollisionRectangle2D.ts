@@ -7,12 +7,12 @@ module world2d {
         /**
          * 项点数据，当矩型与圆和多边型发生碰撞时，需要使用顶点数据
          */
-        vertexs: Array<IVector2D> = [];
+        vertexs: IVector2D[] = [];
 
         /**
          * 线段数据
          */
-        segments: Array<IVector2D> = [];
+        segments: IVector2D[] = [];
 
         constructor() {
             super(CollisionShapEnum2D.RECTANGLE);

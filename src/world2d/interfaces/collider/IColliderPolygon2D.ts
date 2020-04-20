@@ -8,6 +8,6 @@ module world2d {
         /**
          * 顶点数据
          */
-        vertexs: Array<IVector2D>;
+        vertexs: IVector2D[];
     }
 }

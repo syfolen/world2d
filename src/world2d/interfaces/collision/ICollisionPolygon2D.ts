@@ -8,7 +8,7 @@ module world2d {
         /**
          * 更新顶点数据
          */
-        updateVertexs(vertexs: Array<IPoint2D>): void;
+        updateVertexs(vertexs: IPoint2D[]): void;
 
         /**
          * 准备顶点数据

@@ -7,17 +7,17 @@ module world2d {
         /**
          * 临时顶点数据
          */
-        private $tempVertexs: Array<IPoint2D> = null;
+        private $tempVertexs: IPoint2D[] = null;
 
         /**
          * 顶点数据
          */
-        vertexs: Array<IVector2D> = [];
+        vertexs: IVector2D[] = [];
 
         /**
          * 线段数据
          */
-        segments: Array<IVector2D> = [];
+        segments: IVector2D[] = [];
 
         constructor(collider: IColliderPolygon2D) {
             super(CollisionShapEnum2D.POLYGON);
@@ -40,7 +40,7 @@ module world2d {
         /**
          * 更新顶点数据
          */
-        updateVertexs(vertexs: Array<IPoint2D>): void {
+        updateVertexs(vertexs: IPoint2D[]): void {
             this.$tempVertexs = vertexs;
         }
 

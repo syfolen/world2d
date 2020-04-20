@@ -12,7 +12,7 @@ module world2d {
             return true;
         }
 
-        static circle2Polygon(p: IPoint2D, radius: number, polygon: Array<IVector2D>): boolean {
+        static circle2Polygon(p: IPoint2D, radius: number, polygon: IVector2D[]): boolean {
             var position = p;
             if (CollisionResolutionBox2D.pointInPolygon(position, polygon)) {
                 return true;
@@ -30,7 +30,7 @@ module world2d {
             return false;
         }
 
-        static polygon2Polygon(a: Array<IVector2D>, b: Array<IVector2D>): boolean {
+        static polygon2Polygon(a: IVector2D[], b: IVector2D[]): boolean {
             var i, l;
 
             // check if a intersects b
@@ -57,7 +57,7 @@ module world2d {
             return false;
         }
 
-        static pointInPolygon(point: IPoint2D, polygon: Array<IVector2D>): boolean {
+        static pointInPolygon(point: IPoint2D, polygon: IVector2D[]): boolean {
             var inside = false;
             var x = point.x;
             var y = point.y;
@@ -103,7 +103,7 @@ module world2d {
             return Math.sqrt(dx * dx + dy * dy);
         }
 
-        static line2Polygon(a1: IVector2D, a2: IVector2D, b: Array<IVector2D>): boolean {
+        static line2Polygon(a1: IVector2D, a2: IVector2D, b: IVector2D[]): boolean {
             var length = b.length;
 
             for (var i = 0; i < length; ++i) {

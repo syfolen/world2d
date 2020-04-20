@@ -9,7 +9,7 @@ module world2d {
             DrawAPI2D.graphics.clear();
         }
 
-        static draw(transforms: Array<ITransform2D>): void {
+        static draw(transforms: ITransform2D[]): void {
             // 绘制坐标系
             // DrawAPI2D.graphics.drawLine(Global.WIDTH * 0.5, 0, Global.WIDTH * 0.5, Global.WIDTH, "#FF0000");
             // DrawAPI2D.graphics.drawLine(0, Global.HEIGHT * 0.5, Global.WIDTH, Global.HEIGHT * 0.5, "#FF0000");
@@ -74,7 +74,7 @@ module world2d {
             DrawAPI2D.graphics.drawCircle(x, y, radius, void 0, lineColor);
         }
 
-        static drawPolygon(x: number, y: number, vertexs: Array<IVector2D>, lineColor: string): void {
+        static drawPolygon(x: number, y: number, vertexs: IVector2D[], lineColor: string): void {
             for (let i: number = 0; i < vertexs.length; i++) {
                 const a: IVector2D = vertexs[i];
                 const b: IVector2D = i === 0 ? vertexs[vertexs.length - 1] : vertexs[i - 1];

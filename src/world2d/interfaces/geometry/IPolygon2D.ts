@@ -7,11 +7,11 @@ module world2d {
         /**
          * 项点数据
          */
-        vertexs: Array<IVector2D>;
+        vertexs: IVector2D[];
 
         /**
          * 线段数据
          */
-        segments?: Array<IVector2D>;
+        segments?: IVector2D[];
     }
 }

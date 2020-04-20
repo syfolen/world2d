@@ -39,6 +39,6 @@ module world2d {
         /**
          * 对象集合
          */
-        readonly transforms: Array<ITransform2D>;
+        readonly transforms: ITransform2D[];
     }
 }

@@ -36,7 +36,7 @@ module world2d {
          */
         static circle2Polygin(c: ICircle2D, d: IPolygon2D): boolean {
             // 多边形顶点数据
-            const vertexs: Array<IVector2D> = d.vertexs;
+            const vertexs: IVector2D[] = d.vertexs;
             // 半径平方
             const radiusSquared: number = c.radius * c.radius;
 
@@ -82,8 +82,8 @@ module world2d {
                 return false;
             }
 
-            const array: Array<IVector2D> = [a, b];
-            const segments: Array<IVector2D> = d.segments;
+            const array: IVector2D[] = [a, b];
+            const segments: IVector2D[] = d.segments;
 
             // 检测圆与多边形顶点在多边形每条边的方向上的投影是否重合
             for (let i: number = 0; i < segments.length; i++) {
@@ -110,7 +110,7 @@ module world2d {
         /**
          * 判断两组顶点在指定方向上产生的投影是否重叠
          */
-        private static $vertex2VertexInDirection(array: Array<IVector2D>, array2: Array<IVector2D>, direction: IVector2D): boolean {
+        private static $vertex2VertexInDirection(array: IVector2D[], array2: IVector2D[], direction: IVector2D): boolean {
             /**
              * y=kx+b => k=y/x; b=y-kx;
              * x=my+n => m=x/y; n=x-my;
@@ -202,9 +202,9 @@ module world2d {
          * @polygon: 多边形
          * @vertexs: 顶点数据
          */
-        static polygon2Vertexs(polygon: IPolygon2D, vertexs: Array<IVector2D>): boolean {
-            const array: Array<IVector2D> = polygon.vertexs;
-            const segments: Array<IVector2D> = polygon.segments;
+        static polygon2Vertexs(polygon: IPolygon2D, vertexs: IVector2D[]): boolean {
+            const array: IVector2D[] = polygon.vertexs;
+            const segments: IVector2D[] = polygon.segments;
 
             for (let i: number = 0; i < segments.length; i++) {
                 const segment: IVector2D = segments[i];

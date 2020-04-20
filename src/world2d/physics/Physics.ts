@@ -68,10 +68,10 @@ module world2d {
                 Helper2D.max(origin.y, destination.y)
             );
 
-            const transforms: Array<ITransform2D> = World2D.inst.transforms;
+            const transforms: ITransform2D[] = World2D.inst.transforms;
 
             // 参与检测的对象列表
-            let array: Array<ITransform2D> = (layers & CollisionLayerEnum.ALL) ? null : [];
+            let array: ITransform2D[] = (layers & CollisionLayerEnum.ALL) ? null : [];
 
             // 默认检测所有对象
             if (array === null) {
