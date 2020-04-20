@@ -1,6 +1,5 @@
 
 module world2d {
-
     /**
      * 圆形对撞机
      * export

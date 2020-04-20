@@ -1,6 +1,5 @@
 
 module world2d {
-
     /**
      * 线段接口
      */

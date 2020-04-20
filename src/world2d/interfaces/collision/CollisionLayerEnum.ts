@@ -1,6 +1,5 @@
 
 module world2d {
-
     /**
      * 碰撞层级
      * export

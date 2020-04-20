@@ -1,6 +1,5 @@
 
 module world2d {
-
     /**
      * Box2D的碰撞检测算法
      */

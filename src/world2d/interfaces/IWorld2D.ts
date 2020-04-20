@@ -1,6 +1,5 @@
 
 module world2d {
-
     /**
      * 简单2D物理
      * 特性：

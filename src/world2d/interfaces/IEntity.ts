@@ -1,6 +1,5 @@
 
 module world2d {
-
     /**
      * 实体对象接口
      * export

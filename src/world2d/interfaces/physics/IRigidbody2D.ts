@@ -1,6 +1,5 @@
 
 module world2d {
-
     /**
      * 刚体接口
      * export

@@ -1,6 +1,5 @@
 
 module world2d {
-
     /**
      * 点接口
      * export

@@ -1,6 +1,5 @@
 
 module world2d {
-
     /**
      * 圆形碰撞区域（效率最高）
      * export

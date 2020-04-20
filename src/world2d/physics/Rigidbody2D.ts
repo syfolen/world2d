@@ -1,6 +1,5 @@
 
 module world2d {
-
     /**
      * 刚体
      * export

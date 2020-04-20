@@ -1,6 +1,5 @@
 
 module world2d {
-
     /**
      * 物理类
      * export

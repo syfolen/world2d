@@ -6,7 +6,6 @@
  * export
  */
 module world2d {
-
     /**
      * 2D世界
      * 此类主要实现2D世界的碰撞
