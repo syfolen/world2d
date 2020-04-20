@@ -118,7 +118,7 @@ module world2d {
              * 捕鱼专属结束
              */
 
-            let collide: boolean = this.$testAABB == false ? true : CollisionResolution2D.bounds2Bounds(a.collision.bounds, b.collision.bounds);
+            let collide: boolean = this.$testAABB === false ? true : CollisionResolution2D.bounds2Bounds(a.collision.bounds, b.collision.bounds);
 
             // 若包围盒发生碰撞，则继续检测
             if (collide === true) {
@@ -180,14 +180,7 @@ module world2d {
          * 多边型与圆
          */
         private $c2p(a: ICollisionCircle2D, b: ICollisionPolygon2D): boolean {
-            let collide: boolean;
-            if (this.useBox2d === true) {
-                collide = CollisionResolutionBox2D.circle2Polygon(a, a.radius, b.vertexs);
-            }
-            else {
-                collide = CollisionResolution2D.circle2Polygin(a, b);
-            }
-            return collide;
+            return CollisionResolution2D.circle2Polygin(a, b);
         }
 
         /**
@@ -202,9 +195,6 @@ module world2d {
          * 矩型与多边型
          */
         private $r2p(r: ICollisionRectangle2D, p: ICollisionPolygon2D): boolean {
-            if (this.useBox2d === true) {
-                return CollisionResolutionBox2D.polygon2Polygon(r.vertexs, p.vertexs);
-            }
             return CollisionResolution2D.polygon2Vertexs(p, r.vertexs);
         }
 
@@ -212,9 +202,6 @@ module world2d {
          * 多边形与多边形
          */
         private $p2p(p1: ICollisionPolygon2D, p2: ICollisionPolygon2D): boolean {
-            if (this.useBox2d === true) {
-                return CollisionResolutionBox2D.polygon2Polygon(p1.vertexs, p2.vertexs);
-            }
             return CollisionResolution2D.polygon2Vertexs(p1, p2.vertexs) && CollisionResolution2D.polygon2Vertexs(p2, p1.vertexs);
         }
 

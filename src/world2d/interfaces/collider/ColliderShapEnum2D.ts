@@ -1,7 +1,7 @@
 
 module world2d {
     /**
-     * 碰撞体形状枚举
+     * 碰撞机形状枚举
      */
     export enum ColliderShapEnum2D {
         /**

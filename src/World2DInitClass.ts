@@ -17,9 +17,8 @@ module world2d {
             // const a: TestWorld2dStableCircle = new TestWorld2dStableCircle();
             // const b: TestWorld2dStableRectangle = new TestWorld2dStableRectangle();
 
-            let circle: TestWorld2dCircle = null;
             for (let i = 0; i < count; i++) {
-                circle = new TestWorld2dCircle();
+                new TestWorld2dCircle().transform.moveTo(200, 200);
             }
 
             // for (let i = 0; i < count; i++) {
@@ -30,18 +29,20 @@ module world2d {
             //     new TestWorld2dRectangle2();
             // }
 
-            for (let i = 0; i < count; i++) {
-                const x = new TestWorld2dTriangle();
-                x.transform.rigidbody.target = circle.transform;
-            }
+            // for (let i = 0; i < count; i++) {
+            //     const x = new TestWorld2dTriangle();
+            //     x.transform.rigidbody.target = circle.transform;
+            // }
 
             // for (let i = 0; i < count; i++) {
             //     new TestWorld2dTriangle2();
             // }
 
-            // for (let i = 0; i < count; i++) {
-            //     new TestWorld2dRightTriangle();
-            // }
+            for (let i = 0; i < count; i++) {
+                const triangle = new TestWorld2dRightTriangle();
+                triangle.transform.moveTo(400, 200);
+                triangle.transform.setRotation(60);
+            }
 
             // for (let i = 0; i < count; i++) {
             //     new TestWorld2dRightTriangle2();
@@ -55,9 +56,11 @@ module world2d {
             //     new TestWorld2dPolygonRectangle2();
             // }
 
-            // for (let i = 0; i < count; i++) {
-            //     const item = new TestWorld2dPolygon();
-            // }
+            for (let i = 0; i < count; i++) {
+                const polygon = new TestWorld2dPolygon();
+                polygon.transform.moveTo(350, 450);
+                polygon.transform.setRotation(20);
+            }
 
             // for (let i = 0; i < count; i++) {
             //     new TestWorld2dPolygon2();
@@ -74,7 +77,7 @@ module world2d {
             this.$world.update(Laya.timer.delta / 1000);
 
             this.$direction.rotate(Math.PI / 180);
-            world2d.Physics.raycast(new Vector2D(500, 300), this.$direction, 300, CollisionLayerEnum.ALL);
+            world2d.Physics.raycast(new Vector2D(400, 300), this.$direction, 250, CollisionLayerEnum.DEFAULT);
         }
     }
 }

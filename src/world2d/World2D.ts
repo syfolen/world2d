@@ -17,7 +17,7 @@ module world2d {
          * 调试模式
          * export
          */
-        static DEBUG: boolean = false;
+        static DEBUG: boolean = true;
 
         /**
          * 对象的碰撞层级发生了变化

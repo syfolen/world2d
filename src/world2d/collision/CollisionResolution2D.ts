@@ -8,7 +8,7 @@ module world2d {
         /**
          * 包围盒与包围盒
          */
-        static bounds2Bounds(a: Bounds, b: Bounds): boolean {
+        static bounds2Bounds(a: IBounds, b: IBounds): boolean {
             if (a.left > b.right || b.left > a.right || a.top > b.bottom || b.top > a.bottom) {
                 return false;
             }
@@ -240,16 +240,16 @@ module world2d {
         static isLineBetweenPoints(a: IVector2D, ab: IVector2D, p1: IVector2D, p2: IVector2D): boolean {
             // 若向量ab的x为0，则说明ab垂直于x轴，此时点的投影线必定与y轴平行，故可直接比较三个点的x值
             if (ab.x === 0) {
-                // DrawAPI2D.drawLine(new Vector2D(a.x, 0), a, cc.Color.YELLOW);
-                // DrawAPI2D.drawLine(new Vector2D(p1.x, 0), p1, cc.Color.YELLOW);
-                // DrawAPI2D.drawLine(new Vector2D(p2.x, 0), p2, cc.Color.YELLOW);
+                DrawAPI2D.drawLine(new Vector2D(a.x, 0), a, "#00FFFF");
+                DrawAPI2D.drawLine(new Vector2D(p1.x, 0), p1, "#00FFFF");
+                DrawAPI2D.drawLine(new Vector2D(p2.x, 0), p2, "#00FFFF");
                 return CollisionResolution2D.isXbetweenAandB(a.x, p1.x, p2.x);
             }
             // 若向量ab的y为0，则说明ab垂直于y轴，此时点的投影线必定与x轴平行，故可直接比较三个点的y值
             else if (ab.y === 0) {
-                // DrawAPI2D.drawLine(new Vector2D(0, a.y), a, cc.Color.YELLOW);
-                // DrawAPI2D.drawLine(new Vector2D(0, p1.y), p1, cc.Color.YELLOW);
-                // DrawAPI2D.drawLine(new Vector2D(0, p2.y), p2, cc.Color.YELLOW);
+                DrawAPI2D.drawLine(new Vector2D(0, a.y), a, "#00FFFF");
+                DrawAPI2D.drawLine(new Vector2D(0, p1.y), p1, "#00FFFF");
+                DrawAPI2D.drawLine(new Vector2D(0, p2.y), p2, "#00FFFF");
                 return CollisionResolution2D.isXbetweenAandB(a.y, p1.y, p2.y);
             }
             else {
@@ -259,9 +259,9 @@ module world2d {
                     const b: number = a.y - k * a.x;
                     const p1b: number = p1.y - k * p1.x;
                     const p2b: number = p2.y - k * p2.x;
-                    // DrawAPI2D.drawLine(new Vector2D(0, b), a, cc.Color.YELLOW);
-                    // DrawAPI2D.drawLine(new Vector2D(0, p1b), p1, cc.Color.YELLOW);
-                    // DrawAPI2D.drawLine(new Vector2D(0, p2b), p2, cc.Color.YELLOW);
+                    DrawAPI2D.drawLine(new Vector2D(0, b), a, "#00FFFF");
+                    DrawAPI2D.drawLine(new Vector2D(0, p1b), p1, "#00FFFF");
+                    DrawAPI2D.drawLine(new Vector2D(0, p2b), p2, "#00FFFF");
                     return CollisionResolution2D.isXbetweenAandB(b, p1b, p2b);
                 }
                 // 否则应当将点投影到x轴上，此时可直接比较投影线在x轴上的截距, x=my+n=>n=x-my;
@@ -270,9 +270,9 @@ module world2d {
                     const n: number = a.x - m * a.y;
                     const p1n: number = p1.x - m * p1.y;
                     const p2n: number = p2.x - m * p2.y;
-                    // DrawAPI2D.drawLine(new Vector2D(n, 0), a, cc.Color.YELLOW);
-                    // DrawAPI2D.drawLine(new Vector2D(p1n, 0), p1, cc.Color.YELLOW);
-                    // DrawAPI2D.drawLine(new Vector2D(p2n, 0), p2, cc.Color.YELLOW);
+                    DrawAPI2D.drawLine(new Vector2D(n, 0), a, "#00FFFF");
+                    DrawAPI2D.drawLine(new Vector2D(p1n, 0), p1, "#00FFFF");
+                    DrawAPI2D.drawLine(new Vector2D(p2n, 0), p2, "#00FFFF");
                     return CollisionResolution2D.isXbetweenAandB(n, p1n, p2n);
                 }
             }

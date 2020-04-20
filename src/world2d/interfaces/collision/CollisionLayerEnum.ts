@@ -9,21 +9,21 @@ module world2d {
          * 默认
          * export
          */
-        DEFAULT = 0x1,
+        DEFAULT = 0x01,
 
         /**
          * 鱼
          * export
          */
-        FISH = 0x2,
+        FISH = 0x02,
 
         /**
          * 子弹
          * export
          */
-        BULLET = 0x4,
+        BULLET = 0x04,
 
-        POLYGON = 0x8,
+        POLYGON = 0x08,
 
         CIRCLE = 0x10,
 

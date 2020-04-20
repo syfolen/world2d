@@ -43,7 +43,7 @@ module world2d {
                         radian += Vector2D.angle(Vector2D.sub(a, p), Vector2D.sub(b, p));
                     }
 
-                    if (Helper2D.abs(Helper2D.r2d(radian) - 360) < 0.1) {
+                    if (Helper2D.abs(Helper2D.r2d(radian) - 360) < 0.01) {
                         return transform;
                     }
                 }
@@ -54,7 +54,7 @@ module world2d {
         /**
          * 射线检测
          */
-        static raycast(origin: IVector2D, direction: IVector2D, maxDistance: number, layers: CollisionLayerEnum): void {
+        static raycast(origin: IVector2D, direction: IVector2D, maxDistance: number, layers: CollisionLayerEnum): IRayCastResult[] {
             // 射线目标位置
             const destination: IVector2D = direction.copy().normalize().mul(maxDistance).add(origin);
             DrawAPI2D.drawLine(origin, destination, "#FF0000");
@@ -64,34 +64,23 @@ module world2d {
             bounds.updateBounds(
                 Helper2D.min(origin.x, destination.x),
                 Helper2D.max(origin.x, destination.x),
-                Helper2D.max(origin.y, destination.y),
+                Helper2D.min(origin.y, destination.y),
                 Helper2D.max(origin.y, destination.y)
             );
+            DrawAPI2D.drawRect(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, "#FF0000");
 
+            const array: ITransform2D[] = [];
             const transforms: ITransform2D[] = World2D.inst.transforms;
 
-            // 参与检测的对象列表
-            let array: ITransform2D[] = (layers & CollisionLayerEnum.ALL) ? null : [];
-
-            // 默认检测所有对象
-            if (array === null) {
-                array = transforms.concat();
-            }
-            // 获取与射线包围盒发生碰撞的对象
-            else {
-                for (let i: number = 0; i < transforms.length; i++) {
-                    const transform: ITransform2D = transforms[i];
-                    // 不在指定的层级之中
-                    if ((transform.layer & layers) === 0) {
-                        continue;
+            for (let i: number = 0; i < transforms.length; i++) {
+                const transform: ITransform2D = transforms[i];
+                if (layers === CollisionLayerEnum.ALL || (transform.layer & layers)) {
+                    if (CollisionResolution2D.bounds2Bounds(bounds, transform.collision.bounds) === true) {
+                        array.push(transform);
                     }
-                    // 未与射线的包围盒发生碰撞
-                    if (CollisionResolution2D.bounds2Bounds(bounds, transform.collision.bounds) === false) {
-                        continue;
-                    }
-                    array.push(transform);
                 }
             }
+
+            return null;
         }
     }
-}
