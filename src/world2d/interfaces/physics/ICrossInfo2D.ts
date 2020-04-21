@@ -5,13 +5,18 @@ module world2d {
      */
     export interface ICrossInfo2D {
         /**
-         * 相交点
+         * 相交近点
          */
-        p: IVector2D;
+        p1: IVector2D;
 
         /**
-         * 是否相交
+         * 相交远点
          */
-        ok: boolean;
+        p2: IVector2D;
+
+        /**
+         * 相交结果
+         */
+        type: ICrossTypeEnum;
     }
 }

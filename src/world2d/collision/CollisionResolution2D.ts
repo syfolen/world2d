@@ -288,12 +288,34 @@ module world2d {
             // a与b均垂直于x轴
             if (a.x === 0 && b.x === 0) {
                 if (isInRange(a1.y, b1.y, b2.y) || isInRange(a2.y, b1.y, b2.y) || isInRange(b1.y, a1.y, a2.y) || isInRange(b2.y, a1.y, a2.y)) {
-                    out.ok = true;
+                    out.type = ICrossTypeEnum.OVERLAP;
                 }
             }
             // a与b均重直于y轴
             else if (a.y === 0 && b.y === 0) {
-                return isInRange(a1.x, b1.x, b2.x) || isInRange(a2.x, b1.x, b2.x) || isInRange(b1.x, a1.x, a2.x) || isInRange(b2.x, a1.x, a2.x);
+                if (isInRange(a1.x, b1.x, b2.x) || isInRange(a2.x, b1.x, b2.x) || isInRange(b1.x, a1.x, a2.x) || isInRange(b2.x, a1.x, a2.x)) {
+                    //a:[{50,100},{150,100}],b:[{100,100},{200,100}]=>p1:{100,100},p2:{200,100}
+                    //a:[{50,100},{200,100}],b:[{100,100},{150,100}]=>p1:{100,100},p2:{150,100}
+                    //a:[{100,100},{200,100}],b:[{50,100},{150,100}]=>p1:{100,100},p2:{150,100}
+                    //a:[{100,100},{150,100}],b:[{50,100},{200,100}]=>p1:{100,100},p2:{200,100}
+                    if (a1.x < a2.x) {
+                        const b1x: number = Helper2D.min(b1.x, b2.x);
+                        const b2x: number = Helper2D.max(b1.x, b2.x);
+                        out.p1.assign(Helper2D.max(a1.x, b1x), a1.y);
+                        out.p2.assign(b2x, a1.y);
+                    }
+                    //a:[{150,100},{50,100}],b:[{200,100},{100,100}]=>p1:{150,100},p2:{100,100}
+                    //a:[{200,100},{50,100}],b:[{150,100},{100,100}]=>p1:{150,100},p2:{100,100}
+                    //a:[{200,100},{100,100}],b:[{150,100},{50,100}]=>p1:{150,100},p2:{50,100}
+                    //a:[{150,100},{100,100}],b:[{200,100},{50,100}]=>p1:{150,100},p2:{50,100}
+                    else {
+                        const b1x: number = Helper2D.max(b1.x, b2.x);
+                        const b2x: number = Helper2D.min(b1.x, b2.x);
+                        out.p1.assign(Helper2D.min(a1.x, b1x), a1.y);
+                        out.p2.assign(b2x, a1.y);
+                    }
+                    out.type = ICrossTypeEnum.OVERLAP;
+                }
             }
             else {
                 return isLineBetweenPoints(a1, a, b1, b2, out) && isLineBetweenPoints(a1, a, b1, b2, out);

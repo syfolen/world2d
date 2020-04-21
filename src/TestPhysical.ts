@@ -34,16 +34,17 @@ class TestPhysical {
         // world2d.Physics2D.raycast(new world2d.Vector2D(380, 320), this.$direction, 250, world2d.CollisionLayerEnum.DEFAULT);
 
         const s1: world2d.ISegment2D = new world2d.Segment2D();
-        s1.assign(new world2d.Vector2D(100, 50), new world2d.Vector2D(100, 100));
+        s1.assign(new world2d.Vector2D(100, 100), new world2d.Vector2D(200, 100));
         world2d.DrawAPI2D.drawLine(s1.a, s1.b, "#FF0000");
 
         const s2: world2d.ISegment2D = new world2d.Segment2D();
-        s2.assign(new world2d.Vector2D(100, 150), new world2d.Vector2D(100, 200));
+        s2.assign(new world2d.Vector2D(50, 100), new world2d.Vector2D(150, 100));
         world2d.DrawAPI2D.drawLine(s2.a, s2.b, "#FF0000");
 
         const out: world2d.ICrossInfo2D = {
-            p: new world2d.Vector2D(0, 0),
-            ok: false
+            p1: new world2d.Vector2D(0, 0),
+            p2: new world2d.Vector2D(0, 0),
+            type: world2d.ICrossTypeEnum.NONE
         };
         if (world2d.CollisionResolution2D.line2Line(s1.ab, s1.a, s1.b, s2.ab, s2.a, s2.b, out) === true) {
             world2d.DrawAPI2D.drawLine(s1.a, s1.b, "#00FF00");
