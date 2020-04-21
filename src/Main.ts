@@ -3,5 +3,6 @@
 Laya.init(800, 600, Laya.WebGL);
 
 setTimeout(() => {
-    new world2d.World2DIniClass();
+    new TestPhysical();
+    // new TestShapCollide();
 }, 500);
