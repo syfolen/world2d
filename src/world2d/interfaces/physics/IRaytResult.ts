@@ -3,7 +3,7 @@ module world2d {
     /**
      * 射线碰撞结果
      */
-    export interface IRayCastResult {
+    export interface IRaycastResult {
 
         transform: ITransform2D;
 
