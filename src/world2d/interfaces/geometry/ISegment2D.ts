@@ -18,5 +18,10 @@ module world2d {
          * 线段方向
          */
         ab: IVector2D;
+
+        /**
+         * 设置线段数据
+         */
+        assign(a: IVector2D, b: IVector2D): void;
     }
 }

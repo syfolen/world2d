@@ -46,9 +46,7 @@ module world2d {
             DrawAPI2D.drawLine(origin, destination, "#FF00FF");
 
             const segment: ISegment2D = new Segment2D();
-            segment.a.assign(origin.x, origin.y);
-            segment.b.assign(destination.x, destination.y);
-            segment.ab.assign(destination.x - origin.x, destination.y - origin.y);
+            segment.assign(origin, destination);
 
             // 线射碰撞盒
             const bounds: IBounds = new Bounds();
@@ -58,7 +56,7 @@ module world2d {
                 Helper2D.min(origin.y, destination.y),
                 Helper2D.max(origin.y, destination.y)
             );
-            DrawAPI2D.drawRect(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, "#FF0000");
+            // DrawAPI2D.drawRect(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, "#FF0000");
 
             const array: ITransform2D[] = [];
             const transforms: ITransform2D[] = World2D.inst.transforms;
@@ -77,7 +75,12 @@ module world2d {
                 }
                 else {
                     // array.push(transform);
-                    CollisionResolution2D.line2Polygon(segment, transform.collision as ICollisionPolygon2D);
+                    if (CollisionResolution2D.line2Polygon(segment, transform.collision as ICollisionPolygon2D)) {
+                        transform.hitNum = 1;
+                    }
+                    else {
+                        transform.hitNum = 0;
+                    }
                 }
             }
 

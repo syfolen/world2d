@@ -12,6 +12,6 @@ module world2d {
         /**
          * 线段数据
          */
-        segments?: IVector2D[];
+        segments?: ISegment2D[];
     }
 }

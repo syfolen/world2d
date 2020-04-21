@@ -12,14 +12,14 @@ module world2d {
         /**
          * 线段数据
          */
-        segments: IVector2D[] = [];
+        segments: ISegment2D[] = [];
 
         constructor() {
             super(CollisionShapEnum2D.RECTANGLE);
             // 初始化顶点数据
             for (let i: number = 0; i < 4; i++) {
                 this.vertexs.push(new Vector2D(0, 0));
-                this.segments.push(new Vector2D(0, 0));
+                this.segments.push(new Segment2D());
             }
         }
 
@@ -45,9 +45,10 @@ module world2d {
          */
         prepareSegments(): void {
             for (let i: number = 0; i < this.vertexs.length; i++) {
+                const segment: ISegment2D = this.segments[i];
                 const a: IVector2D = this.vertexs[i];
                 const b: IVector2D = i > 0 ? this.vertexs[i - 1] : this.vertexs[this.vertexs.length - 1];
-                this.segments[i].assign(a.x - b.x, a.y - b.y);
+                segment.assign(a, b);
             }
         }
     }

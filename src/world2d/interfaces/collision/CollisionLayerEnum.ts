@@ -37,8 +37,6 @@ module world2d {
         /**
          * 锁定的子弹
          */
-        BULLET_2 = 0x80,
-
-        ALL = 0x1000
+        BULLET_2 = 0x80
     }
 }

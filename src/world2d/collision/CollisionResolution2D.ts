@@ -3,12 +3,44 @@ module world2d {
     /**
      * 2D碰撞检测
      */
-    export abstract class CollisionResolution2D {
+    export namespace CollisionResolution2D {
+        /**
+         * 判断点是否在圆里面
+         */
+        export function pointInCircle(p: IVector2D, c: ICircle2D): boolean {
+            return p.distanceToSquared(c) <= c.radius * c.radius;
+        }
+
+        /**
+         * 判断点是否在矩形内
+         */
+        export function pointInRectangle(p: IVector2D, r: IBounds): boolean {
+            return p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom;
+        }
+
+        /**
+         * 判断点是否在多边形内
+         */
+        export function pointInPolygon(p: IVector2D, p2d: ICollisionPolygon2D): boolean {
+            const vertexs: IVector2D[] = p2d.vertexs;
+
+            let radian: number = 0;
+            for (let i: number = 0; i < vertexs.length; i++) {
+                const a: IVector2D = vertexs[i];
+                const b: IVector2D = i === 0 ? vertexs[vertexs.length - 1] : vertexs[i - 1];
+                if (a.x === b.x && a.y === b.y) {
+                    continue;
+                }
+                radian += Vector2D.angle(Vector2D.sub(a, p), Vector2D.sub(b, p));
+            }
+
+            return Helper2D.abs(Helper2D.r2d(radian) - 360) < 0.01;
+        }
 
         /**
          * 包围盒与包围盒
          */
-        static bounds2Bounds(a: IBounds, b: IBounds): boolean {
+        export function bounds2Bounds(a: IBounds, b: IBounds): boolean {
             if (a.left > b.right || b.left > a.right || a.top > b.bottom || b.top > a.bottom) {
                 return false;
             }
@@ -18,7 +50,7 @@ module world2d {
         /**
          * 圆与圆
          */
-        static circle2Circle(a: ICircle2D, b: ICircle2D): boolean {
+        export function circle2Circle(a: ICircle2D, b: ICircle2D): boolean {
             // 坐标差
             const dx: number = b.x - a.x;
             const dy: number = b.y - a.y;
@@ -34,7 +66,7 @@ module world2d {
         /**
          * 检测圆与多边形是否相交
          */
-        static circle2Polygin(c: ICircle2D, d: IPolygon2D): boolean {
+        export function circle2Polygin(c: ICircle2D, d: IPolygon2D): boolean {
             // 多边形顶点数据
             const vertexs: IVector2D[] = d.vertexs;
             // 半径平方
@@ -43,7 +75,7 @@ module world2d {
             // 与圆最近的顶点
             let nearestVertex: IVector2D = null;
             // 最小距离
-            let nearestDistanceSquared: number = Number.MAX_VALUE;
+            let nearestDistanceSquared: number = Helper2D.MAX_SAFE_INTEGER;
             // 最小距离是否小于或等于半径
             let distanceLessOrEqualThanRadius: boolean = false;
 
@@ -72,34 +104,34 @@ module world2d {
             const b: IVector2D = nearestVertex.copy();
             const ab: IVector2D = new Vector2D(b.x - a.x, b.y - a.y);
             const normal: IVector2D = ab.normal();
-            // DrawAPI2D.drawNormal(normal, "#FFFFFF");
+            DrawAPI2D.drawNormal(normal, "#FFFFFF");
 
             // 获取参与判断的圆上的点
             const p: IVector2D = ab.copy().normalize().mul(c.radius).add(a);
-            // DrawAPI2D.drawLine(a, p, "#FF0000");
+            DrawAPI2D.drawLine(a, p, "#FF0000");
             // 若p与多边形顶点的顶影不重合，则不相交
-            if (CollisionResolution2D.$vertex2VertexInDirection([p], vertexs, normal) === false) {
+            if (vertex2VertexInDirection([p], vertexs, normal) === false) {
                 return false;
             }
 
             const array: IVector2D[] = [a, b];
-            const segments: IVector2D[] = d.segments;
+            const segments: ISegment2D[] = d.segments;
 
             // 检测圆与多边形顶点在多边形每条边的方向上的投影是否重合
             for (let i: number = 0; i < segments.length; i++) {
-                const segment: IVector2D = segments[i];
-                if (segment.length() === 0) {
+                const segment: ISegment2D = segments[i];
+                if (segment.ab.length() === 0) {
                     continue;
                 }
                 // 获取这条边的法向量，并且以半径的倍数放大
-                normal.assign(segment.y, -segment.x).normalize().mul(c.radius);
+                normal.assign(segment.ab.y, -segment.ab.x).normalize().mul(c.radius);
                 // 根据法向量获取圆上的两个点
                 a.assign(c.x, c.y).add(normal);
                 b.assign(c.x, c.y).sub(normal);
-                // DrawAPI2D.drawLine(c, a, "#FF0000");
-                // DrawAPI2D.drawLine(c, b, "#FF0000");
+                DrawAPI2D.drawLine(c, a, "#FF0000");
+                DrawAPI2D.drawLine(c, b, "#FF0000");
                 // 判断多边型顶点与圆顶点的投影是否相交
-                if (CollisionResolution2D.$vertex2VertexInDirection(array, vertexs, segment) === false) {
+                if (vertex2VertexInDirection(array, vertexs, segment.ab) === false) {
                     return false;
                 }
             }
@@ -110,7 +142,7 @@ module world2d {
         /**
          * 判断两组顶点在指定方向上产生的投影是否重叠
          */
-        private static $vertex2VertexInDirection(array: IVector2D[], array2: IVector2D[], direction: IVector2D): boolean {
+        export function vertex2VertexInDirection(array: IVector2D[], array2: IVector2D[], direction: IVector2D): boolean {
             /**
              * y=kx+b => k=y/x; b=y-kx;
              * x=my+n => m=x/y; n=x-my;
@@ -120,10 +152,10 @@ module world2d {
             const k: number = direction.y / direction.x;
             const m: number = direction.x / direction.y;
 
-            let min1: number = Number.MAX_VALUE;
-            let max1: number = -Number.MAX_VALUE;
-            let min2: number = Number.MAX_VALUE;
-            let max2: number = -Number.MAX_VALUE;
+            let min1: number = Helper2D.MAX_SAFE_INTEGER;
+            let max1: number = Helper2D.MIN_SAFE_INTEGER;
+            let min2: number = Helper2D.MAX_SAFE_INTEGER;
+            let max2: number = Helper2D.MIN_SAFE_INTEGER;
 
             let x: number = 0, y: number = 0;
             let collide: boolean = false;
@@ -133,7 +165,7 @@ module world2d {
                     if (x < array.length) {
                         const p: IVector2D = array[x];
                         const b: number = p.x - m * p.y;
-                        // DrawAPI2D.drawLine(p, new Vector2D(b, 0), "#FF0000");
+                        DrawAPI2D.drawLine(p, new Vector2D(b, 0), "#FF0000");
                         if (min1 > b) {
                             min1 = b;
                         }
@@ -145,7 +177,7 @@ module world2d {
                     if (y < array2.length) {
                         const p: IVector2D = array2[y];
                         const b: number = p.x - m * p.y;
-                        // DrawAPI2D.drawLine(p, new Vector2D(b, 0), "#FF0000");
+                        DrawAPI2D.drawLine(p, new Vector2D(b, 0), "#FF0000");
                         if (min2 > b) {
                             min2 = b;
                         }
@@ -166,7 +198,7 @@ module world2d {
                     if (x < array.length) {
                         const p: IVector2D = array[x];
                         const b: number = p.y - k * p.x;
-                        // DrawAPI2D.drawLine(p, new Vector2D(0, b), "#FF0000");
+                        DrawAPI2D.drawLine(p, new Vector2D(0, b), "#FF0000");
                         if (min1 > b) {
                             min1 = b;
                         }
@@ -178,7 +210,7 @@ module world2d {
                     if (y < array2.length) {
                         const p: IVector2D = array2[y];
                         const b: number = p.y - k * p.x;
-                        // DrawAPI2D.drawLine(p, new Vector2D(0, b), "#FF0000");
+                        DrawAPI2D.drawLine(p, new Vector2D(0, b), "#FF0000");
                         if (min2 > b) {
                             min2 = b;
                         }
@@ -202,17 +234,17 @@ module world2d {
          * @polygon: 多边形
          * @vertexs: 顶点数据
          */
-        static polygon2Vertexs(polygon: IPolygon2D, vertexs: IVector2D[]): boolean {
+        export function polygon2Vertexs(polygon: IPolygon2D, vertexs: IVector2D[]): boolean {
             const array: IVector2D[] = polygon.vertexs;
-            const segments: IVector2D[] = polygon.segments;
+            const segments: ISegment2D[] = polygon.segments;
 
             for (let i: number = 0; i < segments.length; i++) {
-                const segment: IVector2D = segments[i];
-                if (segment.length() === 0) {
+                const segment: ISegment2D = segments[i];
+                if (segment.ab.length() === 0) {
                     continue;
                 }
                 // 若未碰撞，则直接返回
-                if (CollisionResolution2D.$vertex2VertexInDirection(array, vertexs, segments[i]) === false) {
+                if (vertex2VertexInDirection(array, vertexs, segments[i].ab) === false) {
                     return false;
                 }
             }
@@ -221,13 +253,51 @@ module world2d {
         }
 
         /**
+         * 检测线和圆是否相交
+         */
+        export function line2Circle(): boolean {
+            // // 若a或b点在圆内，则相交
+            // if (pointInCircle(a, c) || pointInCircle(b, c)) {
+            //     return true;
+            // }
+            return false;
+        }
+
+        /**
+         * 检测线与多线边是否相交
+         */
+        export function line2Polygon(x: ISegment2D, polygon: ICollisionPolygon2D): boolean {
+            const segments: ISegment2D[] = polygon.segments;
+            for (let i: number = 0; i < segments.length; i++) {
+                const y: ISegment2D = segments[i];
+                if (line2Line(x.ab, x.a, x.b, y.ab, y.a, y.b, null) === true) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /**
          * 判断两直线是否相交
          * @a,b: 需要参与判断的两条线段
          * @a1,a2: 线段a的两个点
          * @b1,b2: 线段b的两个点
+         * @out: 输出相交点信息
          */
-        static line2Line(a: IVector2D, a1: IVector2D, a2: IVector2D, b: IVector2D, b1: IVector2D, b2: IVector2D): boolean {
-            return CollisionResolution2D.isLineBetweenPoints(a1, a, b1, b2) && CollisionResolution2D.isLineBetweenPoints(b1, b, a1, a2);
+        export function line2Line(a: IVector2D, a1: IVector2D, a2: IVector2D, b: IVector2D, b1: IVector2D, b2: IVector2D, out: ICrossInfo2D): boolean {
+            // a与b均垂直于x轴
+            if (a.x === 0 && b.x === 0) {
+                if (isInRange(a1.y, b1.y, b2.y) || isInRange(a2.y, b1.y, b2.y) || isInRange(b1.y, a1.y, a2.y) || isInRange(b2.y, a1.y, a2.y)) {
+                    out.ok = true;
+                }
+            }
+            // a与b均重直于y轴
+            else if (a.y === 0 && b.y === 0) {
+                return isInRange(a1.x, b1.x, b2.x) || isInRange(a2.x, b1.x, b2.x) || isInRange(b1.x, a1.x, a2.x) || isInRange(b2.x, a1.x, a2.x);
+            }
+            else {
+                return isLineBetweenPoints(a1, a, b1, b2, out) && isLineBetweenPoints(a1, a, b1, b2, out);
+            }
         }
 
         /**
@@ -235,22 +305,41 @@ module world2d {
          * @a: 线段ab上的一个点
          * @ab: 线段的方向向量
          * @p1,p2: 需要判断的两个点
+         * @out: 输出相交点信息
          * 思路：将点a,p1,p2沿ab方线投射到x或y轴，若点a的投影在ab中间，则返回true，否则返回false
          */
-        static isLineBetweenPoints(a: IVector2D, ab: IVector2D, p1: IVector2D, p2: IVector2D): boolean {
+        export function isLineBetweenPoints(a: IVector2D, ab: IVector2D, p1: IVector2D, p2: IVector2D, out: ICrossInfo2D): boolean {
             // 若向量ab的x为0，则说明ab垂直于x轴，此时点的投影线必定与y轴平行，故可直接比较三个点的x值
             if (ab.x === 0) {
                 DrawAPI2D.drawLine(new Vector2D(a.x, 0), a, "#00FFFF");
                 DrawAPI2D.drawLine(new Vector2D(p1.x, 0), p1, "#00FFFF");
                 DrawAPI2D.drawLine(new Vector2D(p2.x, 0), p2, "#00FFFF");
-                return CollisionResolution2D.isXbetweenAandB(a.x, p1.x, p2.x);
+                if (isInRange(a.x, p1.x, p2.x) === false) {
+                    return false;
+                }
+                // if (out !== null) {
+                //     const len: number = p2.y - p1.y;
+                //     const mul: number = (a.x - p1.x) / (p2.x - p1.x);
+                //     const x: number = a.x;
+                //     const y: number = p1.y + len * mul;
+                //     out.assign(x, y);
+                // }
             }
             // 若向量ab的y为0，则说明ab垂直于y轴，此时点的投影线必定与x轴平行，故可直接比较三个点的y值
             else if (ab.y === 0) {
                 DrawAPI2D.drawLine(new Vector2D(0, a.y), a, "#00FFFF");
                 DrawAPI2D.drawLine(new Vector2D(0, p1.y), p1, "#00FFFF");
                 DrawAPI2D.drawLine(new Vector2D(0, p2.y), p2, "#00FFFF");
-                return CollisionResolution2D.isXbetweenAandB(a.y, p1.y, p2.y);
+                if (isInRange(a.y, p1.y, p2.y) === false) {
+                    return false;
+                }
+                // if (out !== null) {
+                //     const len: number = p2.x - p1.x;
+                //     const mul: number = (a.y - p1.y) / (p2.y - p1.y);
+                //     const x: number = p1.x + len * mul;
+                //     const y: number = a.y;
+                //     out.assign(x, y);
+                // }
             }
             else {
                 const k: number = ab.y / ab.x;
@@ -262,7 +351,9 @@ module world2d {
                     DrawAPI2D.drawLine(new Vector2D(0, b), a, "#00FFFF");
                     DrawAPI2D.drawLine(new Vector2D(0, p1b), p1, "#00FFFF");
                     DrawAPI2D.drawLine(new Vector2D(0, p2b), p2, "#00FFFF");
-                    return CollisionResolution2D.isXbetweenAandB(b, p1b, p2b);
+                    if (isInRange(b, p1b, p2b) === false) {
+                        return false;
+                    }
                 }
                 // 否则应当将点投影到x轴上，此时可直接比较投影线在x轴上的截距, x=my+n=>n=x-my;
                 else {
@@ -273,24 +364,24 @@ module world2d {
                     DrawAPI2D.drawLine(new Vector2D(n, 0), a, "#00FFFF");
                     DrawAPI2D.drawLine(new Vector2D(p1n, 0), p1, "#00FFFF");
                     DrawAPI2D.drawLine(new Vector2D(p2n, 0), p2, "#00FFFF");
-                    return CollisionResolution2D.isXbetweenAandB(n, p1n, p2n);
+                    if (isInRange(n, p1n, p2n) === false) {
+                        return false;
+                    }
                 }
             }
+            return true;
         }
 
         /**
-         * 判断a与b是否在x两侧
+         * 判断x是否在a与b之间
          */
-        static isXbetweenAandB(x: number, a: number, b: number): boolean {
-            if (a > b) {
-                const t: number = a;
-                a = b;
-                b = t;
+        export function isInRange(x: number, a: number, b: number): boolean {
+            if (a < b) {
+                return a <= x && x <= b;
             }
-            if (a <= x && x <= b) {
-                return true;
+            else {
+                return b <= x && x <= a;
             }
-            return false;
         }
     }
 }

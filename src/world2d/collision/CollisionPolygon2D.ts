@@ -17,7 +17,7 @@ module world2d {
         /**
          * 线段数据
          */
-        segments: IVector2D[] = [];
+        segments: ISegment2D[] = [];
 
         constructor(collider: IColliderPolygon2D) {
             super(CollisionShapEnum2D.POLYGON);
@@ -26,7 +26,7 @@ module world2d {
                 // 复制所有顶点信息作为碰撞数据
                 this.vertexs.push(vertex.copy());
                 // 初始化线段数据
-                this.segments.push(new Vector2D(0, 0));
+                this.segments.push(new Segment2D());
             }
         }
 
@@ -61,9 +61,12 @@ module world2d {
          */
         prepareSegments(): void {
             for (let i: number = 0; i < this.vertexs.length; i++) {
+                const segment: ISegment2D = this.segments[i];
+                segment.a = this.vertexs[i];
+                segment.b = i > 0 ? this.vertexs[i - 1] : this.vertexs[this.vertexs.length - 1];
                 const a: IVector2D = this.vertexs[i];
                 const b: IVector2D = i > 0 ? this.vertexs[i - 1] : this.vertexs[this.vertexs.length - 1];
-                this.segments[i].assign(a.x - b.x, a.y - b.y);
+                this.segments[i].assign(a, b);
             }
         }
 

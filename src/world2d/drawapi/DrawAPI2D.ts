@@ -1,18 +1,18 @@
 
 module world2d {
 
-    export abstract class DrawAPI2D {
+    export namespace DrawAPI2D {
 
-        static graphics: Laya.Graphics;
+        export let graphics: Laya.Graphics;
 
-        static clear(): void {
+        export function clear(): void {
             DrawAPI2D.graphics.clear();
         }
 
-        static draw(transforms: ITransform2D[]): void {
+        export function draw(transforms: ITransform2D[]): void {
             // 绘制坐标系
-            // DrawAPI2D.graphics.drawLine(Global.WIDTH * 0.5, 0, Global.WIDTH * 0.5, Global.WIDTH, "#FF0000");
-            // DrawAPI2D.graphics.drawLine(0, Global.HEIGHT * 0.5, Global.WIDTH, Global.HEIGHT * 0.5, "#FF0000");
+            DrawAPI2D.graphics.drawLine(Global.WIDTH * 0.5, 0, Global.WIDTH * 0.5, Global.WIDTH, "#FF0000");
+            DrawAPI2D.graphics.drawLine(0, Global.HEIGHT * 0.5, Global.WIDTH, Global.HEIGHT * 0.5, "#FF0000");
 
             // 绘制所有包围盒
             for (let i: number = 0; i < transforms.length; i++) {
@@ -57,24 +57,24 @@ module world2d {
             }
         }
 
-        static drawLine(a: IPoint2D, b: IVector2D, lineColor: string): void {
+        export function drawLine(a: IPoint2D, b: IVector2D, lineColor: string): void {
             DrawAPI2D.graphics.drawLine(a.x, a.y, b.x, b.y, lineColor);
         }
 
-        static drawNormal(a: IVector2D, lineColor: string): void {
+        export function drawNormal(a: IVector2D, lineColor: string): void {
             const normal: IVector2D = a.copy().normalize().mul(1000);
             DrawAPI2D.graphics.drawLine(a.x, a.y, -a.x, -a.y, lineColor);
         }
 
-        static drawRect(x: number, y: number, width: number, height: number, lineColor: string): void {
+        export function drawRect(x: number, y: number, width: number, height: number, lineColor: string): void {
             DrawAPI2D.graphics.drawRect(x, y, width, height, void 0, lineColor);
         }
 
-        static drawCircle(x: number, y: number, radius: number, lineColor: string): void {
+        export function drawCircle(x: number, y: number, radius: number, lineColor: string): void {
             DrawAPI2D.graphics.drawCircle(x, y, radius, void 0, lineColor);
         }
 
-        static drawPolygon(x: number, y: number, vertexs: IVector2D[], lineColor: string): void {
+        export function drawPolygon(x: number, y: number, vertexs: IVector2D[], lineColor: string): void {
             for (let i: number = 0; i < vertexs.length; i++) {
                 const a: IVector2D = vertexs[i];
                 const b: IVector2D = i === 0 ? vertexs[vertexs.length - 1] : vertexs[i - 1];
