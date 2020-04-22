@@ -31,7 +31,7 @@ module test {
             if (rigidbody === null) {
                 rigidbody = new world2d.Rigidbody2D();
                 rigidbody.torque = 5;
-                rigidbody.moveSpeed = suncom.Common.random(30, 100) * (Math.random() < 0.5 ? -1 : 1);
+                // rigidbody.moveSpeed = suncom.Common.random(30, 100) * (Math.random() < 0.5 ? -1 : 1);
             }
 
             this.$transform = new world2d.Transform2D(this, this.$collider, rigidbody, this.$collision);

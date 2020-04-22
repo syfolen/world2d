@@ -10,41 +10,41 @@ class TestPhysical {
         this.$world = new world2d.World2D(this.$image.graphics);
         Global.world2d = this.$world;
 
-        // new test.TestWorld2dCircle().transform.moveTo(200, 200);
+        new test.TestWorld2dCircle().transform.moveTo(200, 200);
 
-        // const triangle = new test.TestWorld2dRightTriangle();
-        // triangle.transform.moveTo(400, 150);
-        // triangle.transform.setRotation(60);
+        const triangle = new test.TestWorld2dRightTriangle();
+        triangle.transform.moveTo(400, 100);
+        triangle.transform.setRotation(60);
 
-        // const polygon = new test.TestWorld2dPolygon();
-        // polygon.transform.moveTo(350, 450);
-        // polygon.transform.setRotation(20);
+        const polygon = new test.TestWorld2dPolygon();
+        polygon.transform.moveTo(350, 450);
+        polygon.transform.setRotation(20);
 
-        new test.TestWorld2dStableCircle();
-        
-        new test.TestWorld2dStableRectangle();
+        // new test.TestWorld2dStableCircle();
 
-        new test.TestWorld2dCircle();
+        // new test.TestWorld2dStableRectangle();
 
-        new test.TestWorld2dRectangle();
+        // new test.TestWorld2dCircle();
 
-        new test.TestWorld2dRectangle2();
+        // new test.TestWorld2dRectangle();
 
-        new test.TestWorld2dTriangle();
+        // new test.TestWorld2dRectangle2();
 
-        new test.TestWorld2dTriangle2();
+        // new test.TestWorld2dTriangle();
 
-        new test.TestWorld2dRightTriangle();
+        // new test.TestWorld2dTriangle2();
 
-        new test.TestWorld2dRightTriangle2();
+        // new test.TestWorld2dRightTriangle();
 
-        new test.TestWorld2dPolygonRectangle();
+        // new test.TestWorld2dRightTriangle2();
 
-        new test.TestWorld2dPolygonRectangle2();
+        // new test.TestWorld2dPolygonRectangle();
 
-        new test.TestWorld2dPolygon();
+        // new test.TestWorld2dPolygonRectangle2();
 
-        new test.TestWorld2dPolygon2();
+        // new test.TestWorld2dPolygon();
+
+        // new test.TestWorld2dPolygon2();
 
         Laya.stage.addChild(this.$image);
         world2d.DrawAPI2D.graphics = this.$image.graphics;
@@ -56,8 +56,15 @@ class TestPhysical {
         world2d.DrawAPI2D.clear();
         this.$world.update(Laya.timer.delta / 1000);
 
-        this.$direction.rotate(Math.PI / 180);
-        world2d.Physics2D.raycast(new world2d.Vector2D(380, 320), this.$direction, 250, world2d.CollisionLayerEnum.FISH);
+        this.$direction.rotate(Math.PI / 180 * 0.5);
+        const array: world2d.IRaycastResult[] = world2d.Physics2D.raycast(new world2d.Vector2D(380, 320), this.$direction, 250, world2d.CollisionLayerEnum.FISH, world2d.RaycastTypeEnum.ANY);
+        if (array.length > 0) {
+            const res: world2d.IRaycastResult = array[0];
+            world2d.DrawAPI2D.drawLine(new world2d.Vector2D(380, 320), res.p1, "#FFFFFF");
+            if (res.type === world2d.CrossTypeEnum.CROSS_2) {
+                world2d.DrawAPI2D.drawLine(res.p1, res.p2, "#FF00FF");
+            }
+        }
 
         // const s1: world2d.ISegment2D = new world2d.Segment2D();
         // s1.assign(new world2d.Vector2D(100, 100), new world2d.Vector2D(400, 100));

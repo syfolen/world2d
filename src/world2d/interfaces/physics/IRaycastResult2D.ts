@@ -5,6 +5,11 @@ module world2d {
      */
     export interface IRaycastResult {
         /**
+         * 射线与目标对象的交叉类型
+         */
+        type: CrossTypeEnum;
+
+        /**
          * 射线碰到的对象
          */
         transform: ITransform2D;

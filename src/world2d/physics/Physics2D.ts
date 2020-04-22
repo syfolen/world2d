@@ -45,7 +45,7 @@ module world2d {
         static raycast(origin: IVector2D, direction: IVector2D, maxDistance: number, layers: CollisionLayerEnum = 0, type: RaycastTypeEnum = RaycastTypeEnum.CLOSEST): IRaycastResult[] {
             // 射线目标位置
             const destination: IVector2D = direction.copy().normalize().mul(maxDistance).add(origin);
-            DrawAPI2D.drawLine(origin, destination, "#FF00FF");
+            DrawAPI2D.drawLine(origin, destination, "#FF0000");
 
             const segment: ISegment2D = new Segment2D();
             segment.assign(origin, destination);
@@ -63,7 +63,7 @@ module world2d {
             const array: IRaycastResult[] = [];
             const transforms: ITransform2D[] = World2D.inst.transforms;
 
-            let res: IRaycastResult = null;
+            let out: IRaycastResult = null;
 
             for (let i: number = 0; i < transforms.length; i++) {
                 const transform: ITransform2D = transforms[i];
@@ -74,8 +74,9 @@ module world2d {
                 if (CollisionResolution2D.bounds2Bounds(bounds, transform.collision.bounds) === false) {
                     continue;
                 }
-                if (res === null) {
-                    res = {
+                if (out === null) {
+                    out = {
+                        type: CrossTypeEnum.NONE,
                         transform: null,
                         p1: new Vector2D(0, 0),
                         p2: new Vector2D(0, 0),
@@ -84,21 +85,19 @@ module world2d {
                     };
                 }
                 if (transform.collision.shap === CollisionShapEnum2D.CIRCLE) {
-                    // array.push(transform);
-                    // CollisionResolution2D.line2Circle();
+                    CollisionResolution2D.line2Circle(segment, transform.collision as ICollisionCircle2D, out);
                 }
                 else {
-                    if (CollisionResolution2D.line2Polygon(segment, transform.collision as ICollisionPolygon2D, res)) {
-                        res.transform = transform;
-                        transform.hitNum = 1;
-                    }
-                    else {
-                        transform.hitNum = 0;
-                    }
+                    CollisionResolution2D.line2Polygon(segment, transform.collision as ICollisionPolygon2D, out);
                 }
-                if (res.transform !== null) {
-                    array.push(res);
-                    res = null;
+                if (out.type === CrossTypeEnum.NONE) {
+                    transform.hitNum = 0;
+                }
+                else {
+                    transform.hitNum = 1;
+                    out.transform = transform;
+                    array.push(out);
+                    out = null;
                 }
             }
             console.log(array.length);
