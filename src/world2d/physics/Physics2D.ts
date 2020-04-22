@@ -39,8 +39,10 @@ module world2d {
 
         /**
          * 射线检测
+         * @layers: 射线检测的层级，若为0，则检测所有层级，默认为：0
+         * @type: 射线类型，默认为：CLOSEST
          */
-        static raycast(origin: IVector2D, direction: IVector2D, maxDistance: number, layers: CollisionLayerEnum = 0): IRaycastResult[] {
+        static raycast(origin: IVector2D, direction: IVector2D, maxDistance: number, layers: CollisionLayerEnum = 0, type: RaycastTypeEnum = RaycastTypeEnum.CLOSEST): IRaycastResult[] {
             // 射线目标位置
             const destination: IVector2D = direction.copy().normalize().mul(maxDistance).add(origin);
             DrawAPI2D.drawLine(origin, destination, "#FF00FF");
@@ -58,35 +60,50 @@ module world2d {
             );
             // DrawAPI2D.drawRect(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, "#FF0000");
 
-            const array: ITransform2D[] = [];
+            const array: IRaycastResult[] = [];
             const transforms: ITransform2D[] = World2D.inst.transforms;
+
+            let res: IRaycastResult = null;
 
             for (let i: number = 0; i < transforms.length; i++) {
                 const transform: ITransform2D = transforms[i];
+                transform.hitNum = 0;
                 if (layers > 0 && (transform.layer & layers) === 0) {
                     continue;
                 }
                 if (CollisionResolution2D.bounds2Bounds(bounds, transform.collision.bounds) === false) {
                     continue;
                 }
+                if (res === null) {
+                    res = {
+                        transform: null,
+                        p1: new Vector2D(0, 0),
+                        p2: new Vector2D(0, 0),
+                        normal: null,
+                        distance: 0
+                    };
+                }
                 if (transform.collision.shap === CollisionShapEnum2D.CIRCLE) {
                     // array.push(transform);
                     // CollisionResolution2D.line2Circle();
                 }
                 else {
-                    // array.push(transform);
-                    if (CollisionResolution2D.line2Polygon(segment, transform.collision as ICollisionPolygon2D)) {
+                    if (CollisionResolution2D.line2Polygon(segment, transform.collision as ICollisionPolygon2D, res)) {
+                        res.transform = transform;
                         transform.hitNum = 1;
                     }
                     else {
                         transform.hitNum = 0;
                     }
                 }
+                if (res.transform !== null) {
+                    array.push(res);
+                    res = null;
+                }
             }
-
             console.log(array.length);
 
-            return null;
+            return array;
         }
     }
 }

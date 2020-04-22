@@ -5,18 +5,23 @@ module world2d {
      */
     export interface ICrossInfo2D {
         /**
-         * 相交近点
+         * 相交点
          */
-        p1: IVector2D;
+        p: IVector2D;
 
         /**
-         * 相交远点
+         * 相交近点
          */
-        p2: IVector2D;
+        // p1: IVector2D;
+
+        /**
+         * 相交远点（存在于线段重叠时）
+         */
+        // p2: IVector2D;
 
         /**
          * 相交结果
          */
-        type: ICrossTypeEnum;
+        type: CrossTypeEnum;
     }
 }

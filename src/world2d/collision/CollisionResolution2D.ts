@@ -104,11 +104,11 @@ module world2d {
             const b: IVector2D = nearestVertex.copy();
             const ab: IVector2D = new Vector2D(b.x - a.x, b.y - a.y);
             const normal: IVector2D = ab.normal();
-            DrawAPI2D.drawNormal(normal, "#FFFFFF");
+            // DrawAPI2D.drawNormal(normal, "#FFFFFF");
 
             // 获取参与判断的圆上的点
             const p: IVector2D = ab.copy().normalize().mul(c.radius).add(a);
-            DrawAPI2D.drawLine(a, p, "#FF0000");
+            // DrawAPI2D.drawLine(a, p, "#FF0000");
             // 若p与多边形顶点的顶影不重合，则不相交
             if (vertex2VertexInDirection([p], vertexs, normal) === false) {
                 return false;
@@ -128,8 +128,8 @@ module world2d {
                 // 根据法向量获取圆上的两个点
                 a.assign(c.x, c.y).add(normal);
                 b.assign(c.x, c.y).sub(normal);
-                DrawAPI2D.drawLine(c, a, "#FF0000");
-                DrawAPI2D.drawLine(c, b, "#FF0000");
+                // DrawAPI2D.drawLine(c, a, "#FF0000");
+                // DrawAPI2D.drawLine(c, b, "#FF0000");
                 // 判断多边型顶点与圆顶点的投影是否相交
                 if (vertex2VertexInDirection(array, vertexs, segment.ab) === false) {
                     return false;
@@ -142,7 +142,7 @@ module world2d {
         /**
          * 判断两组顶点在指定方向上产生的投影是否重叠
          */
-        export function vertex2VertexInDirection(array: IVector2D[], array2: IVector2D[], direction: IVector2D): boolean {
+        function vertex2VertexInDirection(array: IVector2D[], array2: IVector2D[], direction: IVector2D): boolean {
             /**
              * y=kx+b => k=y/x; b=y-kx;
              * x=my+n => m=x/y; n=x-my;
@@ -165,7 +165,7 @@ module world2d {
                     if (x < array.length) {
                         const p: IVector2D = array[x];
                         const b: number = p.x - m * p.y;
-                        DrawAPI2D.drawLine(p, new Vector2D(b, 0), "#FF0000");
+                        // DrawAPI2D.drawLine(p, new Vector2D(b, 0), "#FF0000");
                         if (min1 > b) {
                             min1 = b;
                         }
@@ -177,7 +177,7 @@ module world2d {
                     if (y < array2.length) {
                         const p: IVector2D = array2[y];
                         const b: number = p.x - m * p.y;
-                        DrawAPI2D.drawLine(p, new Vector2D(b, 0), "#FF0000");
+                        // DrawAPI2D.drawLine(p, new Vector2D(b, 0), "#FF0000");
                         if (min2 > b) {
                             min2 = b;
                         }
@@ -198,7 +198,7 @@ module world2d {
                     if (x < array.length) {
                         const p: IVector2D = array[x];
                         const b: number = p.y - k * p.x;
-                        DrawAPI2D.drawLine(p, new Vector2D(0, b), "#FF0000");
+                        // DrawAPI2D.drawLine(p, new Vector2D(0, b), "#FF0000");
                         if (min1 > b) {
                             min1 = b;
                         }
@@ -210,7 +210,7 @@ module world2d {
                     if (y < array2.length) {
                         const p: IVector2D = array2[y];
                         const b: number = p.y - k * p.x;
-                        DrawAPI2D.drawLine(p, new Vector2D(0, b), "#FF0000");
+                        // DrawAPI2D.drawLine(p, new Vector2D(0, b), "#FF0000");
                         if (min2 > b) {
                             min2 = b;
                         }
@@ -266,15 +266,34 @@ module world2d {
         /**
          * 检测线与多线边是否相交
          */
-        export function line2Polygon(x: ISegment2D, polygon: ICollisionPolygon2D): boolean {
+        export function line2Polygon(line: ISegment2D, polygon: ICollisionPolygon2D, res: IRaycastResult): boolean {
             const segments: ISegment2D[] = polygon.segments;
+
+            let out: ICrossInfo2D = {
+                p: new world2d.Vector2D(0, 0),
+                type: CrossTypeEnum.NONE
+            };
+            let crossCount: number = 0;
+
             for (let i: number = 0; i < segments.length; i++) {
-                const y: ISegment2D = segments[i];
-                if (line2Line(x.ab, x.a, x.b, y.ab, y.a, y.b, null) === true) {
-                    return true;
+                const seg: ISegment2D = segments[i];
+                line2Line(line.ab, line.a, line.b, seg.ab, seg.a, seg.b, out);
+                if (out.type === CrossTypeEnum.CROSS) {
+                    if (crossCount === 0) {
+                        res.p1.assign(out.p.x, out.p.y);
+                    }
+                    else {
+                        res.p2.assign(out.p.x, out.p.y);
+                    }
+                    crossCount++;
+                    if (crossCount === 2) {
+                        break;
+                    }
+                    out.type = CrossTypeEnum.NONE;
                 }
             }
-            return false;
+
+            return crossCount > 0;
         }
 
         /**
@@ -288,37 +307,64 @@ module world2d {
             // a与b均垂直于x轴
             if (a.x === 0 && b.x === 0) {
                 if (isInRange(a1.y, b1.y, b2.y) || isInRange(a2.y, b1.y, b2.y) || isInRange(b1.y, a1.y, a2.y) || isInRange(b2.y, a1.y, a2.y)) {
-                    out.type = ICrossTypeEnum.OVERLAP;
+                    // if (a1.y < a2.y) {
+                    //     const b1y: number = Helper2D.min(b1.y, b2.y);
+                    //     const b2y: number = Helper2D.max(b1.y, b2.y);
+                    //     out.p1.assign(Helper2D.max(a1.y, b1y), a1.x);
+                    //     out.p2.assign(b2y, a1.x);
+                    // }
+                    // else {
+                    //     const b1y: number = Helper2D.max(b1.y, b2.y);
+                    //     const b2y: number = Helper2D.min(b1.y, b2.y);
+                    //     out.p1.assign(Helper2D.min(a1.y, b1y), a1.x);
+                    //     out.p2.assign(b2y, a1.x);
+                    // }
+                    out.type = CrossTypeEnum.OVERLAP;
+                }
+                else {
+                    out.type = CrossTypeEnum.NONE;
                 }
             }
             // a与b均重直于y轴
             else if (a.y === 0 && b.y === 0) {
                 if (isInRange(a1.x, b1.x, b2.x) || isInRange(a2.x, b1.x, b2.x) || isInRange(b1.x, a1.x, a2.x) || isInRange(b2.x, a1.x, a2.x)) {
-                    //a:[{50,100},{150,100}],b:[{100,100},{200,100}]=>p1:{100,100},p2:{200,100}
-                    //a:[{50,100},{200,100}],b:[{100,100},{150,100}]=>p1:{100,100},p2:{150,100}
-                    //a:[{100,100},{200,100}],b:[{50,100},{150,100}]=>p1:{100,100},p2:{150,100}
-                    //a:[{100,100},{150,100}],b:[{50,100},{200,100}]=>p1:{100,100},p2:{200,100}
-                    if (a1.x < a2.x) {
-                        const b1x: number = Helper2D.min(b1.x, b2.x);
-                        const b2x: number = Helper2D.max(b1.x, b2.x);
-                        out.p1.assign(Helper2D.max(a1.x, b1x), a1.y);
-                        out.p2.assign(b2x, a1.y);
-                    }
-                    //a:[{150,100},{50,100}],b:[{200,100},{100,100}]=>p1:{150,100},p2:{100,100}
-                    //a:[{200,100},{50,100}],b:[{150,100},{100,100}]=>p1:{150,100},p2:{100,100}
-                    //a:[{200,100},{100,100}],b:[{150,100},{50,100}]=>p1:{150,100},p2:{50,100}
-                    //a:[{150,100},{100,100}],b:[{200,100},{50,100}]=>p1:{150,100},p2:{50,100}
-                    else {
-                        const b1x: number = Helper2D.max(b1.x, b2.x);
-                        const b2x: number = Helper2D.min(b1.x, b2.x);
-                        out.p1.assign(Helper2D.min(a1.x, b1x), a1.y);
-                        out.p2.assign(b2x, a1.y);
-                    }
-                    out.type = ICrossTypeEnum.OVERLAP;
+                    // a:[{50,100},{150,100}],b:[{100,100},{200,100}]=>p1:{100,100},p2:{200,100}
+                    // a:[{50,100},{200,100}],b:[{100,100},{150,100}]=>p1:{100,100},p2:{150,100}
+                    // a:[{100,100},{200,100}],b:[{50,100},{150,100}]=>p1:{100,100},p2:{150,100}
+                    // a:[{100,100},{150,100}],b:[{50,100},{200,100}]=>p1:{100,100},p2:{200,100}
+                    // if (a1.x < a2.x) {
+                    //     const b1x: number = Helper2D.min(b1.x, b2.x);
+                    //     const b2x: number = Helper2D.max(b1.x, b2.x);
+                    //     out.p1.assign(Helper2D.max(a1.x, b1x), a1.y);
+                    //     out.p2.assign(b2x, a1.y);
+                    // }
+                    // a:[{150,100},{50,100}],b:[{200,100},{100,100}]=>p1:{150,100},p2:{100,100}
+                    // a:[{200,100},{50,100}],b:[{150,100},{100,100}]=>p1:{150,100},p2:{100,100}
+                    // a:[{200,100},{100,100}],b:[{150,100},{50,100}]=>p1:{150,100},p2:{50,100}
+                    // a:[{150,100},{100,100}],b:[{200,100},{50,100}]=>p1:{150,100},p2:{50,100}
+                    // else {
+                    //     const b1x: number = Helper2D.max(b1.x, b2.x);
+                    //     const b2x: number = Helper2D.min(b1.x, b2.x);
+                    //     out.p1.assign(Helper2D.min(a1.x, b1x), a1.y);
+                    //     out.p2.assign(b2x, a1.y);
+                    // }
+                    out.type = CrossTypeEnum.OVERLAP;
+                }
+                else {
+                    out.type = CrossTypeEnum.NONE;
                 }
             }
+            else if (isLineBetweenPoints(b1, b, a1, a2, out) && isLineBetweenPoints(a1, a, b1, b2, out)) {
+                // out.type = CrossTypeEnum.CROSS;
+            }
             else {
-                return isLineBetweenPoints(a1, a, b1, b2, out) && isLineBetweenPoints(a1, a, b1, b2, out);
+                out.type = CrossTypeEnum.NONE;
+            }
+            if (out.type === CrossTypeEnum.NONE) {
+                return false;
+            }
+            else {
+                return true;
             }
         }
 
@@ -333,35 +379,17 @@ module world2d {
         export function isLineBetweenPoints(a: IVector2D, ab: IVector2D, p1: IVector2D, p2: IVector2D, out: ICrossInfo2D): boolean {
             // 若向量ab的x为0，则说明ab垂直于x轴，此时点的投影线必定与y轴平行，故可直接比较三个点的x值
             if (ab.x === 0) {
-                DrawAPI2D.drawLine(new Vector2D(a.x, 0), a, "#00FFFF");
-                DrawAPI2D.drawLine(new Vector2D(p1.x, 0), p1, "#00FFFF");
-                DrawAPI2D.drawLine(new Vector2D(p2.x, 0), p2, "#00FFFF");
-                if (isInRange(a.x, p1.x, p2.x) === false) {
-                    return false;
-                }
-                // if (out !== null) {
-                //     const len: number = p2.y - p1.y;
-                //     const mul: number = (a.x - p1.x) / (p2.x - p1.x);
-                //     const x: number = a.x;
-                //     const y: number = p1.y + len * mul;
-                //     out.assign(x, y);
-                // }
+                // DrawAPI2D.drawLine(new Vector2D(a.x, 0), a, "#00FFFF");
+                // DrawAPI2D.drawLine(new Vector2D(p1.x, 0), p1, "#00FFFF");
+                // DrawAPI2D.drawLine(new Vector2D(p2.x, 0), p2, "#00FFFF");
+                return isInRange(a.x, p1.x, p2.x);
             }
             // 若向量ab的y为0，则说明ab垂直于y轴，此时点的投影线必定与x轴平行，故可直接比较三个点的y值
             else if (ab.y === 0) {
-                DrawAPI2D.drawLine(new Vector2D(0, a.y), a, "#00FFFF");
-                DrawAPI2D.drawLine(new Vector2D(0, p1.y), p1, "#00FFFF");
-                DrawAPI2D.drawLine(new Vector2D(0, p2.y), p2, "#00FFFF");
-                if (isInRange(a.y, p1.y, p2.y) === false) {
-                    return false;
-                }
-                // if (out !== null) {
-                //     const len: number = p2.x - p1.x;
-                //     const mul: number = (a.y - p1.y) / (p2.y - p1.y);
-                //     const x: number = p1.x + len * mul;
-                //     const y: number = a.y;
-                //     out.assign(x, y);
-                // }
+                // DrawAPI2D.drawLine(new Vector2D(0, a.y), a, "#00FFFF");
+                // DrawAPI2D.drawLine(new Vector2D(0, p1.y), p1, "#00FFFF");
+                // DrawAPI2D.drawLine(new Vector2D(0, p2.y), p2, "#00FFFF");
+                return isInRange(a.y, p1.y, p2.y);
             }
             else {
                 const k: number = ab.y / ab.x;
@@ -370,12 +398,10 @@ module world2d {
                     const b: number = a.y - k * a.x;
                     const p1b: number = p1.y - k * p1.x;
                     const p2b: number = p2.y - k * p2.x;
-                    DrawAPI2D.drawLine(new Vector2D(0, b), a, "#00FFFF");
-                    DrawAPI2D.drawLine(new Vector2D(0, p1b), p1, "#00FFFF");
-                    DrawAPI2D.drawLine(new Vector2D(0, p2b), p2, "#00FFFF");
-                    if (isInRange(b, p1b, p2b) === false) {
-                        return false;
-                    }
+                    // DrawAPI2D.drawLine(new Vector2D(0, b), a, "#00FFFF");
+                    // DrawAPI2D.drawLine(new Vector2D(0, p1b), p1, "#00FFFF");
+                    // DrawAPI2D.drawLine(new Vector2D(0, p2b), p2, "#00FFFF");
+                    return isInRange(b, p1b, p2b) && makeCrossInfo(b, p1b, p2b, p1, p2, out);
                 }
                 // 否则应当将点投影到x轴上，此时可直接比较投影线在x轴上的截距, x=my+n=>n=x-my;
                 else {
@@ -383,15 +409,12 @@ module world2d {
                     const n: number = a.x - m * a.y;
                     const p1n: number = p1.x - m * p1.y;
                     const p2n: number = p2.x - m * p2.y;
-                    DrawAPI2D.drawLine(new Vector2D(n, 0), a, "#00FFFF");
-                    DrawAPI2D.drawLine(new Vector2D(p1n, 0), p1, "#00FFFF");
-                    DrawAPI2D.drawLine(new Vector2D(p2n, 0), p2, "#00FFFF");
-                    if (isInRange(n, p1n, p2n) === false) {
-                        return false;
-                    }
+                    // DrawAPI2D.drawLine(new Vector2D(n, 0), a, "#00FFFF");
+                    // DrawAPI2D.drawLine(new Vector2D(p1n, 0), p1, "#00FFFF");
+                    // DrawAPI2D.drawLine(new Vector2D(p2n, 0), p2, "#00FFFF");
+                    return isInRange(n, p1n, p2n) && makeCrossInfo(n, p1n, p2n, p1, p2, out);
                 }
             }
-            return true;
         }
 
         /**
@@ -404,6 +427,17 @@ module world2d {
             else {
                 return b <= x && x <= a;
             }
+        }
+
+        /**
+         * 计算交叉点信息
+         */
+        function makeCrossInfo(k: number, k1: number, k2: number, p1: IVector2D, p2: IVector2D, out: ICrossInfo2D): boolean {
+            if (out !== null && out.type === CrossTypeEnum.NONE) {
+                out.p = new Vector2D(p2.x - p1.x, p2.y - p1.y).mul((k - k1) / (k2 - k1)).add(p1);
+                out.type = CrossTypeEnum.CROSS;
+            }
+            return true;
         }
     }
 }

@@ -12,12 +12,12 @@ module world2d {
         /**
          * 射线与对象发生碰撞的近点坐标
          */
-        a: IVector2D;
+        p1: IVector2D;
 
         /**
          * 射线离开对象的理论远点坐标（不一定在射线的长度范围内）
          */
-        b: IVector2D;
+        p2: IVector2D;
 
         /**
          * 近点法线
