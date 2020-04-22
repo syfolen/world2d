@@ -21,7 +21,7 @@ module world2d {
         /**
          * 判断点是否在多边形内
          */
-        export function pointInPolygon(p: IVector2D, p2d: ICollisionPolygon2D): boolean {
+        export function pointInPolygon(p: IVector2D, p2d: IPolygon2D): boolean {
             const vertexs: IVector2D[] = p2d.vertexs;
 
             let radian: number = 0;
@@ -61,6 +61,25 @@ module world2d {
                 return false;
             }
             return true;
+        }
+
+        /**
+         * 判断线段是否与圆相交
+         */
+        function lineCrossCircle(line: ISegment2D, circle: ICollisionCircle2D, out: IRaycastResult): boolean {
+            const a2p: number = line.a.distanceToSquared(circle);
+            const b2p: number = line.b.distanceToSquared(circle);
+            const rxr: number = circle.radius * circle.radius;
+
+            if (a2p <= rxr && b2p <= rxr) {
+                out.p1.assign(line.a.x, line.a.y);
+                out.type = CrossTypeEnum.CROSS;
+            }
+            else {
+
+            }
+
+            return false;
         }
 
         /**
@@ -258,7 +277,12 @@ module world2d {
         export function line2Circle(line: ISegment2D, circle: ICollisionCircle2D, out: IRaycastResult): boolean {
             const isAInC: boolean = pointInCircle(line.a, circle);
             const isBInC: boolean = pointInCircle(line.b, circle);
-            
+
+            if (isAInC === true && isBInC === true) {
+                out.p1.assign(line.a.x, line.a.y);
+                out.type = CrossTypeEnum.CROSS;
+            }
+
             // if (pointInCircle(line.a, c) || pointInCircle(line.b, c)) {
             //     return true;
             // }
@@ -292,6 +316,13 @@ module world2d {
                         break;
                     }
                     info.type = CrossTypeEnum.NONE;
+                }
+            }
+
+            if (out.type === CrossTypeEnum.NONE) {
+                if (pointInPolygon(line.a, polygon) && pointInPolygon(line.b, polygon)) {
+                    out.p1.assign(line.a.x, line.a.y);
+                    out.type = CrossTypeEnum.CROSS;
                 }
             }
 
