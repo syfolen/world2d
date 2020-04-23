@@ -45,7 +45,7 @@ module world2d {
         static raycast(origin: IVector2D, direction: IVector2D, maxDistance: number, layers: CollisionLayerEnum = 0, type: RaycastTypeEnum = RaycastTypeEnum.CLOSEST): IRaycastResult[] {
             // 射线目标位置
             const destination: IVector2D = direction.copy().normalize().mul(maxDistance).add(origin);
-            // DrawAPI2D.drawLine(origin, destination, "#FF0000");
+            world2d.World2D.DEBUG === true && DrawAPI2D.drawLine(origin, destination, "#FF0000");
 
             const segment: ISegment2D = new Segment2D();
             segment.assign(origin, destination);
@@ -60,10 +60,10 @@ module world2d {
             );
             // DrawAPI2D.drawRect(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, "#FF0000");
 
-            const array: IRaycastResult[] = [];
             const transforms: ITransform2D[] = World2D.inst.transforms;
 
             let out: IRaycastResult = null;
+            let array: IRaycastResult[] = [];
 
             // 测试代码
             for (let i: number = 0; i < transforms.length; i++) {
@@ -131,7 +131,28 @@ module world2d {
                  */
                 out = null;
             }
-            console.log(array.length);
+
+            if (type === RaycastTypeEnum.ALL_CLOSEST && array.length > 1) {
+                const newArray: IRaycastResult[] = [];
+                while (array.length > 1) {
+                    let res: IRaycastResult = null;
+                    let index: number = 0;
+                    let distance: number = Helper2D.MAX_SAFE_INTEGER;
+                    for (let i: number = 0; i < array.length; i++) {
+                        const item: IRaycastResult = array[i];
+                        const dis: number = origin.distanceToSquared(item.p1);
+                        if (res === null || dis < distance) {
+                            res = item;
+                            index = i;
+                            distance = dis;
+                        }
+                    }
+                    array.splice(index, 1);
+                    newArray.push(res);
+                }
+                newArray.push(array[0]);
+                array = newArray;
+            }
 
             return array;
         }

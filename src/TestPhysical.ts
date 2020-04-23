@@ -61,20 +61,24 @@ class TestPhysical {
 
         this.$direction.rotate(Math.PI / 180 * -0.5);
 
-        const type: world2d.RaycastTypeEnum = world2d.RaycastTypeEnum.CLOSEST;
+        const type: world2d.RaycastTypeEnum = world2d.RaycastTypeEnum.ALL_CLOSEST;
         const layers: world2d.CollisionLayerEnum = world2d.CollisionLayerEnum.FISH;
 
         const array: world2d.IRaycastResult[] = world2d.Physics2D.raycast(new world2d.Vector2D(380, 320), this.$direction, 250, layers, type);
-        if (array.length > 0 && type !== world2d.RaycastTypeEnum.ANY && type !== world2d.RaycastTypeEnum.ALL) {
-            const res: world2d.IRaycastResult = array[0];
-            world2d.DrawAPI2D.drawLine(new world2d.Vector2D(380, 320), res.p1, "#FFFFFF");
-            // if (res.type === world2d.CrossTypeEnum.CROSS_2) {
-            //     world2d.DrawAPI2D.drawLine(res.p1, res.p2, "#FF00FF");
-            // }
-        }
-        else {
-            world2d.DrawAPI2D.drawLine(new world2d.Vector2D(380, 320), this.$direction.copy().normalize().mul(250).add(new world2d.Vector2D(380, 320)), "#FF0000");
-        }
+        // if (array.length > 0 && (type === world2d.RaycastTypeEnum.CLOSES || type === world2d.RaycastTypeEnum.ALL_CLOSEST)) {
+        //     let p: world2d.IVector2D = new world2d.Vector2D(380, 320);
+        //     let width: number = 1;
+        //     for (let i: number = 0; i < array.length; i++) {
+        //         const res: world2d.IRaycastResult = array[i];
+        //         world2d.DrawAPI2D.drawLine(p, res.p1, "#FFFFFF", width);
+        //         p = res.p1;
+        //         width += 2;
+        //     }
+        //     world2d.DrawAPI2D.drawLine(p, this.$direction.copy().normalize().mul(250).add(new world2d.Vector2D(380, 320)), "#FF0000");
+        // }
+        // else {
+        //     world2d.DrawAPI2D.drawLine(new world2d.Vector2D(380, 320), this.$direction.copy().normalize().mul(250).add(new world2d.Vector2D(380, 320)), "#FF0000");
+        // }
 
         // if (world2d.Helper2D.r2d(this.$direction.angle()) < 45 || world2d.Helper2D.r2d(this.$direction.angle()) > 250) {
         //     this.$direction = new world2d.Vector2D(1, 0).rotate(world2d.Helper2D.d2r(45));
