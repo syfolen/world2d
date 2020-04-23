@@ -19,7 +19,7 @@ module world2d {
         /**
          * 相减
          */
-        sub(a: IVector2D): IVector2D;
+        sub(a: IPoint2D): IVector2D;
 
         /**
          * 相乘
@@ -29,12 +29,12 @@ module world2d {
         /**
          * 点积
          */
-        dot(a: IVector2D): number;
+        dot(a: IPoint2D): number;
 
         /**
          * 叉积
          */
-        cross(a: IVector2D): number;
+        cross(a: IPoint2D): number;
 
         /**
          * 归零
@@ -74,6 +74,11 @@ module world2d {
          * export
          */
         length(): number;
+
+        /**
+         * 长量的平方
+         */
+        lengthSquared(): number;
 
         /**
          * 计算到指定位置的距离

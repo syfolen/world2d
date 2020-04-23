@@ -275,24 +275,68 @@ module world2d {
          * 检测线和圆是否相交
          */
         export function line2Circle(line: ISegment2D, circle: ICollisionCircle2D, out: IRaycastResult): boolean {
-            const isAInC: boolean = pointInCircle(line.a, circle);
-            const isBInC: boolean = pointInCircle(line.b, circle);
+            const rxr: number = circle.radius * circle.radius;
+            const a2cs: number = line.a.distanceToSquared(circle);
+            const b2cs: number = line.b.distanceToSquared(circle);
 
-            if (isAInC === true && isBInC === true) {
+            // 若a和b均在圆内，则相交
+            if (a2cs <= rxr && b2cs <= rxr) {
                 out.p1.assign(line.a.x, line.a.y);
                 out.type = CrossTypeEnum.CROSS;
+                return true;
             }
 
-            // if (pointInCircle(line.a, c) || pointInCircle(line.b, c)) {
-            //     return true;
-            // }
-            return false;
+            // 线段法向量
+            const normal: IVector2D = line.ab.normal().normalize().mul(circle.radius);
+
+            let a: IVector2D = new Vector2D(circle.x, circle.y).add(normal);
+            let b: IVector2D = new Vector2D(circle.x, circle.y).sub(normal);
+            // DrawAPI2D.drawLine(a, b, "#FF00FF");
+
+            const info: ICrossInfo2D = {
+                p: new Vector2D(0, 0),
+                type: CrossTypeEnum.NONE
+            };
+            isLineBetweenPoints(line.a, line.ab, a, b, info);
+            if (info.type === CrossTypeEnum.NONE) {
+                return false;
+            }
+            info.type = CrossTypeEnum.NONE;
+            // DrawAPI2D.drawLine(info.p, new Vector2D(0, 0), "#FF00FF");
+
+            // 点p到圆心的长度平方
+            const lxl: number = info.p.copy().sub(circle).lengthSquared();
+            // 点p到线段与圆相交点的距离
+            const distance: number = Math.sqrt(rxr - lxl);
+            // 点p到线段与圆其中一个相交点的向量
+            normal.assign(line.ab.x, line.ab.y).normalize().mul(distance);
+
+            a = info.p.copy().add(normal);
+            b = info.p.copy().sub(normal);
+
+            const isAinLine: boolean = isInRange(a.x, line.a.x, line.b.x) && isInRange(a.y, line.a.y, line.b.y);
+            const isBinLine: boolean = isInRange(b.x, line.a.x, line.b.x) && isInRange(b.y, line.a.y, line.b.y);
+            if (isAinLine && isBinLine) {
+                makeP1andP2(line.a, a, b, out);
+                out.type = CrossTypeEnum.CROSS_2;
+            }
+            else if (isAinLine) {
+                out.p1 = a;
+                out.type = CrossTypeEnum.CROSS;
+            }
+            else if (isBinLine) {
+                out.p1 = b;
+                out.type = CrossTypeEnum.CROSS;
+            }
+            else {
+                return false;
+            }
         }
 
         /**
          * 检测线与多线边是否相交
          */
-        export function line2Polygon(line: ISegment2D, polygon: IPolygon2D, out: IRaycastResult): boolean {
+        export function line2Polygon(line: ISegment2D, polygon: IPolygon2D, type: RaycastTypeEnum, out: IRaycastResult): boolean {
             const segments: ISegment2D[] = polygon.segments;
 
             let info: ICrossInfo2D = {
@@ -302,20 +346,28 @@ module world2d {
 
             for (let i: number = 0; i < segments.length; i++) {
                 const seg: ISegment2D = segments[i];
-                line2Line(line.ab, line.a, line.b, seg.ab, seg.a, seg.b, info);
-                if (info.type === CrossTypeEnum.CROSS) {
-                    if (out.type === CrossTypeEnum.NONE) {
+                if (type === RaycastTypeEnum.ANY || type === RaycastTypeEnum.ALL) {
+                    if (line2Line(line.ab, line.a, line.b, seg.ab, seg.a, seg.b, null)) {
                         out.type = CrossTypeEnum.CROSS;
-                        out.p1.assign(info.p.x, info.p.y);
-                    }
-                    else {
-                        out.type = CrossTypeEnum.CROSS_2;
-                        out.p2.assign(info.p.x, info.p.y);
-                    }
-                    if (out.type === CrossTypeEnum.CROSS_2) {
                         break;
                     }
-                    info.type = CrossTypeEnum.NONE;
+                }
+                else {
+                    line2Line(line.ab, line.a, line.b, seg.ab, seg.a, seg.b, info);
+                    if (info.type === CrossTypeEnum.CROSS) {
+                        if (out.type === CrossTypeEnum.NONE) {
+                            out.type = CrossTypeEnum.CROSS;
+                            out.p1.assign(info.p.x, info.p.y);
+                        }
+                        else {
+                            out.type = CrossTypeEnum.CROSS_2;
+                            out.p2.assign(info.p.x, info.p.y);
+                        }
+                        if (out.type === CrossTypeEnum.CROSS_2) {
+                            break;
+                        }
+                        info.type = CrossTypeEnum.NONE;
+                    }
                 }
             }
 
@@ -325,8 +377,25 @@ module world2d {
                     out.type = CrossTypeEnum.CROSS;
                 }
             }
+            else if (out.type === CrossTypeEnum.CROSS_2) {
+                makeP1andP2(line.a, out.p1, out.p2, out);
+            }
 
             return out.type !== CrossTypeEnum.NONE;
+        }
+
+        /**
+         * 设置远点和近点
+         */
+        function makeP1andP2(p: IVector2D, p1: IVector2D, p2: IVector2D, out: IRaycastResult): void {
+            if (p2.distanceToSquared(p) < p1.distanceToSquared(p)) {
+                out.p1 = p2;
+                out.p2 = p1;
+            }
+            else {
+                out.p1 = p1;
+                out.p2 = p2;
+            }
         }
 
         /**
@@ -337,9 +406,12 @@ module world2d {
          * @info: 相交信息
          */
         export function line2Line(a: IVector2D, a1: IVector2D, a2: IVector2D, b: IVector2D, b1: IVector2D, b2: IVector2D, info: ICrossInfo2D): boolean {
+            // 线段相交类型
+            let type: CrossTypeEnum;
+
             // a与b均垂直于x轴
             if (a.x === 0 && b.x === 0) {
-                if (isInRange(a1.y, b1.y, b2.y) || isInRange(a2.y, b1.y, b2.y) || isInRange(b1.y, a1.y, a2.y) || isInRange(b2.y, a1.y, a2.y)) {
+                if (a1.x === b1.x && (isInRange(a1.y, b1.y, b2.y) || isInRange(a2.y, b1.y, b2.y) || isInRange(b1.y, a1.y, a2.y) || isInRange(b2.y, a1.y, a2.y))) {
                     // if (a1.y < a2.y) {
                     //     const b1y: number = Helper2D.min(b1.y, b2.y);
                     //     const b2y: number = Helper2D.max(b1.y, b2.y);
@@ -352,15 +424,15 @@ module world2d {
                     //     info.p1.assign(Helper2D.min(a1.y, b1y), a1.x);
                     //     info.p2.assign(b2y, a1.x);
                     // }
-                    info.type = CrossTypeEnum.OVERLAP;
+                    type = CrossTypeEnum.OVERLAP;
                 }
                 else {
-                    info.type = CrossTypeEnum.NONE;
+                    type = CrossTypeEnum.NONE;
                 }
             }
             // a与b均重直于y轴
             else if (a.y === 0 && b.y === 0) {
-                if (isInRange(a1.x, b1.x, b2.x) || isInRange(a2.x, b1.x, b2.x) || isInRange(b1.x, a1.x, a2.x) || isInRange(b2.x, a1.x, a2.x)) {
+                if (a1.y === b1.y && (isInRange(a1.x, b1.x, b2.x) || isInRange(a2.x, b1.x, b2.x) || isInRange(b1.x, a1.x, a2.x) || isInRange(b2.x, a1.x, a2.x))) {
                     // a:[{50,100},{150,100}],b:[{100,100},{200,100}]=>p1:{100,100},p2:{200,100}
                     // a:[{50,100},{200,100}],b:[{100,100},{150,100}]=>p1:{100,100},p2:{150,100}
                     // a:[{100,100},{200,100}],b:[{50,100},{150,100}]=>p1:{100,100},p2:{150,100}
@@ -381,24 +453,22 @@ module world2d {
                     //     info.p1.assign(Helper2D.min(a1.x, b1x), a1.y);
                     //     info.p2.assign(b2x, a1.y);
                     // }
-                    info.type = CrossTypeEnum.OVERLAP;
+                    type = CrossTypeEnum.OVERLAP;
                 }
                 else {
-                    info.type = CrossTypeEnum.NONE;
+                    type = CrossTypeEnum.NONE;
                 }
             }
             else if (isLineBetweenPoints(b1, b, a1, a2, info) && isLineBetweenPoints(a1, a, b1, b2, info)) {
-                // out.type = CrossTypeEnum.CROSS;
+                type = CrossTypeEnum.CROSS;
             }
             else {
-                info.type = CrossTypeEnum.NONE;
+                type = CrossTypeEnum.NONE;
             }
-            if (info.type === CrossTypeEnum.NONE) {
-                return false;
+            if (info !== null && info.type !== type) {
+                info.type = type;
             }
-            else {
-                return true;
-            }
+            return type !== CrossTypeEnum.NONE;
         }
 
         /**
@@ -415,14 +485,14 @@ module world2d {
                 // DrawAPI2D.drawLine(new Vector2D(a.x, 0), a, "#00FFFF");
                 // DrawAPI2D.drawLine(new Vector2D(p1.x, 0), p1, "#00FFFF");
                 // DrawAPI2D.drawLine(new Vector2D(p2.x, 0), p2, "#00FFFF");
-                return isInRange(a.x, p1.x, p2.x);
+                return isInRange(a.x, p1.x, p2.x) && fixCrossInfo(a.x, a.x, p1.y, p2.y, info);
             }
             // 若向量ab的y为0，则说明ab垂直于y轴，此时点的投影线必定与x轴平行，故可直接比较三个点的y值
             else if (ab.y === 0) {
                 // DrawAPI2D.drawLine(new Vector2D(0, a.y), a, "#00FFFF");
                 // DrawAPI2D.drawLine(new Vector2D(0, p1.y), p1, "#00FFFF");
                 // DrawAPI2D.drawLine(new Vector2D(0, p2.y), p2, "#00FFFF");
-                return isInRange(a.y, p1.y, p2.y);
+                return isInRange(a.y, p1.y, p2.y) && fixCrossInfo(p1.x, p2.x, a.y, a.y, info);
             }
             else {
                 const k: number = ab.y / ab.x;
@@ -460,6 +530,18 @@ module world2d {
             else {
                 return b <= x && x <= a;
             }
+        }
+
+        /**
+         * 确认交叉信息（适用于两条相互垂直的线段）
+         * @b: 若为true，则k为x，v为y，否则反之
+         */
+        function fixCrossInfo(x1: number, x2: number, y1: number, y2: number, info: ICrossInfo2D): boolean {
+            if (info !== null && info.type === CrossTypeEnum.NONE && x1 === x2 && y1 === y2) {
+                info.p.assign(x1, y1);
+                info.type = CrossTypeEnum.CROSS;
+            }
+            return true;
         }
 
         /**

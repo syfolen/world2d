@@ -22,10 +22,11 @@ module world2d {
         /**
          * 设置线段数据
          */
-        assign(a: IVector2D, b: IVector2D): void {
+        assign(a: IVector2D, b: IVector2D): ISegment2D {
             this.a = a;
             this.b = b;
             this.ab.assign(b.x - a.x, b.y - a.y);
+            return this;
         }
     }
 }

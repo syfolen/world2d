@@ -14,6 +14,7 @@ module test {
         protected $speedY: number = Math.random() * 40 - 20;
 
         protected $radius: number = Math.random() * 50 + 50;
+        // protected $radius: number = 100;
 
         protected $width: number = Math.random() * 50 + 50;
         protected $height: number = Math.random() * 50 + 50;
@@ -31,7 +32,7 @@ module test {
             if (rigidbody === null) {
                 rigidbody = new world2d.Rigidbody2D();
                 rigidbody.torque = 5;
-                // rigidbody.moveSpeed = suncom.Common.random(30, 100) * (Math.random() < 0.5 ? -1 : 1);
+                rigidbody.moveSpeed = suncom.Common.random(30, 100) * (Math.random() < 0.5 ? -1 : 1);
             }
 
             this.$transform = new world2d.Transform2D(this, this.$collider, rigidbody, this.$collision);

@@ -45,7 +45,7 @@ module world2d {
         static raycast(origin: IVector2D, direction: IVector2D, maxDistance: number, layers: CollisionLayerEnum = 0, type: RaycastTypeEnum = RaycastTypeEnum.CLOSEST): IRaycastResult[] {
             // 射线目标位置
             const destination: IVector2D = direction.copy().normalize().mul(maxDistance).add(origin);
-            DrawAPI2D.drawLine(origin, destination, "#FF0000");
+            // DrawAPI2D.drawLine(origin, destination, "#FF0000");
 
             const segment: ISegment2D = new Segment2D();
             segment.assign(origin, destination);
@@ -65,9 +65,13 @@ module world2d {
 
             let out: IRaycastResult = null;
 
+            // 测试代码
+            for (let i: number = 0; i < transforms.length; i++) {
+                transforms[i].hitNum = 0;
+            }
+
             for (let i: number = 0; i < transforms.length; i++) {
                 const transform: ITransform2D = transforms[i];
-                transform.hitNum = 0;
                 if (layers > 0 && (transform.layer & layers) === 0) {
                     continue;
                 }
@@ -88,17 +92,44 @@ module world2d {
                     CollisionResolution2D.line2Circle(segment, transform.collision as ICollisionCircle2D, out);
                 }
                 else {
-                    CollisionResolution2D.line2Polygon(segment, transform.collision as ICollisionPolygon2D, out);
+                    CollisionResolution2D.line2Polygon(segment, transform.collision as ICollisionPolygon2D, type, out);
                 }
+
                 if (out.type === CrossTypeEnum.NONE) {
-                    transform.hitNum = 0;
+                    continue;
+                }
+                out.transform = transform;
+
+                // 测试代码
+                transform.hitNum = 1;
+
+                // 若射线类型为CLOSEST，则替换己找到的对象，并更新射线的矩形区域
+                if (type === RaycastTypeEnum.CLOSEST) {
+                    if (array.length === 1) {
+                        // 测试代码
+                        array[0].transform.hitNum = 0;
+                    }
+                    array[0] = out;
+                    bounds.updateBounds(
+                        Helper2D.min(origin.x, out.p1.x),
+                        Helper2D.max(origin.x, out.p1.x),
+                        Helper2D.min(origin.y, out.p1.y),
+                        Helper2D.max(origin.y, out.p1.y)
+                    );
+                    // DrawAPI2D.drawRect(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, "#FF0000");
                 }
                 else {
-                    transform.hitNum = 1;
-                    out.transform = transform;
                     array.push(out);
-                    out = null;
                 }
+
+                if (type === RaycastTypeEnum.ANY) {
+                    break;
+                }
+
+                /**
+                 * 以上为测试代码，正式发布时需要优化
+                 */
+                out = null;
             }
             console.log(array.length);
 

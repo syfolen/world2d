@@ -4,47 +4,50 @@ class TestPhysical {
     private $image: Laya.Image = new Laya.Image();
     private $world: world2d.IWorld2D;
 
-    private $direction: world2d.IVector2D = new world2d.Vector2D(1, 0);
+    private $direction: world2d.IVector2D = new world2d.Vector2D(-1, 0);
 
     constructor() {
         this.$world = new world2d.World2D(this.$image.graphics);
         Global.world2d = this.$world;
 
-        new test.TestWorld2dCircle().transform.moveTo(200, 200);
+        new test.TestWorld2dCircle().transform.moveTo(460, 230);
 
-        const triangle = new test.TestWorld2dRightTriangle();
-        triangle.transform.moveTo(400, 100);
-        triangle.transform.setRotation(60);
+        // const triangle = new test.TestWorld2dRightTriangle();
+        // triangle.transform.moveTo(400, 100);
+        // triangle.transform.setRotation(60);
 
-        const polygon = new test.TestWorld2dPolygon();
-        polygon.transform.moveTo(350, 450);
-        polygon.transform.setRotation(20);
+        // const polygon = new test.TestWorld2dPolygon();
+        // polygon.transform.moveTo(350, 450);
+        // polygon.transform.setRotation(20);
 
-        // new test.TestWorld2dStableCircle();
+        // const rect = new test.TestWorld2dRectangle();
+        // rect.transform.moveTo(150, 320);
 
-        // new test.TestWorld2dStableRectangle();
+        new test.TestWorld2dStableCircle();
 
-        // new test.TestWorld2dCircle();
+        new test.TestWorld2dStableRectangle();
 
-        // new test.TestWorld2dRectangle();
+        new test.TestWorld2dCircle();
 
-        // new test.TestWorld2dRectangle2();
+        new test.TestWorld2dRectangle();
 
-        // new test.TestWorld2dTriangle();
+        new test.TestWorld2dRectangle2();
 
-        // new test.TestWorld2dTriangle2();
+        new test.TestWorld2dTriangle();
 
-        // new test.TestWorld2dRightTriangle();
+        new test.TestWorld2dTriangle2();
 
-        // new test.TestWorld2dRightTriangle2();
+        new test.TestWorld2dRightTriangle();
 
-        // new test.TestWorld2dPolygonRectangle();
+        new test.TestWorld2dRightTriangle2();
 
-        // new test.TestWorld2dPolygonRectangle2();
+        new test.TestWorld2dPolygonRectangle();
 
-        // new test.TestWorld2dPolygon();
+        new test.TestWorld2dPolygonRectangle2();
 
-        // new test.TestWorld2dPolygon2();
+        new test.TestWorld2dPolygon();
+
+        new test.TestWorld2dPolygon2();
 
         Laya.stage.addChild(this.$image);
         world2d.DrawAPI2D.graphics = this.$image.graphics;
@@ -56,15 +59,26 @@ class TestPhysical {
         world2d.DrawAPI2D.clear();
         this.$world.update(Laya.timer.delta / 1000);
 
-        this.$direction.rotate(Math.PI / 180 * 0.5);
-        const array: world2d.IRaycastResult[] = world2d.Physics2D.raycast(new world2d.Vector2D(380, 320), this.$direction, 250, world2d.CollisionLayerEnum.FISH, world2d.RaycastTypeEnum.ANY);
-        if (array.length > 0) {
+        this.$direction.rotate(Math.PI / 180 * -0.5);
+
+        const type: world2d.RaycastTypeEnum = world2d.RaycastTypeEnum.CLOSEST;
+        const layers: world2d.CollisionLayerEnum = world2d.CollisionLayerEnum.FISH;
+
+        const array: world2d.IRaycastResult[] = world2d.Physics2D.raycast(new world2d.Vector2D(380, 320), this.$direction, 250, layers, type);
+        if (array.length > 0 && type !== world2d.RaycastTypeEnum.ANY && type !== world2d.RaycastTypeEnum.ALL) {
             const res: world2d.IRaycastResult = array[0];
             world2d.DrawAPI2D.drawLine(new world2d.Vector2D(380, 320), res.p1, "#FFFFFF");
-            if (res.type === world2d.CrossTypeEnum.CROSS_2) {
-                world2d.DrawAPI2D.drawLine(res.p1, res.p2, "#FF00FF");
-            }
+            // if (res.type === world2d.CrossTypeEnum.CROSS_2) {
+            //     world2d.DrawAPI2D.drawLine(res.p1, res.p2, "#FF00FF");
+            // }
         }
+        else {
+            world2d.DrawAPI2D.drawLine(new world2d.Vector2D(380, 320), this.$direction.copy().normalize().mul(250).add(new world2d.Vector2D(380, 320)), "#FF0000");
+        }
+
+        // if (world2d.Helper2D.r2d(this.$direction.angle()) < 45 || world2d.Helper2D.r2d(this.$direction.angle()) > 250) {
+        //     this.$direction = new world2d.Vector2D(1, 0).rotate(world2d.Helper2D.d2r(45));
+        // }
 
         // const s1: world2d.ISegment2D = new world2d.Segment2D();
         // s1.assign(new world2d.Vector2D(100, 100), new world2d.Vector2D(400, 100));
