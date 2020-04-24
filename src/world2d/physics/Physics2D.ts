@@ -125,6 +125,9 @@ module world2d {
                 if (type === RaycastTypeEnum.ANY) {
                     break;
                 }
+                else if (type === RaycastTypeEnum.CLOSEST || type === RaycastTypeEnum.ALL_CLOSEST) {
+                    out.distance = out.p1.distanceTo(origin);
+                }
 
                 /**
                  * 以上为测试代码，正式发布时需要优化
@@ -132,24 +135,26 @@ module world2d {
                 out = null;
             }
 
+            // CLOSEST类型的射线得到的array长度己在上面作过限制了
             if (type === RaycastTypeEnum.ALL_CLOSEST && array.length > 1) {
                 const newArray: IRaycastResult[] = [];
+
                 while (array.length > 1) {
-                    let res: IRaycastResult = null;
+                    let res: IRaycastResult = array[0];
                     let index: number = 0;
-                    let distance: number = Helper2D.MAX_SAFE_INTEGER;
-                    for (let i: number = 0; i < array.length; i++) {
+
+                    for (let i: number = 1; i < array.length; i++) {
                         const item: IRaycastResult = array[i];
-                        const dis: number = origin.distanceToSquared(item.p1);
-                        if (res === null || dis < distance) {
+                        if (res === null || item.distance < res.distance) {
                             res = item;
                             index = i;
-                            distance = dis;
                         }
                     }
+
                     array.splice(index, 1);
                     newArray.push(res);
                 }
+
                 newArray.push(array[0]);
                 array = newArray;
             }
