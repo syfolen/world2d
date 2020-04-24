@@ -25,7 +25,7 @@ module world2d {
         p2: IVector2D;
 
         /**
-         * 近点法线
+         * 近点法线（似乎没卵用，故暂未实现）
          */
         normal: IVector2D;
 
