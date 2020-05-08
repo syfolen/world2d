@@ -7,42 +7,57 @@ declare module suncom {
         /**
          * 任意
          */
-        ANY = 0x01,
+        ANY = 0x1,
+
+        /**
+         * 开发测试
+         */
+        TDD = 0x2,
+
+        /**
+         * 验收测试
+         */
+        ATDD = 0x4,
+
+        /**
+         * 测试信息
+         */
+        TEST = 0x8,
 
         /**
          * 调试信息
          */
-        DEBUG = 0x02,
+        DEBUG = 0x10,
 
         /**
          * 工程模式
          */
-        ENGINEER = 0x04,
+        ENGINEER = 0x20,
 
         /**
          * 框架
          */
-        ENGINE = 0x08,
+        ENGINE = 0x40,
 
         /**
          * 原生
          */
-        NATIVE = 0x10,
+        NATIVE = 0x80,
 
         /**
          * 网络
          */
-        NETWORK = 0x20,
+        NETWORK = 0x100,
 
         /**
          * 网络心跳
          */
-        NETWORK_HEARTBEAT = 0x40,
+        NETWORK_HEARTBEAT = 0x200,
 
         /**
          * 普通
          */
-        NORMAL = 0x80
+        NORMAL = 0x400
     }
 
     /**
@@ -164,6 +179,107 @@ declare module suncom {
          * 移除事件
          */
         removeEventListener(type: string, method: Function, caller: Object): void;
+    }
+
+    /**
+     * 期望异常测试类接口
+     */
+    interface IExpect {
+        /**
+         * 期望相反
+         */
+        readonly not: IExpect;
+
+        /**
+         * 解释异常
+         */
+        interpret(str: string): IExpect;
+
+        /**
+         * 期望为任意值，但不为null和undefined
+         */
+        anything(): void;
+
+        /**
+         * 期望数组中包含
+         */
+        arrayContaining<T>(array: T[]): void;
+
+        /**
+         * 期望字符串中含有value
+         */
+        stringContaining(value: string): void;
+
+        /**
+         * 期望字符串被包含
+         */
+        stringMatching(value: string): void;
+
+        /**
+         * 期望存在属性
+         * @value: 若不为void 0，则同时校验值
+         */
+        toHaveProperty(key: string, value?: any): void;
+
+        /**
+         * 期望值为：value
+         */
+        toBe(value: any): void;
+
+        /**
+         * 期望值为：null
+         */
+        toBeNull(): void;
+
+        /**
+         * 期望值为：undefined
+         */
+        toBeUndefined(): void;
+
+        /**
+         * 期望对象类型为：cls
+         */
+        toBeInstanceOf(cls: new (...args: any[]) => any): void;
+
+        /**
+         * 期望在不关心类型的情况下，值在布尔上下文中为假
+         */
+        toBeFalsy(value: any): void;
+
+        /**
+         * 期望在不关心类型的情况下，值在布尔上下文中为真
+         */
+        toBeTruthy(value: any): void;
+
+        /**
+         * 期望数字大于
+         */
+        toBeGreaterThan(value: number): void;
+
+        /**
+         * 期望数字大于或等于
+         */
+        toBeGreaterOrEqualThan(value: number): void;
+
+        /**
+         * 期望数字小于
+         */
+        toBeLessThan(value: number): void;
+
+        /**
+         * 期望数字小于或等于
+         */
+        toBeLessOrEqualThan(value: number): void;
+
+        /**
+         * 深度相等
+         */
+        toEqual(value: any): void;
+
+        /**
+         * 深度相等且类型一致
+         */
+        toStrictEqual(value: any): void;
     }
 
     /**
@@ -396,11 +512,6 @@ declare module suncom {
         function getMethodName(method: Function, caller?: Object): string;
 
         /**
-         * 将枚举转化成字符串
-         */
-        function convertEnumToString(value: number, oEnum: any): string;
-
-        /**
          * 判断是否为数字
          */
         function isNumber(str: string | number): boolean;
@@ -447,13 +558,15 @@ declare module suncom {
          * 时间累加
          * @datepart: yy, MM, ww, dd, hh, mm, ss, ms
          * @increment： 增量，可为负
-         * @arg2: 时间参数
+         * @time: 时间参数
+         * @return: 时间戳
          */
         function dateAdd(datepart: string, increment: number, time: string | number | Date): number;
 
         /**
          * 计算时间差
          * @datepart: yy, MM, ww, dd, hh, mm, ss, ms
+         * @return: 时间戳
          */
         function dateDiff(datepart: string, date: string | number | Date, date2: string | number | Date): number;
 
@@ -506,6 +619,11 @@ declare module suncom {
          * 将数据从数组中移除
          */
         function removeItemsFromArray<T>(items: T[], array: T[]): void;
+
+        /**
+         * 判断深度相等
+         */
+        function isEqual(oldData: any, newData: any, strict: boolean): boolean;
 
         /**
          * 比较版本号
@@ -621,6 +739,38 @@ declare module suncom {
          * 1. 此事件仅在Global.debugMode为DebugMode.DEBUG时才会被派发
          */
         const DEBUG_PRINT: string;
+
+        /**
+         * 测试等待信号 { id: number, handler: suncom.IHandler = null}
+         */
+        const TEST_WAIT: string;
+
+        /**
+         * 测试发射信号 { id: number, args?: any }
+         */
+        const TEST_EMIT: string;
+
+        /**
+         * 测试发送事件 { id: number, act: string, out: suncore.ITestSeqInfo }
+         * @act: "exe" or "reg", exe为执行点击行为，reg为注册点击行为
+         */
+        const TEST_EVENT: string;
+
+        /**
+         * 测试下行协议 { id: number, act: string, out: suncore.ITestSeqInfo }
+         * @act: "exe" or "reg", exe为执行下行行为，reg为注册下行行为
+         */
+        const TEST_PROTOCAL: string;
+
+        /**
+         * 测试注册按钮事件 { id: number, button?: any, once: boolean = true }
+         */
+        const TEST_REG_BUTTON: string;
+
+        /**
+         * 测试点击按钮事件 { btnId: number, type: string | Laya.Event = Laya.Event.CLICK }
+         */
+        const TEST_CLICK_BUTTON: string;
     }
 
     /**
@@ -667,5 +817,70 @@ declare module suncom {
          * 返回一个随机数
          */
         function random(): number;
+    }
+
+    /**
+     * 测试类
+     */
+    namespace Test {
+        /**
+         * 断言是否失败，默认为：false
+         */
+        let ASSERT_FAILED: boolean;
+
+        /**
+         * 断言失败时是否自动断点，默认为：true
+         */
+        let ASSERT_BREAKPOINT: boolean;
+
+        /**
+         * 启用微服务器，默认为：false
+         */
+        let ENABLE_MICRO_SERVER: boolean;
+
+        /**
+         * 期望测试
+         */
+        function expect(value: any, description?: string): IExpect;
+
+        /**
+         * 期望之外的，执行此方法时直接触发ASSERT_FAILED
+         */
+        function notExpected(message?: string): void;
+
+        /**
+         * 测试表达式是否为true
+         */
+        function assertTrue(value: boolean, message?: string): void;
+
+        /**
+         * 测试表达式是否为false
+         */
+        function assertFalse(value: boolean, message?: string): void;
+
+        /**
+         * 等待信号，同一时间只允许监听一个测试信号
+         */
+        function wait(id: number, handler?: IHandler): void;
+
+        /**
+         * 发射信号
+         */
+        function emit(id: number, args?: any): void;
+
+        /**
+         * 点击按钮
+         * @event: 默认为：Laya.Event.CLICK
+         * 说明：
+         * 1. 按钮的点击会延时500毫秒执行
+         */
+        function click(btnId: number, event?: string | Laya.Event): void;
+
+        /**
+         * 注册按钮
+         * @id: 按钮编号，若为-1则清除所有按钮
+         * @once: 一次性的按钮，默认为：true
+         */
+        function regButton(id: number, button?: any, once?: boolean): void;
     }
 }
