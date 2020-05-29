@@ -6,21 +6,25 @@ module world2d {
     export namespace Helper2D {
         /**
          * PI
+         * export
          */
         export const PI: number = Math.PI;
 
         /**
          * 2PI
+         * export
          */
         export const PI2: number = Math.PI * 2;
 
         /**
          * 整数的最大安全值
+         * export
          */
         export const MAX_SAFE_INTEGER: number = 9007199254740991;
 
         /**
          * 整数的最小安全值
+         * export
          */
         export const MIN_SAFE_INTEGER: number = -9007199254740991;
 

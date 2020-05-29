@@ -36,6 +36,7 @@ module world2d {
 
         /**
          * 相加
+         * export
          */
         add(vec2: IPoint2D): IVector2D {
             this.x += vec2.x;
@@ -45,6 +46,7 @@ module world2d {
 
         /**
          * 相减
+         * export
          */
         sub(vec2: IPoint2D): IVector2D {
             this.x -= vec2.x;
@@ -54,6 +56,7 @@ module world2d {
 
         /**
          * 相乘
+         * export
          */
         mul(value: number): IVector2D {
             this.x *= value;
@@ -63,6 +66,7 @@ module world2d {
 
         /**
          * 点积
+         * export
          */
         dot(a: IPoint2D): number {
             return this.x * a.x + this.y * a.y;
@@ -70,6 +74,7 @@ module world2d {
 
         /**
          * 叉积
+         * export
          */
         cross(a: IPoint2D): number {
             return this.x * a.y - this.y * a.x;
@@ -77,6 +82,7 @@ module world2d {
 
         /**
          * 相反
+         * export
          */
         negate(): IVector2D {
             this.x = -this.x;
@@ -114,6 +120,7 @@ module world2d {
 
         /**
          * 归零
+         * export
          */
         zero(): IVector2D {
             this.x = this.y = 0;
@@ -123,6 +130,7 @@ module world2d {
         /**
          * 返回新的向量作为当前向量的法向量
          * NOTE：法向量与向量相交，且相互垂直，向量的法向量为(-y,x)或(y,-x)
+         * export
          */
         normal(): IVector2D {
             return new Vector2D(this.y, -this.x);
@@ -130,6 +138,7 @@ module world2d {
 
         /**
          * 归一
+         * export
          */
         normalize(): IVector2D {
             const length: number = this.length();
@@ -151,6 +160,7 @@ module world2d {
 
         /**
          * 长度平方
+         * export
          */
         lengthSquared(): number {
             return this.x * this.x + this.y * this.y;
@@ -158,6 +168,7 @@ module world2d {
 
         /**
          * 计算到指定位置的距离
+         * export
          */
         distanceTo(p: IPoint2D): number {
             const dx: number = this.x - p.x;
@@ -167,6 +178,7 @@ module world2d {
 
         /**
          * 计算到指定位置的距离平方
+         * export
          */
         distanceToSquared(p: IPoint2D): number {
             const dx: number = this.x - p.x;
@@ -176,6 +188,7 @@ module world2d {
 
         /**
          * 拷贝
+         * export
          */
         copy(): IVector2D {
             return new Vector2D(this.x, this.y);
@@ -183,6 +196,7 @@ module world2d {
 
         /**
          * 输出向量值
+         * export
          */
         toString(): string {
             return `{${this.x},${this.y}}`;
@@ -190,6 +204,7 @@ module world2d {
 
         /**
          * 两向量相加
+         * export
          */
         static add(a: IPoint2D, b: IPoint2D): IVector2D {
             return new Vector2D(a.x + b.x, a.y + b.y);
@@ -197,6 +212,7 @@ module world2d {
 
         /**
          * 两向量相减
+         * export
          */
         static sub(a: IPoint2D, b: IPoint2D): IVector2D {
             return new Vector2D(b.x - a.x, b.y - a.y);
@@ -204,6 +220,7 @@ module world2d {
 
         /**
          * 法向量
+         * export
          */
         static normal(a: IPoint2D, b: IPoint2D): IVector2D {
             return new Vector2D(b.y - a.y, a.x - b.x);
@@ -211,6 +228,7 @@ module world2d {
 
         /**
          * 计算两个向量之间的夹角
+         * export
          */
         static angle(a: IVector2D, b: IVector2D): number {
             const m: number = a.length();
