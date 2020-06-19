@@ -34,7 +34,7 @@ module world2d {
                 radian += Vector2D.angle(Vector2D.sub(a, p), Vector2D.sub(b, p));
             }
 
-            return Helper2D.abs(Helper2D.r2d(radian) - 360) < 0.01;
+            return suncom.Common.abs(suncom.Common.r2d(radian) - 360) < 0.01;
         }
 
         /**
@@ -94,7 +94,7 @@ module world2d {
             // 与圆最近的顶点
             let nearestVertex: IVector2D = null;
             // 最小距离
-            let nearestDistanceSquared: number = Helper2D.MAX_SAFE_INTEGER;
+            let nearestDistanceSquared: number = suncom.Common.MAX_SAFE_INTEGER;
             // 最小距离是否小于或等于半径
             let distanceLessOrEqualThanRadius: boolean = false;
 
@@ -171,10 +171,10 @@ module world2d {
             const k: number = direction.y / direction.x;
             const m: number = direction.x / direction.y;
 
-            let min1: number = Helper2D.MAX_SAFE_INTEGER;
-            let max1: number = Helper2D.MIN_SAFE_INTEGER;
-            let min2: number = Helper2D.MAX_SAFE_INTEGER;
-            let max2: number = Helper2D.MIN_SAFE_INTEGER;
+            let min1: number = suncom.Common.MAX_SAFE_INTEGER;
+            let max1: number = suncom.Common.MIN_SAFE_INTEGER;
+            let min2: number = suncom.Common.MAX_SAFE_INTEGER;
+            let max2: number = suncom.Common.MIN_SAFE_INTEGER;
 
             let x: number = 0, y: number = 0;
             let collide: boolean = false;

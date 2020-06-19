@@ -173,15 +173,15 @@ module world2d {
          */
         private $updateRadian(radian: number): void {
             if (radian < 0) {
-                radian %= Helper2D.PI2;
-                radian += Helper2D.PI2;
+                radian %= suncom.Common.PI2;
+                radian += suncom.Common.PI2;
             }
-            else if (radian >= Helper2D.PI2) {
-                radian %= Helper2D.PI2;
+            else if (radian >= suncom.Common.PI2) {
+                radian %= suncom.Common.PI2;
             }
             if (this.$rotateTo !== radian) {
                 this.$rotateTo = radian;
-                this.$rotation = Helper2D.r2d(radian);
+                this.$rotation = suncom.Common.r2d(radian);
             }
         }
 
@@ -283,7 +283,7 @@ module world2d {
          * export
          */
         setRotation(rotation: number): void {
-            this.rotateTo(Helper2D.d2r(rotation));
+            this.rotateTo(suncom.Common.d2r(rotation));
         }
 
         /**

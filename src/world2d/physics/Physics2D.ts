@@ -53,10 +53,10 @@ module world2d {
             // 线射碰撞盒
             const bounds: IBounds = new Bounds();
             bounds.updateBounds(
-                Helper2D.min(origin.x, destination.x),
-                Helper2D.max(origin.x, destination.x),
-                Helper2D.min(origin.y, destination.y),
-                Helper2D.max(origin.y, destination.y)
+                suncom.Common.min(origin.x, destination.x),
+                suncom.Common.max(origin.x, destination.x),
+                suncom.Common.min(origin.y, destination.y),
+                suncom.Common.max(origin.y, destination.y)
             );
             // DrawAPI2D.drawRect(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, "#FF0000");
 
@@ -111,10 +111,10 @@ module world2d {
                     }
                     array[0] = out;
                     bounds.updateBounds(
-                        Helper2D.min(origin.x, out.p1.x),
-                        Helper2D.max(origin.x, out.p1.x),
-                        Helper2D.min(origin.y, out.p1.y),
-                        Helper2D.max(origin.y, out.p1.y)
+                        suncom.Common.min(origin.x, out.p1.x),
+                        suncom.Common.max(origin.x, out.p1.x),
+                        suncom.Common.min(origin.y, out.p1.y),
+                        suncom.Common.max(origin.y, out.p1.y)
                     );
                     // DrawAPI2D.drawRect(bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, "#FF0000");
                 }
