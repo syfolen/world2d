@@ -57,20 +57,20 @@ module world2d {
                 // 否则需要考虑旋转极限
                 else {
                     // 转向极限
-                    let min: number = this.transform.rotation - suncom.Common.PI;
-                    let max: number = this.transform.rotation + suncom.Common.PI;
+                    let min: number = this.transform.rotation - suncom.Mathf.PI;
+                    let max: number = this.transform.rotation + suncom.Mathf.PI;
 
                     if (rotate2 < min) {
-                        rotate2 += suncom.Common.PI2;
+                        rotate2 += suncom.Mathf.PI2;
                     }
                     else if (rotate2 > max) {
-                        rotate2 -= suncom.Common.PI2;
+                        rotate2 -= suncom.Mathf.PI2;
                     }
 
                     // 需要旋转的弧度值
                     const rotation: number = rotate2 - this.transform.rotation;
                     // 扭矩限制转向能力
-                    const torque: number = suncom.Common.clamp(this.$torque * delta * 10, 0, suncom.Common.PI);
+                    const torque: number = suncom.Mathf.clamp(this.$torque * delta * 10, 0, suncom.Mathf.PI);
 
                     // 转向
                     if (rotation < -torque) {
@@ -97,10 +97,10 @@ module world2d {
          * 扭矩（最大转向角度）
          */
         get torque(): number {
-            return suncom.Common.r2d(this.$torque);
+            return suncom.Mathf.r2d(this.$torque);
         }
         set torque(value: number) {
-            this.$torque = suncom.Common.d2r(value);
+            this.$torque = suncom.Mathf.d2r(value);
         }
     }
 }
