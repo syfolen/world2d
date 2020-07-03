@@ -5,6 +5,11 @@ module world2d {
      * export
      */
     export interface IEntity {
+        /**
+         * 对象主体
+         * export
+         */
+        body: any;
 
         /**
          * 碰撞产生
