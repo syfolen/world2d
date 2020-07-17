@@ -5,11 +5,12 @@ module world2d {
      * export
      */
     export interface IEntity {
+
         /**
-         * 对象主体
+         * 设置对象主体
          * export
          */
-        body: any;
+        setBody(body: any): void;
 
         /**
          * 碰撞产生
@@ -28,6 +29,12 @@ module world2d {
          * export
          */
         onCollisionExit(other: IEntity): void;
+
+        /**
+         * 对象主体
+         * export
+         */
+        readonly body: any;
 
         /**
          * 物理数据转换器
