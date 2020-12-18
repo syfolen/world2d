@@ -19,82 +19,64 @@ var suncom;
         EnvMode[EnvMode["DEVELOP"] = 0] = "DEVELOP";
         EnvMode[EnvMode["DEBUG"] = 1] = "DEBUG";
         EnvMode[EnvMode["WEB"] = 2] = "WEB";
+        EnvMode[EnvMode["NATIVE"] = 3] = "NATIVE";
     })(EnvMode = suncom.EnvMode || (suncom.EnvMode = {}));
     var EventPriorityEnum;
     (function (EventPriorityEnum) {
-        EventPriorityEnum[EventPriorityEnum["LAZY"] = 0] = "LAZY";
+        EventPriorityEnum[EventPriorityEnum["LOWEST"] = 0] = "LOWEST";
         EventPriorityEnum[EventPriorityEnum["LOW"] = 1] = "LOW";
         EventPriorityEnum[EventPriorityEnum["MID"] = 2] = "MID";
         EventPriorityEnum[EventPriorityEnum["HIGH"] = 3] = "HIGH";
-        EventPriorityEnum[EventPriorityEnum["FWL"] = 4] = "FWL";
-        EventPriorityEnum[EventPriorityEnum["EGL"] = 5] = "EGL";
-        EventPriorityEnum[EventPriorityEnum["OSL"] = 6] = "OSL";
+        EventPriorityEnum[EventPriorityEnum["HIGHEST"] = 4] = "HIGHEST";
+        EventPriorityEnum[EventPriorityEnum["FWL"] = 5] = "FWL";
+        EventPriorityEnum[EventPriorityEnum["EGL"] = 6] = "EGL";
+        EventPriorityEnum[EventPriorityEnum["OSL"] = 7] = "OSL";
     })(EventPriorityEnum = suncom.EventPriorityEnum || (suncom.EventPriorityEnum = {}));
+    var EventInfo = (function () {
+        function EventInfo() {
+            this.type = null;
+            this.caller = null;
+            this.method = null;
+            this.priority = EventPriorityEnum.MID;
+            this.receiveOnce = false;
+        }
+        EventInfo.prototype.recover = function () {
+            this.caller = null;
+            this.method = null;
+            Pool.recover("suncom.EventInfo", this);
+        };
+        return EventInfo;
+    }());
+    suncom.EventInfo = EventInfo;
     var EventSystem = (function () {
         function EventSystem() {
-            this.$events = {};
-            this.$onceList = [];
-            this.$isCanceled = false;
+            this.$var_events = {};
+            this.$var_lockers = {};
+            this.$var_onceList = [];
+            this.$var_isCanceled = false;
         }
-        EventSystem.prototype.dispatchCancel = function () {
-            this.$isCanceled = true;
-        };
-        EventSystem.prototype.dispatchEvent = function (type, args, cancelable) {
-            if (cancelable === void 0) { cancelable = false; }
-            if (Common.isStringInvalidOrEmpty(type) === true) {
-                throw Error("\u6D3E\u53D1\u65E0\u6548\u4E8B\u4EF6\uFF01\uFF01\uFF01");
-            }
-            var list = this.$events[type] || null;
-            if (list === null) {
-                return;
-            }
-            list[0] = true;
-            var isCanceled = this.$isCanceled;
-            this.$isCanceled = false;
-            for (var i = 1; i < list.length; i++) {
-                var event_1 = list[i];
-                if (event_1.receiveOnce === true) {
-                    this.$onceList.push(event_1);
-                }
-                if (args === void 0) {
-                    event_1.method.call(event_1.caller);
-                }
-                else if (args instanceof Array) {
-                    event_1.method.apply(event_1.caller, args);
-                }
-                else {
-                    event_1.method.call(event_1.caller, args);
-                }
-                if (cancelable === true && this.$isCanceled) {
-                    break;
-                }
-            }
-            this.$isCanceled = isCanceled;
-            list[0] = false;
-            while (this.$onceList.length > 0) {
-                var event_2 = this.$onceList.pop();
-                this.removeEventListener(event_2.type, event_2.method, event_2.caller);
-            }
-        };
         EventSystem.prototype.addEventListener = function (type, method, caller, receiveOnce, priority) {
             if (receiveOnce === void 0) { receiveOnce = false; }
-            if (priority === void 0) { priority = EventPriorityEnum.LOW; }
-            if (Common.isStringInvalidOrEmpty(type) === true) {
+            if (priority === void 0) { priority = EventPriorityEnum.MID; }
+            if (Common.isStringNullOrEmpty(type) === true) {
                 throw Error("\u6CE8\u518C\u65E0\u6548\u4E8B\u4EF6\uFF01\uFF01\uFF01");
             }
             if (method === void 0 || method === null) {
                 throw Error("\u6CE8\u518C\u65E0\u6548\u7684\u4E8B\u4EF6\u56DE\u8C03\uFF01\uFF01\uFF01");
             }
-            var list = this.$events[type] || null;
-            if (list === null) {
-                list = this.$events[type] = [false];
+            if (caller === void 0) {
+                caller = null;
             }
-            else if (list[0] === true) {
-                list = this.$events[type] = list.slice(0);
-                list[0] = false;
+            var list = this.$var_events[type];
+            if (list === void 0) {
+                list = this.$var_events[type] = [];
+            }
+            else if (this.$var_lockers[type] === true) {
+                this.$var_events[type] = list = list.slice(0);
+                this.$var_lockers[type] = false;
             }
             var index = -1;
-            for (var i = 1; i < list.length; i++) {
+            for (var i = 0; i < list.length; i++) {
                 var item = list[i];
                 if (item.method === method && item.caller === caller) {
                     return;
@@ -103,13 +85,12 @@ var suncom;
                     index = i;
                 }
             }
-            var event = {
-                type: type,
-                method: method,
-                caller: caller,
-                priority: priority,
-                receiveOnce: receiveOnce
-            };
+            var event = Pool.getItemByClass("suncom.EventInfo", EventInfo);
+            event.type = type;
+            event.caller = caller;
+            event.method = method;
+            event.priority = priority;
+            event.receiveOnce = receiveOnce;
             if (index < 0) {
                 list.push(event);
             }
@@ -118,30 +99,75 @@ var suncom;
             }
         };
         EventSystem.prototype.removeEventListener = function (type, method, caller) {
-            if (Common.isStringInvalidOrEmpty(type) === true) {
+            if (Common.isStringNullOrEmpty(type) === true) {
                 throw Error("\u79FB\u9664\u65E0\u6548\u7684\u4E8B\u4EF6\uFF01\uFF01\uFF01");
             }
             if (method === void 0 || method === null) {
                 throw Error("\u79FB\u9664\u65E0\u6548\u7684\u4E8B\u4EF6\u56DE\u8C03\uFF01\uFF01\uFF01");
             }
-            var list = this.$events[type] || null;
-            if (list === null) {
+            if (caller === void 0) {
+                caller = null;
+            }
+            var list = this.$var_events[type];
+            if (list === void 0) {
                 return;
             }
-            if (list[0] === true) {
-                list = this.$events[type] = list.slice(0);
-                list[0] = false;
+            if (this.$var_lockers[type] === true) {
+                this.$var_events[type] = list = list.slice(0);
+                this.$var_lockers[type] = false;
             }
             for (var i = 0; i < list.length; i++) {
-                var event_3 = list[i];
-                if (event_3.method === method && event_3.caller === caller) {
-                    list.splice(i, 1);
+                var event_1 = list[i];
+                if (event_1.method === method && event_1.caller === caller) {
+                    list.splice(i, 1)[0].recover();
                     break;
                 }
             }
-            if (list.length === 1) {
-                delete this.$events[type];
+            if (list.length === 0) {
+                delete this.$var_events[type];
+                delete this.$var_lockers[type];
             }
+        };
+        EventSystem.prototype.dispatchEvent = function (type, data, cancelable) {
+            if (cancelable === void 0) { cancelable = true; }
+            if (Common.isStringNullOrEmpty(type) === true) {
+                throw Error("\u6D3E\u53D1\u65E0\u6548\u4E8B\u4EF6\uFF01\uFF01\uFF01");
+            }
+            var list = this.$var_events[type];
+            if (list === void 0) {
+                return;
+            }
+            this.$var_lockers[type] = true;
+            var isCanceled = this.$var_isCanceled;
+            this.$var_isCanceled = false;
+            for (var i = 0; i < list.length; i++) {
+                var event_2 = list[i];
+                if (event_2.receiveOnce === true) {
+                    this.$var_onceList.push(event_2);
+                }
+                if (data instanceof Array) {
+                    event_2.method.apply(event_2.caller, data);
+                }
+                else {
+                    event_2.method.call(event_2.caller, data);
+                }
+                if (this.$var_isCanceled) {
+                    if (cancelable === true) {
+                        break;
+                    }
+                    console.error("\u5C1D\u8BD5\u53D6\u6D88\u4E0D\u53EF\u88AB\u53D6\u6D88\u7684\u4E8B\u4EF6\uFF1A" + type);
+                    this.$var_isCanceled = false;
+                }
+            }
+            this.$var_isCanceled = isCanceled;
+            this.$var_lockers[type] = false;
+            while (this.$var_onceList.length > 0) {
+                var event_3 = this.$var_onceList.pop();
+                this.removeEventListener(event_3.type, event_3.method, event_3.caller);
+            }
+        };
+        EventSystem.prototype.dispatchCancel = function () {
+            this.$var_isCanceled = true;
         };
         return EventSystem;
     }());
@@ -149,25 +175,26 @@ var suncom;
     var Expect = (function () {
         function Expect(description) {
             if (description === void 0) { description = null; }
-            this.$asNot = false;
-            this.$interpretation = null;
+            this.$var_value = void 0;
+            this.$var_asNot = false;
+            this.$var_interpretation = null;
             if (Global.debugMode & DebugMode.TEST) {
                 description !== null && Logger.log(DebugMode.ANY, description);
             }
         }
         Expect.prototype.expect = function (value) {
-            this.$value = value;
+            this.$var_value = value;
             return this;
         };
         Expect.prototype.interpret = function (str) {
-            this.$interpretation = str;
+            this.$var_interpretation = str;
             return this;
         };
         Expect.prototype.test = function (pass, message) {
-            if ((this.$asNot === false && pass === false) || (this.$asNot === true && pass === true)) {
+            if ((this.$var_asNot === false && pass === false) || (this.$var_asNot === true && pass === true)) {
                 Test.ASSERT_FAILED = true;
                 message !== null && Logger.error(DebugMode.ANY, message);
-                this.$interpretation !== null && Logger.error(DebugMode.ANY, this.$interpretation);
+                this.$var_interpretation !== null && Logger.error(DebugMode.ANY, this.$var_interpretation);
                 if (Test.ASSERT_BREAKPOINT === true) {
                     debugger;
                 }
@@ -176,8 +203,8 @@ var suncom;
         };
         Expect.prototype.anything = function () {
             if (Global.debugMode & DebugMode.TEST) {
-                var pass = this.$value !== null && this.$value !== void 0;
-                var message = "\u671F\u671B\u503C" + (this.$asNot === false ? "" : "不为") + "\uFF1Anull or undefined, \u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(this.$value);
+                var pass = this.$var_value !== null && this.$var_value !== void 0;
+                var message = "\u671F\u671B\u503C" + (this.$var_asNot === false ? "" : "不为") + "\uFF1Anull or undefined, \u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(this.$var_value);
                 this.test(pass, message);
             }
         };
@@ -186,40 +213,40 @@ var suncom;
                 var pass = true;
                 for (var i = 0; i < array.length; i++) {
                     var value = array[i];
-                    if (this.$value.indexOf(value) < 0) {
+                    if (this.$var_value.indexOf(value) < 0) {
                         pass = false;
                         break;
                     }
                 }
-                var message = "\u671F\u671B" + (this.$asNot === false ? "" : "不") + "\u5305\u542B\uFF1A" + Common.toDisplayString(array) + ", \u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(this.$value);
+                var message = "\u671F\u671B" + (this.$var_asNot === false ? "" : "不") + "\u5305\u542B\uFF1A" + Common.toDisplayString(array) + ", \u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(this.$var_value);
                 this.test(pass, message);
             }
         };
         Expect.prototype.stringContaining = function (value) {
             if (Global.debugMode & DebugMode.TEST) {
-                var pass = this.$value.indexOf(value) > -1;
-                var message = "\u671F\u671B" + (this.$asNot === false ? "" : "不") + "\u5305\u542B\uFF1A" + value + ", \u5B9E\u9645\u503C\uFF1A" + this.$value;
+                var pass = this.$var_value.indexOf(value) > -1;
+                var message = "\u671F\u671B" + (this.$var_asNot === false ? "" : "不") + "\u5305\u542B\uFF1A" + value + ", \u5B9E\u9645\u503C\uFF1A" + this.$var_value;
                 this.test(pass, message);
             }
         };
         Expect.prototype.stringMatching = function (value) {
             if (Global.debugMode & DebugMode.TEST) {
-                var pass = value.indexOf(this.$value) > -1;
-                var message = "\u671F\u671B" + (this.$asNot === false ? "" : "不") + "\u88AB\u5305\u542B\uFF1A" + value + ", \u5B9E\u9645\u503C\uFF1A" + this.$value;
+                var pass = value.indexOf(this.$var_value) > -1;
+                var message = "\u671F\u671B" + (this.$var_asNot === false ? "" : "不") + "\u88AB\u5305\u542B\uFF1A" + value + ", \u5B9E\u9645\u503C\uFF1A" + this.$var_value;
                 this.test(pass, message);
             }
         };
         Expect.prototype.toHaveProperty = function (key, value) {
             if (Global.debugMode & DebugMode.TEST) {
-                var pass = value === void 0 ? this.$value[key] !== void 0 : this.$value[key] === value;
-                var message = "\u671F\u671B" + (this.$asNot === false ? "" : "不") + "\u5B58\u5728\u5C5E\u6027\uFF1A" + key + ", \u5B9E\u9645\u503C\uFF1A" + this.$value;
+                var pass = value === void 0 ? this.$var_value[key] !== void 0 : this.$var_value[key] === value;
+                var message = "\u671F\u671B" + (this.$var_asNot === false ? "" : "不") + "\u5B58\u5728\u5C5E\u6027\uFF1A" + key + ", \u5B9E\u9645\u503C\uFF1A" + this.$var_value;
                 this.test(pass, message);
             }
         };
         Expect.prototype.toBe = function (value) {
             if (Global.debugMode & DebugMode.TEST) {
-                var pass = this.$value === value;
-                var message = "\u671F\u671B\u503C" + (this.$asNot === false ? "" : "不为") + "\uFF1A" + Common.toDisplayString(value) + ", \u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(this.$value);
+                var pass = this.$var_value === value;
+                var message = "\u671F\u671B\u503C" + (this.$var_asNot === false ? "" : "不为") + "\uFF1A" + Common.toDisplayString(value) + ", \u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(this.$var_value);
                 this.test(pass, message);
             }
         };
@@ -231,154 +258,189 @@ var suncom;
         };
         Expect.prototype.toBeBoolean = function () {
             if (Global.debugMode & DebugMode.TEST) {
-                var pass = typeof this.$value === "boolean";
-                var message = "\u671F\u671B" + (this.$asNot === false ? "为" : "不为") + "\uFF1A\u5E03\u5C14\u7C7B\u578B, \u5B9E\u9645\u4E3A\uFF1A" + typeof this.$value;
+                var pass = typeof this.$var_value === "boolean";
+                var message = "\u671F\u671B" + (this.$var_asNot === false ? "为" : "不为") + "\uFF1A\u5E03\u5C14\u7C7B\u578B, \u5B9E\u9645\u4E3A\uFF1A" + typeof this.$var_value;
                 this.test(pass, message);
             }
         };
         Expect.prototype.toBeInstanceOf = function (cls) {
             if (Global.debugMode & DebugMode.TEST) {
-                var pass = this.$value instanceof cls;
-                var message = "\u671F\u671B " + Common.getQualifiedClassName(this.$value) + " \u7684\u7C7B\u578B" + (this.$asNot === false ? "" : "不") + "\u4E3A " + Common.getClassName(cls);
+                var pass = this.$var_value instanceof cls;
+                var message = "\u671F\u671B " + Common.getQualifiedClassName(this.$var_value) + " \u7684\u7C7B\u578B" + (this.$var_asNot === false ? "" : "不") + "\u4E3A " + Common.getClassName(cls);
                 this.test(pass, message);
             }
         };
         Expect.prototype.toBeFalsy = function (value) {
             if (Global.debugMode & DebugMode.TEST) {
                 var pass = value ? false : true;
-                var message = "\u671F\u671B " + Common.toDisplayString(value) + " " + (this.$asNot === false ? "" : "不") + "\u4E3A\u5047, \u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(this.$value);
+                var message = "\u671F\u671B " + Common.toDisplayString(value) + " " + (this.$var_asNot === false ? "" : "不") + "\u4E3A\u5047, \u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(this.$var_value);
                 this.test(pass, message);
             }
         };
         Expect.prototype.toBeTruthy = function (value) {
             if (Global.debugMode & DebugMode.TEST) {
                 var pass = value ? true : false;
-                var message = "\u671F\u671B " + Common.toDisplayString(value) + " " + (this.$asNot === false ? "" : "不") + "\u4E3A\u5047, \u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(this.$value);
+                var message = "\u671F\u671B " + Common.toDisplayString(value) + " " + (this.$var_asNot === false ? "" : "不") + "\u4E3A\u5047, \u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(this.$var_value);
                 this.test(pass, message);
             }
         };
         Expect.prototype.toBeCloseTo = function (value, deviation) {
             if (deviation === void 0) { deviation = 0; }
             if (Global.debugMode & DebugMode.TEST) {
-                var pass = Math.abs(this.$value - value) <= Math.abs(deviation);
-                var message = "\u671F\u671B\u4E0E" + value + "\u7684\u8BEF\u5DEE" + (this.$asNot === true ? "" : "不") + "\u8D85\u8FC7" + deviation + "\uFF0C\u5B9E\u9645\u503C\uFF1A" + this.$value;
+                var pass = Math.abs(this.$var_value - value) <= Math.abs(deviation);
+                var message = "\u671F\u671B\u4E0E" + value + "\u7684\u8BEF\u5DEE" + (this.$var_asNot === true ? "" : "不") + "\u8D85\u8FC7" + deviation + "\uFF0C\u5B9E\u9645\u503C\uFF1A" + this.$var_value;
                 this.test(pass, message);
             }
         };
         Expect.prototype.toBeGreaterThan = function (value) {
             if (Global.debugMode & DebugMode.TEST) {
-                var pass = this.$value > value;
-                var message = "\u671F\u671B" + (this.$asNot === true ? "" : "不") + "\u5927\u4E8E " + value + "\uFF0C\u5B9E\u9645\u503C\uFF1A" + this.$value;
+                var pass = this.$var_value > value;
+                var message = "\u671F\u671B" + (this.$var_asNot === true ? "" : "不") + "\u5927\u4E8E " + value + "\uFF0C\u5B9E\u9645\u503C\uFF1A" + this.$var_value;
                 this.test(pass, message);
             }
         };
         Expect.prototype.toBeGreaterOrEqualThan = function (value) {
             if (Global.debugMode & DebugMode.TEST) {
-                var pass = this.$value >= value;
-                var message = "\u671F\u671B" + (this.$asNot === true ? "" : "不") + "\u5927\u4E8E\u7B49\u4E8E " + value + "\uFF0C\u5B9E\u9645\u503C\uFF1A" + this.$value;
+                var pass = this.$var_value >= value;
+                var message = "\u671F\u671B" + (this.$var_asNot === true ? "" : "不") + "\u5927\u4E8E\u7B49\u4E8E " + value + "\uFF0C\u5B9E\u9645\u503C\uFF1A" + this.$var_value;
                 this.test(pass, message);
             }
         };
         Expect.prototype.toBeLessThan = function (value) {
             if (Global.debugMode & DebugMode.TEST) {
-                var pass = this.$value < value;
-                var message = "\u671F\u671B" + (this.$asNot === true ? "" : "不") + "\u5C0F\u4E8E " + value + "\uFF0C\u5B9E\u9645\u503C\uFF1A" + this.$value;
+                var pass = this.$var_value < value;
+                var message = "\u671F\u671B" + (this.$var_asNot === true ? "" : "不") + "\u5C0F\u4E8E " + value + "\uFF0C\u5B9E\u9645\u503C\uFF1A" + this.$var_value;
                 this.test(pass, message);
             }
         };
         Expect.prototype.toBeLessOrEqualThan = function (value) {
             if (Global.debugMode & DebugMode.TEST) {
-                var pass = this.$value <= value;
-                var message = "\u671F\u671B" + (this.$asNot === true ? "" : "不") + "\u5C0F\u4E8E\u7B49\u4E8E " + value + "\uFF0C\u5B9E\u9645\u503C\uFF1A" + this.$value;
+                var pass = this.$var_value <= value;
+                var message = "\u671F\u671B" + (this.$var_asNot === true ? "" : "不") + "\u5C0F\u4E8E\u7B49\u4E8E " + value + "\uFF0C\u5B9E\u9645\u503C\uFF1A" + this.$var_value;
                 this.test(pass, message);
             }
         };
         Expect.prototype.toEqual = function (value) {
             if (Global.debugMode & DebugMode.TEST) {
-                var pass = Common.isEqual(this.$value, value, false);
-                var message = "\u671F\u671B\u76F8\u7B49\uFF1A" + Common.toDisplayString(value) + "\uFF0C\u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(this.$value);
+                var pass = Common.isEqual(this.$var_value, value, false);
+                var message = "\u671F\u671B\u76F8\u7B49\uFF1A" + Common.toDisplayString(value) + "\uFF0C\u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(this.$var_value);
                 this.test(pass, message);
             }
         };
         Expect.prototype.toStrictEqual = function (value) {
             if (Global.debugMode & DebugMode.TEST) {
-                var pass = Common.isEqual(this.$value, value, true);
-                var message = "\u671F\u671B\u76F8\u7B49\uFF1A" + Common.toDisplayString(value) + "\uFF0C\u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(this.$value);
+                var pass = Common.isEqual(this.$var_value, value, true);
+                var message = "\u671F\u671B\u76F8\u7B49\uFF1A" + Common.toDisplayString(value) + "\uFF0C\u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(this.$var_value);
                 this.test(pass, message);
             }
         };
         Object.defineProperty(Expect.prototype, "not", {
             get: function () {
-                this.$asNot = true;
+                this.$var_asNot = true;
                 return this;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         return Expect;
     }());
     suncom.Expect = Expect;
     var Handler = (function () {
-        function Handler(caller, method, args) {
-            this.$args = args;
-            this.$caller = caller;
-            this.$method = method;
+        function Handler() {
+            this.$var_id = 0;
+            this.$var_args = null;
+            this.$var_caller = null;
+            this.$var_method = null;
+            this.$var_once = false;
         }
-        Handler.prototype.run = function () {
-            if (this.$args === void 0) {
-                return this.$method.call(this.$caller);
+        Handler.prototype.setTo = function (caller, method, args, once) {
+            if (args === void 0) { args = null; }
+            if (once === void 0) { once = true; }
+            if (this.$var_id === -1) {
+                throw Error("Handler\u5DF1\u88AB\u56DE\u6536\uFF01\uFF01\uFF01");
             }
-            return this.$method.apply(this.$caller, this.$args);
+            this.$var_id = Common.createHashId();
+            this.$var_caller = caller || null;
+            this.$var_method = method || null;
+            this.$var_args = args;
+            this.$var_once = once;
+            return this;
+        };
+        Handler.prototype.run = function () {
+            var id = this.$var_id;
+            var res = this.$var_method.apply(this.$var_caller, this.$var_args);
+            id === this.$var_id && this.$var_once === true && this.recover();
+            return res;
         };
         Handler.prototype.runWith = function (args) {
-            if (this.$args === void 0) {
-                if (args instanceof Array) {
-                    return this.$method.apply(this.$caller, args);
-                }
-                return this.$method.call(this.$caller, args);
+            var id = this.$var_id;
+            var res;
+            if (this.$var_args !== null) {
+                res = this.$var_method.apply(this.$var_caller, this.$var_args.concat(args));
             }
-            return this.$method.apply(this.$caller, this.$args.concat(args));
+            else if (args instanceof Array) {
+                res = this.$var_method.apply(this.$var_caller, args);
+            }
+            else {
+                res = this.$var_method.call(this.$var_caller, args);
+            }
+            id === this.$var_id && this.$var_once === true && this.recover();
+            return res;
+        };
+        Handler.prototype.recover = function () {
+            if (Pool.recover("suncom.Handler", this) === true) {
+                this.$var_id = -1;
+                this.$var_args = null;
+                this.$var_caller = null;
+                this.$var_method = null;
+            }
         };
         Object.defineProperty(Handler.prototype, "caller", {
             get: function () {
-                return this.$caller;
+                return this.$var_caller;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         Object.defineProperty(Handler.prototype, "method", {
             get: function () {
-                return this.$method;
+                return this.$var_method;
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
-        Handler.create = function (caller, method, args) {
-            return new Handler(caller, method, args);
+        Handler.create = function (caller, method, args, once) {
+            var handler = Pool.getItemByClass("suncom.Handler", Handler);
+            handler.$var_id = 0;
+            return handler.setTo(caller, method, args, once);
         };
         return Handler;
     }());
     suncom.Handler = Handler;
     var HashMap = (function () {
         function HashMap(primaryKey) {
+            this.$var_primaryKey = null;
+            this.$var_dataMap = {};
             this.source = [];
-            this.dataMap = {};
+            if (typeof primaryKey === "number") {
+                primaryKey = primaryKey + "";
+            }
             if (typeof primaryKey !== "string") {
                 throw Error("\u975E\u6CD5\u7684\u4E3B\u952E\u5B57\u6BB5\u540D\uFF1A" + primaryKey);
             }
             if (primaryKey.length === 0) {
                 throw Error("\u65E0\u6548\u7684\u4E3B\u952E\u5B57\u6BB5\u540D\u5B57\u957F\u5EA6\uFF1A" + primaryKey.length);
             }
-            this.$primaryKey = primaryKey;
+            this.$var_primaryKey = primaryKey;
         }
-        HashMap.prototype.$removeByIndex = function (index) {
+        HashMap.prototype.$func_removeByIndex = function (index) {
             var data = this.source[index];
             this.source.splice(index, 1);
-            var value = data[this.$primaryKey];
-            delete this.dataMap[value];
+            var value = data[this.$var_primaryKey];
+            delete this.$var_dataMap[value];
             return data;
         };
-        HashMap.prototype.$getIndexByValue = function (key, value) {
+        HashMap.prototype.$func_getIndexByValue = function (key, value) {
             if (value === void 0) {
                 return -1;
             }
@@ -391,48 +453,48 @@ var suncom;
             return -1;
         };
         HashMap.prototype.put = function (data) {
-            var value = data[this.$primaryKey];
-            if (Common.isStringInvalidOrEmpty(value) === true) {
+            var value = data[this.$var_primaryKey];
+            if (Common.isStringNullOrEmpty(value) === true) {
                 throw Error("\u65E0\u6548\u7684\u4E3B\u952E\u7684\u503C\uFF0Ctype:" + typeof value + ", value:" + value);
             }
             if (this.getByPrimaryValue(value) === null) {
                 this.source.push(data);
-                this.dataMap[value] = data;
+                this.$var_dataMap[value] = data;
             }
             else {
-                throw Error("\u91CD\u590D\u7684\u4E3B\u952E\u503C\uFF1A[" + this.$primaryKey + "]" + value);
+                throw Error("\u91CD\u590D\u7684\u4E3B\u952E\u503C\uFF1A[" + this.$var_primaryKey + "]" + value);
             }
             return data;
         };
         HashMap.prototype.getByValue = function (key, value) {
-            if (key === this.$primaryKey) {
+            if (key === this.$var_primaryKey) {
                 return this.getByPrimaryValue(value);
             }
-            var index = this.$getIndexByValue(key, value);
+            var index = this.$func_getIndexByValue(key, value);
             if (index === -1) {
                 return null;
             }
             return this.source[index];
         };
         HashMap.prototype.getByPrimaryValue = function (value) {
-            return this.dataMap[value.toString()] || null;
+            return this.$var_dataMap[value.toString()] || null;
         };
         HashMap.prototype.remove = function (data) {
             var index = this.source.indexOf(data);
             if (index === -1) {
                 return data;
             }
-            return this.$removeByIndex(index);
+            return this.$func_removeByIndex(index);
         };
         HashMap.prototype.removeByValue = function (key, value) {
-            if (key === this.$primaryKey) {
+            if (key === this.$var_primaryKey) {
                 return this.removeByPrimaryValue(value);
             }
-            var index = this.$getIndexByValue(key, value);
+            var index = this.$func_getIndexByValue(key, value);
             if (index === -1) {
                 return null;
             }
-            return this.$removeByIndex(index);
+            return this.$func_removeByIndex(index);
         };
         HashMap.prototype.removeByPrimaryValue = function (value) {
             var data = this.getByPrimaryValue(value);
@@ -459,10 +521,14 @@ var suncom;
             return $hashId;
         }
         Common.createHashId = createHashId;
+        function isNullOrUndefined(value) {
+            return value === void 0 || value === null;
+        }
+        Common.isNullOrUndefined = isNullOrUndefined;
         function getClassName(cls) {
             var classString = cls.toString().trim();
             var index = classString.indexOf("(");
-            return classString.substring(9, index);
+            return cls.name || classString.substring(9, index);
         }
         Common.getClassName = getClassName;
         function getQualifiedClassName(obj) {
@@ -474,13 +540,13 @@ var suncom;
             if (prototype === null) {
                 return type;
             }
-            return Common.getClassName(prototype.constructor);
+            return this.getClassName(prototype.constructor);
         }
         Common.getQualifiedClassName = getQualifiedClassName;
         function getMethodName(method, caller) {
             if (caller === void 0) { caller = null; }
             if (caller === null) {
-                return Common.getClassName(method);
+                return this.getClassName(method);
             }
             for (var key in caller) {
                 if (caller[key] === method) {
@@ -500,85 +566,54 @@ var suncom;
         }
         Common.convertEnumToString = convertEnumToString;
         function trim(str) {
-            if (str === void 0) { str = null; }
-            if (str === null) {
+            if (this.isNullOrUndefined(str) === true) {
                 return null;
             }
             var chrs = ["\r", "\n", "\t", " "];
-            while (str.length > 0) {
-                var length_1 = str.length;
-                for (var i = 0; i < chrs.length; i++) {
-                    var chr = chrs[i];
-                    if (str.charAt(0) === chr) {
-                        str = str.substr(1);
-                        break;
-                    }
-                    var index = str.length - 1;
-                    if (str.charAt(index) === chr) {
-                        str = str.substr(0, index);
-                        break;
-                    }
-                }
-                if (str.length === length_1) {
+            var from = 0;
+            while (from < str.length) {
+                var chr = str.charAt(from);
+                var index = chrs.indexOf(chr);
+                if (index === -1) {
                     break;
                 }
+                from++;
             }
-            return str;
+            var to = str.length - 1;
+            while (to > from) {
+                var chr = str.charAt(to);
+                var index = chrs.indexOf(chr);
+                if (index === -1) {
+                    break;
+                }
+                to--;
+            }
+            return str.substring(from, to + 1);
         }
         Common.trim = trim;
-        function isStringInvalidOrEmpty(str) {
-            if (typeof str === "number") {
-                return false;
+        function isStringNullOrEmpty(value) {
+            if (typeof value === "number") {
+                return isNaN(value);
             }
-            if (typeof str === "string" && str !== "") {
+            if (typeof value === "string" && value !== "") {
                 return false;
             }
             return true;
         }
-        Common.isStringInvalidOrEmpty = isStringInvalidOrEmpty;
+        Common.isStringNullOrEmpty = isStringNullOrEmpty;
         function formatString(str, args) {
-            var signs = ["%d", "%s"];
-            var index = 0;
-            while (args.length > 0) {
-                var key = null;
-                var indexOfReplace = -1;
-                for (var i = 0; i < signs.length; i++) {
-                    var sign = signs[i];
-                    var indexOfSign = str.indexOf(sign, index);
-                    if (indexOfSign === -1) {
-                        continue;
-                    }
-                    if (indexOfReplace === -1 || indexOfSign < indexOfReplace) {
-                        key = sign;
-                        indexOfReplace = indexOfSign;
-                    }
-                }
-                if (indexOfReplace === -1) {
-                    Logger.warn(DebugMode.ANY, "\u5B57\u7B26\u4E32\u66FF\u6362\u672A\u5B8C\u6210 str:" + str);
+            var length = str.length;
+            for (var i = 0; i < args.length; i++) {
+                var flag = "{" + i + "}";
+                var index = str.indexOf(flag, str.length - length);
+                if (index === -1) {
                     break;
                 }
-                var suffix = str.substr(indexOfReplace + key.length);
-                str = str.substr(0, indexOfReplace) + args.shift() + suffix;
-                index = str.length - suffix.length;
+                str = str.substr(0, index) + args[i] + str.substr(index + 3);
             }
             return str;
         }
         Common.formatString = formatString;
-        function formatString$(str, args) {
-            var index = 0;
-            while (args.length > 0) {
-                var indexOfSign = str.indexOf("{$}", index);
-                if (index === -1) {
-                    Logger.warn(DebugMode.ANY, "\u5B57\u7B26\u4E32\u66FF\u6362\u672A\u5B8C\u6210 str:" + str);
-                    break;
-                }
-                var suffix = str.substr(indexOfSign + 3);
-                str = str.substr(0, indexOfSign) + args.shift() + suffix;
-                index = str.length - suffix.length;
-            }
-            return str;
-        }
-        Common.formatString$ = formatString$;
         function convertToDate(date) {
             if (date instanceof Date) {
                 return date;
@@ -605,7 +640,7 @@ var suncom;
         }
         Common.convertToDate = convertToDate;
         function dateAdd(datepart, increment, time) {
-            var date = Common.convertToDate(time);
+            var date = this.convertToDate(time);
             if (datepart === "yy") {
                 date.setFullYear(date.getFullYear() + increment);
             }
@@ -649,8 +684,8 @@ var suncom;
         }
         Common.dateAdd = dateAdd;
         function dateDiff(datepart, date, date2) {
-            var d1 = Common.convertToDate(date);
-            var d2 = Common.convertToDate(date2);
+            var d1 = this.convertToDate(date);
+            var d2 = this.convertToDate(date2);
             var t1 = d1.valueOf();
             var t2 = d2.valueOf();
             if (datepart === "ms") {
@@ -689,7 +724,7 @@ var suncom;
         }
         Common.dateDiff = dateDiff;
         function formatDate(str, time) {
-            var date = Common.convertToDate(time);
+            var date = this.convertToDate(time);
             str = str.replace("MS", ("00" + (date.getMilliseconds()).toString()).substr(-3));
             str = str.replace("ms", (date.getMilliseconds()).toString());
             str = str.replace("yyyy", date.getFullYear().toString());
@@ -711,6 +746,13 @@ var suncom;
             throw Error("未实现的接口！！！");
         }
         Common.md5 = md5;
+        function getQueryString(name, param) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var str = param || window.location.search;
+            var array = str.substr(1).match(reg) || null;
+            return array === null ? null : decodeURIComponent(array[2]);
+        }
+        Common.getQueryString = getQueryString;
         function createHttpSign(params, key, sign) {
             if (sign === void 0) { sign = "sign"; }
             var array = [];
@@ -720,7 +762,7 @@ var suncom;
                 }
             }
             array.push("key=" + key);
-            return Common.md5(array.join("&"));
+            return this.md5(array.join("&"));
         }
         Common.createHttpSign = createHttpSign;
         function getFileName(path) {
@@ -728,7 +770,10 @@ var suncom;
             if (index > -1) {
                 path = path.substr(index + 1);
             }
-            var suffix = Common.getFileExtension(path);
+            var suffix = this.getFileExtension(path);
+            if (suffix === null) {
+                return path;
+            }
             return path.substr(0, path.length - suffix.length - 1);
         }
         Common.getFileName = getFileName;
@@ -748,7 +793,7 @@ var suncom;
             return path.substr(0, index + 1) + newExt;
         }
         Common.replacePathExtension = replacePathExtension;
-        function findFromArray(array, method, out) {
+        function findInArray(array, method, out) {
             if (out === void 0) { out = null; }
             for (var i = 0; i < array.length; i++) {
                 var item = array[i];
@@ -761,7 +806,7 @@ var suncom;
             }
             return null;
         }
-        Common.findFromArray = findFromArray;
+        Common.findInArray = findInArray;
         function removeItemFromArray(item, array) {
             for (var i = 0; i < array.length; i++) {
                 if (array[i] === item) {
@@ -773,16 +818,10 @@ var suncom;
         Common.removeItemFromArray = removeItemFromArray;
         function removeItemsFromArray(items, array) {
             for (var i = 0; i < items.length; i++) {
-                Common.removeItemFromArray(items[i], array);
+                this.removeItemFromArray(items[i], array);
             }
         }
         Common.removeItemsFromArray = removeItemsFromArray;
-        function createPrefab(json) {
-            var prefab = new Laya.Prefab();
-            prefab.json = Laya.loader.getRes(json);
-            return prefab.create();
-        }
-        Common.createPrefab = createPrefab;
         function copy(data, deep) {
             if (deep === void 0) { deep = false; }
             if (data instanceof Array) {
@@ -792,7 +831,7 @@ var suncom;
                 else {
                     var array = [];
                     for (var i = 0; i < data.length; i++) {
-                        array.push(Common.copy(data[i], deep));
+                        array.push(this.copy(data[i], deep));
                     }
                     return array;
                 }
@@ -806,7 +845,7 @@ var suncom;
                 }
                 else {
                     for (var key in data) {
-                        newData[key] = Common.copy(data[key], deep);
+                        newData[key] = this.copy(data[key], deep);
                     }
                 }
                 return newData;
@@ -831,7 +870,7 @@ var suncom;
                     newData[key] = null;
                 }
                 else {
-                    throw Error("\u514B\u9686\u610F\u5916\u7684\u6570\u636E\u7C7B\u578B\uFF1A" + value);
+                    throw Error("克隆意外的数据类型：" + value);
                 }
             }
             return newData;
@@ -852,7 +891,7 @@ var suncom;
                     newData.sort();
                 }
                 for (var i = 0; i < oldData.length; i++) {
-                    if (Common.isEqual(oldData[i], newData[i], strict) === false) {
+                    if (this.isEqual(oldData[i], newData[i], strict) === false) {
                         return false;
                     }
                 }
@@ -863,7 +902,7 @@ var suncom;
                     return false;
                 }
                 for (var key in oldData) {
-                    if (oldData.hasOwnProperty(key) === true && Common.isEqual(oldData[key], newData[key], strict) === false) {
+                    if (oldData.hasOwnProperty(key) === true && this.isEqual(oldData[key], newData[key], strict) === false) {
                         return false;
                     }
                 }
@@ -883,7 +922,7 @@ var suncom;
             if (data instanceof Array) {
                 var array = [];
                 for (var i = 0; i < data.length; i++) {
-                    array.push(Common.toDisplayString(data[i]));
+                    array.push(this.toDisplayString(data[i]));
                 }
                 return "[" + array.join(",") + "]";
             }
@@ -892,7 +931,7 @@ var suncom;
                     str = JSON.stringify(data);
                 }
                 catch (error) {
-                    str = "[" + Common.getQualifiedClassName(data) + "]";
+                    str = "[" + this.getQualifiedClassName(data) + "]";
                 }
             }
             return str;
@@ -900,11 +939,11 @@ var suncom;
         Common.toDisplayString = toDisplayString;
         function compareVersion(ver) {
             if (typeof ver !== "string") {
-                Logger.error(DebugMode.ANY, "\u53C2\u6570\u7248\u672C\u53F7\u65E0\u6548");
+                Logger.error(DebugMode.ANY, "参数版本号无效");
                 return 0;
             }
             if (typeof Global.VERSION !== "string") {
-                Logger.error(DebugMode.ANY, "\u7248\u672C\u53F7\u672A\u8BBE\u7F6E");
+                Logger.error(DebugMode.ANY, "版本号未设置");
                 return 0;
             }
             var array = ver.split(".");
@@ -930,10 +969,10 @@ var suncom;
                 }
             }
             if (error & 0x1) {
-                Logger.error(DebugMode.ANY, "\u53C2\u6570\u7248\u672C\u53F7\u65E0\u6548 ver:" + ver);
+                Logger.error(DebugMode.ANY, "参数版本号无效 " + ("ver:" + ver));
             }
             if (error & 0x2) {
-                Logger.error(DebugMode.ANY, "\u5F53\u524D\u7248\u672C\u53F7\u65E0\u6548 ver:" + Global.VERSION);
+                Logger.error(DebugMode.ANY, "当前版本号无效 " + ("ver:" + Global.VERSION));
             }
             if (error > 0) {
                 return 0;
@@ -957,7 +996,7 @@ var suncom;
         var $id = 0;
         DBService.$table = {};
         function get(name) {
-            return DBService.$table[name.toString()];
+            return DBService.$table[name];
         }
         DBService.get = get;
         function put(name, data) {
@@ -966,17 +1005,19 @@ var suncom;
                 DBService.$table["auto_" + $id] = data;
             }
             else {
-                DBService.$table[name.toString()] = data;
+                DBService.$table[name] = data;
             }
             return data;
         }
         DBService.put = put;
         function exist(name) {
-            return DBService.$table[name.toString()] !== void 0;
+            return DBService.$table[name] !== void 0;
         }
         DBService.exist = exist;
         function drop(name) {
-            delete DBService.$table[name.toString()];
+            var data = DBService.get(name);
+            delete DBService.$table[name];
+            return data;
         }
         DBService.drop = drop;
     })(DBService = suncom.DBService || (suncom.DBService = {}));
@@ -989,6 +1030,7 @@ var suncom;
         Global.width = 1280;
         Global.height = 720;
         Global.VERSION = "1.0.0";
+        Global.dataMap = {};
     })(Global = suncom.Global || (suncom.Global = {}));
     var Logger;
     (function (Logger) {
@@ -1123,33 +1165,6 @@ var suncom;
             return a * 180 / Math.PI;
         }
         Mathf.r2d = r2d;
-        function abs(a) {
-            if (a < 0) {
-                return -a;
-            }
-            else {
-                return a;
-            }
-        }
-        Mathf.abs = abs;
-        function min(a, b) {
-            if (a < b) {
-                return a;
-            }
-            else {
-                return b;
-            }
-        }
-        Mathf.min = min;
-        function max(a, b) {
-            if (a > b) {
-                return a;
-            }
-            else {
-                return b;
-            }
-        }
-        Mathf.max = max;
         function clamp(value, min, max) {
             if (value < min) {
                 return min;
@@ -1239,8 +1254,11 @@ var suncom;
             if (typeof str === "number") {
                 return true;
             }
-            if (typeof str === "string" && isNaN(Number(str)) === false) {
-                return true;
+            if (typeof str === "string") {
+                if (str === "") {
+                    return false;
+                }
+                return isNaN(+str) === false;
             }
             return false;
         }
@@ -1250,8 +1268,8 @@ var suncom;
     (function (Pool) {
         var $pool = {};
         function getItem(sign) {
-            var array = $pool[sign] || null;
-            if (array === null || array.length === 0) {
+            var array = $pool[sign];
+            if (array === void 0 || array.length === 0) {
                 return null;
             }
             var item = array.pop();
@@ -1263,7 +1281,9 @@ var suncom;
             var item = Pool.getItem(sign);
             if (item === null) {
                 if (Laya.Prefab !== void 0 && cls === Laya.Prefab) {
-                    item = Common.createPrefab(args);
+                    var prefab = new Laya.Prefab();
+                    prefab.json = args;
+                    item = prefab.create();
                 }
                 else {
                     item = {};
@@ -1281,16 +1301,17 @@ var suncom;
         Pool.getItemByClass = getItemByClass;
         function recover(sign, item) {
             if (item["__suncom__$__inPool__"] === true) {
-                return;
+                return false;
             }
             item["__suncom__$__inPool__"] = true;
-            var array = $pool[sign] || null;
-            if (array === null) {
+            var array = $pool[sign];
+            if (array === void 0) {
                 $pool[sign] = [item];
             }
             else {
                 array.push(item);
             }
+            return true;
         }
         Pool.recover = recover;
         function clear(sign) {
@@ -1340,21 +1361,22 @@ var suncom;
         Test.expect = expect;
         function notExpected(message) {
             if (Global.debugMode & DebugMode.TEST) {
-                suncom.Test.expect(true).interpret("Test.notExpected \u671F\u671B\u4E4B\u5916\u7684").toBe(false);
+                Test.expect(true).interpret("Test.notExpected \u671F\u671B\u4E4B\u5916\u7684").toBe(false);
             }
         }
         Test.notExpected = notExpected;
         function assertTrue(value, message) {
             if (Global.debugMode & DebugMode.TEST) {
-                suncom.Test.expect(value).interpret(message || "Test.assertTrue error\uFF0C\u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(value)).toBe(true);
+                Test.expect(value).interpret(message || "Test.assertTrue error\uFF0C\u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(value)).toBe(true);
             }
         }
         Test.assertTrue = assertTrue;
         function assertFalse(value, message) {
             if (Global.debugMode & DebugMode.TEST) {
-                suncom.Test.expect(value).interpret(message || "Test.assertFalse error\uFF0C\u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(value)).toBe(false);
+                Test.expect(value).interpret(message || "Test.assertFalse error\uFF0C\u5B9E\u9645\u503C\uFF1A" + Common.toDisplayString(value)).toBe(false);
             }
         }
         Test.assertFalse = assertFalse;
     })(Test = suncom.Test || (suncom.Test = {}));
 })(suncom || (suncom = {}));
+//# sourceMappingURL=suncom.js.map
